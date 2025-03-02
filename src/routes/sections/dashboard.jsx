@@ -53,9 +53,9 @@ export const dashboardRoutes = [
       </AuthGuard>
     ),
     children: [
-      { element: <IndexPage />, },
+      { path: 'analytics', element: <OverviewAnalyticsPage />, index: true },
+      // { element: <IndexPage /> },
       { path: 'ecommerce', element: <OverviewEcommercePage /> },
-      { path: 'analytics', element: <OverviewAnalyticsPage />, index: true  },
       {
         path: 'user',
         children: [
