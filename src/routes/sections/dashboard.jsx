@@ -26,17 +26,11 @@ const InvoiceListPage = lazy(() => import('src/pages/dashboard/invoice/list'));
 const InvoiceDetailsPage = lazy(() => import('src/pages/dashboard/invoice/details'));
 const InvoiceCreatePage = lazy(() => import('src/pages/dashboard/invoice/new'));
 const InvoiceEditPage = lazy(() => import('src/pages/dashboard/invoice/edit'));
-// USER
-const UserProfilePage = lazy(() => import('src/pages/dashboard/user/profile'));
-const UserCardsPage = lazy(() => import('src/pages/dashboard/user/cards'));
+//Manage USER
 const UserListPage = lazy(() => import('src/pages/dashboard/user/list'));
 const UserAccountPage = lazy(() => import('src/pages/dashboard/user/account'));
 const UserCreatePage = lazy(() => import('src/pages/dashboard/user/new'));
 const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
-// APP
-const ChatPage = lazy(() => import('src/pages/dashboard/chat'));
-const MailPage = lazy(() => import('src/pages/dashboard/mail'));
-const CalendarPage = lazy(() => import('src/pages/dashboard/calendar'));
 
 // ----------------------------------------------------------------------
 
@@ -53,16 +47,13 @@ export const dashboardRoutes = [
       </AuthGuard>
     ),
     children: [
-      { path: 'analytics', element: <OverviewAnalyticsPage />, index: true },
+      { element: <OverviewAnalyticsPage />, index: true },
       // { element: <IndexPage /> },
       { path: 'ecommerce', element: <OverviewEcommercePage /> },
       {
         path: 'user',
         children: [
-          { element: <UserProfilePage />, index: true },
-          { path: 'profile', element: <UserProfilePage /> },
-          { path: 'cards', element: <UserCardsPage /> },
-          { path: 'list', element: <UserListPage /> },
+          { path: 'list', element: <UserListPage />, index: true },
           { path: 'new', element: <UserCreatePage /> },
           { path: ':id/edit', element: <UserEditPage /> },
           { path: 'account', element: <UserAccountPage /> },
@@ -96,10 +87,6 @@ export const dashboardRoutes = [
           { path: 'new', element: <InvoiceCreatePage /> },
         ],
       },
-
-      { path: 'mail', element: <MailPage /> },
-      { path: 'chat', element: <ChatPage /> },
-      { path: 'calendar', element: <CalendarPage /> },
     ],
   },
 ];

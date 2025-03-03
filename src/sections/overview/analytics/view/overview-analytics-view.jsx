@@ -2,12 +2,14 @@
 import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 // _mock
 import {
   _analyticTasks,
   _analyticPosts,
   _analyticTraffic,
   _analyticOrderTimeline,
+  _ecommerceLatestProducts,
 } from 'src/_mock';
 // components
 import { useSettingsContext } from 'src/components/settings';
@@ -21,11 +23,16 @@ import AnalyticsWidgetSummary from '../analytics-widget-summary';
 import AnalyticsTrafficBySite from '../analytics-traffic-by-site';
 import AnalyticsCurrentSubject from '../analytics-current-subject';
 import AnalyticsConversionRates from '../analytics-conversion-rates';
+import EcommerceLatestProducts from '../../e-commerce/ecommerce-latest-products';
+import EcommerceWidgetSummary from '../../e-commerce/ecommerce-widget-summary';
+import EcommerceSaleByGender from '../../e-commerce/ecommerce-sale-by-gender';
+import EcommerceYearlySales from '../../e-commerce/ecommerce-yearly-sales';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
+  const theme = useTheme();
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -65,14 +72,49 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid xs={12} md={4}>
+          <EcommerceWidgetSummary
+            title="Product Sold"
+            percent={2.6}
+            total={765}
+            chart={{
+              series: [22, 8, 35, 50, 82, 84, 77, 12, 87, 43],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} md={4}>
+          <EcommerceWidgetSummary
+            title="Total Balance"
+            percent={-0.1}
+            total={18765}
+            chart={{
+              colors: [theme.palette.info.light, theme.palette.info.main],
+              series: [56, 47, 40, 62, 73, 30, 23, 54, 67, 68],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} md={4}>
+          <EcommerceWidgetSummary
+            title="Sales Profit"
+            percent={0.6}
+            total={4876}
+            chart={{
+              colors: [theme.palette.warning.light, theme.palette.warning.main],
+              series: [40, 70, 75, 70, 50, 28, 7, 64, 38, 27],
+            }}
+          />
+        </Grid>
+
+        {/* <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Bug Reports"
             total={234}
             color="error"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
-        </Grid>
+        </Grid> */}
 
         <Grid xs={12} md={6} lg={8}>
           <AnalyticsWebsiteVisits
@@ -116,69 +158,76 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
+        {/* <Grid xs={12} md={6} lg={4}>
+          <AnalyticsOrderTimeline title="Order Timeline" list={_analyticOrderTimeline} />
+        </Grid> */}
+
         <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentVisits
-            title="Current Visits"
+          <EcommerceLatestProducts title="Latest Products" list={_ecommerceLatestProducts} />
+        </Grid>
+
+        <Grid xs={12} md={6} lg={4}>
+          <EcommerceSaleByGender
+            title="Sale By Gender"
+            total={2324}
             chart={{
               series: [
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
+                { label: 'Mens', value: 44 },
+                { label: 'Womens', value: 75 },
               ],
             }}
           />
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>
-          <AnalyticsConversionRates
-            title="Conversion Rates"
+          <EcommerceYearlySales
+            title="Yearly Sales"
             subheader="(+43%) than last year"
             chart={{
+              categories: [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
               series: [
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
+                {
+                  year: '2019',
+                  data: [
+                    {
+                      name: 'Total Income',
+                      data: [10, 41, 35, 51, 49, 62, 69, 91, 148, 35, 51, 49],
+                    },
+                    {
+                      name: 'Total Expenses',
+                      data: [10, 34, 13, 56, 77, 88, 99, 77, 45, 13, 56, 77],
+                    },
+                  ],
+                },
+                {
+                  year: '2020',
+                  data: [
+                    {
+                      name: 'Total Income',
+                      data: [51, 35, 41, 10, 91, 69, 62, 148, 91, 69, 62, 49],
+                    },
+                    {
+                      name: 'Total Expenses',
+                      data: [56, 13, 34, 10, 77, 99, 88, 45, 77, 99, 88, 77],
+                    },
+                  ],
+                },
               ],
             }}
           />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentSubject
-            title="Current Subject"
-            chart={{
-              categories: ['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math'],
-              series: [
-                { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-                { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-                { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
-              ],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={8}>
-          <AnalyticsNews title="News" list={_analyticPosts} />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsOrderTimeline title="Order Timeline" list={_analyticOrderTimeline} />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsTrafficBySite title="Traffic by Site" list={_analyticTraffic} />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={8}>
-          <AnalyticsTasks title="Tasks" list={_analyticTasks} />
         </Grid>
       </Grid>
     </Container>

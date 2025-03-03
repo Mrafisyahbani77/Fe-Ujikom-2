@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
 // routes
 import { paths } from 'src/routes/paths';
-// locales
-import { useLocales } from 'src/locales';
 // components
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -48,122 +46,110 @@ const ICONS = {
 // ----------------------------------------------------------------------
 
 export function useNavData() {
-  const { t } = useLocales();
+  const data = useMemo(() => [
+    // OVERVIEW
+    // ----------------------------------------------------------------------
+    {
+      subheader: 'overview',
+      items: [
+        {
+          title: 'analytics',
+          path: paths.dashboard.root,
+          icon: ICONS.analytics,
+        },
+        // {
+        //   title: 'ecommerce',
+        //   path: paths.dashboard.general.ecommerce,
+        //   icon: ICONS.ecommerce,
+        // },
+      ],
+    },
 
-  const data = useMemo(
-    () => [
-      // OVERVIEW
-      // ----------------------------------------------------------------------
-      {
-        subheader: t('overview'),
-        items: [
-          {
-            title: t('analytics'),
-            path: paths.dashboard.general.analytics,
-            icon: ICONS.analytics,
-          },
-          // {
-          //   title: t('app'),
-          //   path: paths.dashboard.root,
-          //   icon: ICONS.dashboard,
-          // },
-          {
-            title: t('ecommerce'),
-            path: paths.dashboard.general.ecommerce,
-            icon: ICONS.ecommerce,
-          },
-        ],
-      },
+    // MANAGEMENT
+    // ----------------------------------------------------------------------
+    {
+      subheader: 'management',
+      items: [
+        // USER
+        {
+          title: 'user',
+          path: paths.dashboard.user.root,
+          icon: ICONS.user,
+          children: [
+            { title: 'list', path: paths.dashboard.user.list },
+            { title: 'create', path: paths.dashboard.user.new },
+            { title: 'edit', path: paths.dashboard.user.demo.edit },
+            // { title: 'account', path: paths.dashboard.user.account },
+          ],
+        },
 
-      // MANAGEMENT
-      // ----------------------------------------------------------------------
-      {
-        subheader: t('management'),
-        items: [
-          // USER
-          {
-            title: t('user'),
-            path: paths.dashboard.user.root,
-            icon: ICONS.user,
-            children: [
-              { title: t('profile'), path: paths.dashboard.user.root },
-              { title: t('cards'), path: paths.dashboard.user.cards },
-              { title: t('list'), path: paths.dashboard.user.list },
-              { title: t('create'), path: paths.dashboard.user.new },
-              { title: t('edit'), path: paths.dashboard.user.demo.edit },
-              { title: t('account'), path: paths.dashboard.user.account },
-            ],
-          },
+        // PRODUCT
+        {
+          title: 'product',
+          path: paths.dashboard.product.root,
+          icon: ICONS.product,
+          children: [
+            { title: 'list', path: paths.dashboard.product.root },
+            {
+              title: 'details',
+              path: paths.dashboard.product.demo.details,
+            },
+            { title: 'create', path: paths.dashboard.product.new },
+            { title: 'edit', path: paths.dashboard.product.demo.edit },
+          ],
+        },
 
-          // PRODUCT
-          {
-            title: t('product'),
-            path: paths.dashboard.product.root,
-            icon: ICONS.product,
-            children: [
-              { title: t('list'), path: paths.dashboard.product.root },
-              {
-                title: t('details'),
-                path: paths.dashboard.product.demo.details,
-              },
-              { title: t('create'), path: paths.dashboard.product.new },
-              { title: t('edit'), path: paths.dashboard.product.demo.edit },
-            ],
-          },
+        // ORDER
+        {
+          title: 'order',
+          path: paths.dashboard.order.root,
+          icon: ICONS.order,
+          children: [
+            { title: 'list', path: paths.dashboard.order.root },
+            { title: 'details', path: paths.dashboard.order.demo.details },
+          ],
+        },
 
-          // ORDER
-          {
-            title: t('order'),
-            path: paths.dashboard.order.root,
-            icon: ICONS.order,
-            children: [
-              { title: t('list'), path: paths.dashboard.order.root },
-              { title: t('details'), path: paths.dashboard.order.demo.details },
-            ],
-          },
+        // INVOICE
+        {
+          title: 'invoice',
+          path: paths.dashboard.invoice.root,
+          icon: ICONS.invoice,
+          children: [
+            { title: 'list', path: paths.dashboard.invoice.root },
+            {
+              title: 'details',
+              path: paths.dashboard.invoice.demo.details,
+            },
+            { title: 'create', path: paths.dashboard.invoice.new },
+            { title: 'edit', path: paths.dashboard.invoice.demo.edit },
+          ],
+        },
 
-          // INVOICE
-          {
-            title: t('invoice'),
-            path: paths.dashboard.invoice.root,
-            icon: ICONS.invoice,
-            children: [
-              { title: t('list'), path: paths.dashboard.invoice.root },
-              {
-                title: t('details'),
-                path: paths.dashboard.invoice.demo.details,
-              },
-              { title: t('create'), path: paths.dashboard.invoice.new },
-              { title: t('edit'), path: paths.dashboard.invoice.demo.edit },
-            ],
-          },
+        // // MAIL
+        // {
+        //   title: 'mail',
+        //   path: paths.dashboard.mail,
+        //   icon: ICONS.mail,
+        //   info: <Label color="error">+32</Label>,
+        // },
 
-          // MAIL
-          {
-            title: t('mail'),
-            path: paths.dashboard.mail,
-            icon: ICONS.mail,
-            info: <Label color="error">+32</Label>,
-          },
+        // // CHAT
+        // {
+        //   title: 'chat',
+        //   path: paths.dashboard.chat,
+        //   icon: ICONS.chat,
+        // },
 
-          // CHAT
-          {
-            title: t('chat'),
-            path: paths.dashboard.chat,
-            icon: ICONS.chat,
-          },
-
-          // CALENDAR
-          {
-            title: t('calendar'),
-            path: paths.dashboard.calendar,
-            icon: ICONS.calendar,
-          },
-        ],
-      },
-    ],
-    [t]
-  );
+        // CALENDAR
+        // {
+        //   title: 'calendar',
+        //   path: paths.dashboard.calendar,
+        //   icon: ICONS.calendar,
+        // },
+      ],
+    },
+  ]);
 
   return data;
 }

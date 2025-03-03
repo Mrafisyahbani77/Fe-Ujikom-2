@@ -2,15 +2,8 @@ import PropTypes from 'prop-types';
 // @mui
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-// auth
-import { useAuthContext } from 'src/auth/hooks';
-// routes
-import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
 // hooks
 import { useResponsive } from 'src/hooks/use-responsive';
 // theme
@@ -21,7 +14,6 @@ import Logo from 'src/components/logo';
 // ----------------------------------------------------------------------
 
 export default function AuthClassicLayout({ children, image, title }) {
-  const { method } = useAuthContext();
 
   const theme = useTheme();
 
@@ -67,9 +59,9 @@ export default function AuthClassicLayout({ children, image, title }) {
         }),
       }}
     >
-      <Typography variant="h3" sx={{ maxWidth: 480, textAlign: 'center' }}>
+      {/* <Typography variant="h3" sx={{ maxWidth: 480, textAlign: 'center' }}>
         {title || 'Hi, Welcome back'}
-      </Typography>
+      </Typography> */}
 
       <Box
         component="img"

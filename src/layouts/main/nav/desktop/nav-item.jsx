@@ -11,12 +11,13 @@ import { RouterLink } from 'src/routes/components';
 import Iconify from 'src/components/iconify';
 //
 import { ListItem } from './styles';
+import { ListItemIcon, ListItemText } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export const NavItem = forwardRef(
   ({ item, open, offsetTop, active, subItem, externalLink, ...other }, ref) => {
-    const { title, path, children } = item;
+    const { title, path, children, icon } = item;
 
     const renderContent = (
       <ListItem
@@ -28,8 +29,8 @@ export const NavItem = forwardRef(
         open={open}
         {...other}
       >
-        {title}
-
+        <ListItemIcon> {icon} </ListItemIcon>
+        <ListItemText disableTypography primary={title} />
         {!!children && <Iconify width={16} icon="eva:arrow-ios-downward-fill" sx={{ ml: 1 }} />}
       </ListItem>
     );

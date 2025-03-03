@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 // utils
 import { fetcher, endpoints } from 'src/utils/axios';
@@ -8,17 +8,20 @@ import { fetcher, endpoints } from 'src/utils/axios';
 export function useGetProducts() {
   const URL = endpoints.product.list;
 
-  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+  const { data, isLoading, error, isFetching } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => fetcher(URL),
+  });
 
   const memoizedValue = useMemo(
     () => ({
       products: data?.products || [],
       productsLoading: isLoading,
       productsError: error,
-      productsValidating: isValidating,
-      productsEmpty: !isLoading && !data?.products.length,
+      productsFetching: isFetching,
+      productsEmpty: !isLoading && !data?.products?.length,
     }),
-    [data?.products, error, isLoading, isValidating]
+    [data?.products, error, isLoading, isFetching]
   );
 
   return memoizedValue;
@@ -27,18 +30,22 @@ export function useGetProducts() {
 // ----------------------------------------------------------------------
 
 export function useGetProduct(productId) {
-  const URL = productId ? [endpoints.product.details, { params: { productId } }] : null;
+  const URL = productId ? `${endpoints.product.details}?productId=${productId}` : null;
 
-  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+  const { data, isLoading, error, isFetching } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: () => (productId ? fetcher(URL) : Promise.resolve(null)),
+    enabled: !!productId, // Query hanya berjalan jika productId ada
+  });
 
   const memoizedValue = useMemo(
     () => ({
       product: data?.product,
       productLoading: isLoading,
       productError: error,
-      productValidating: isValidating,
+      productFetching: isFetching,
     }),
-    [data?.product, error, isLoading, isValidating]
+    [data?.product, error, isLoading, isFetching]
   );
 
   return memoizedValue;
@@ -47,9 +54,12 @@ export function useGetProduct(productId) {
 // ----------------------------------------------------------------------
 
 export function useSearchProducts(query) {
-  const URL = query ? [endpoints.product.search, { params: { query } }] : null;
+  const URL = query ? `${endpoints.product.search}?query=${query}` : null;
 
-  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher, {
+  const { data, isLoading, error, isFetching } = useQuery({
+    queryKey: ['searchProducts', query],
+    queryFn: () => (query ? fetcher(URL) : Promise.resolve(null)),
+    enabled: !!query, // Query hanya berjalan jika query ada
     keepPreviousData: true,
   });
 
@@ -58,10 +68,10 @@ export function useSearchProducts(query) {
       searchResults: data?.results || [],
       searchLoading: isLoading,
       searchError: error,
-      searchValidating: isValidating,
-      searchEmpty: !isLoading && !data?.results.length,
+      searchFetching: isFetching,
+      searchEmpty: !isLoading && !data?.results?.length,
     }),
-    [data?.results, error, isLoading, isValidating]
+    [data?.results, error, isLoading, isFetching]
   );
 
   return memoizedValue;

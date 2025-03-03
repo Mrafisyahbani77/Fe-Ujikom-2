@@ -17,9 +17,6 @@ const ROOTS = {
 // ----------------------------------------------------------------------
 
 export const paths = {
-  comingSoon: '/coming-soon',
-  maintenance: '/maintenance',
-  pricing: '/pricing',
   payment: '/payment',
   about: '/about-us',
   contact: '/contact-us',
@@ -76,9 +73,6 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
-    mail: `${ROOTS.DASHBOARD}/mail`,
-    chat: `${ROOTS.DASHBOARD}/chat`,
-    calendar: `${ROOTS.DASHBOARD}/calendar`,
     general: {
       app: `${ROOTS.DASHBOARD}/app`,
       ecommerce: `${ROOTS.DASHBOARD}/ecommerce`,

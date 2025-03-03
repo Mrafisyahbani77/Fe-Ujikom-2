@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 // locales
-import { useLocales } from 'src/locales';
+// import { useLocales } from 'src/locales';
 // components
 import { useSettingsContext } from 'src/components/settings';
 // system
@@ -23,7 +23,7 @@ import RTL, { direction } from './options/right-to-left';
 // ----------------------------------------------------------------------
 
 export default function ThemeProvider({ children }) {
-  const { currentLang } = useLocales();
+  // const { currentLang } = useLocales();
 
   const settings = useSettingsContext();
 
@@ -67,10 +67,7 @@ export default function ThemeProvider({ children }) {
 
   theme.components = merge(componentsOverrides(theme), contrastOption.components);
 
-  const themeWithLocale = useMemo(
-    () => createTheme(theme, currentLang.systemValue),
-    [currentLang.systemValue, theme]
-  );
+  const themeWithLocale = useMemo(() => createTheme(theme), [theme]);
 
   return (
     <MuiThemeProvider theme={themeWithLocale}>

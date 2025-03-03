@@ -1,6 +1,3 @@
-// i18n
-import 'src/locales/i18n';
-
 // scrollbar
 import 'simplebar-react/dist/simplebar.min.css';
 
@@ -28,8 +25,6 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import Router from 'src/routes/sections';
 // theme
 import ThemeProvider from 'src/theme';
-// locales
-import { LocalizationProvider } from 'src/locales';
 // hooks
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 // components
@@ -44,52 +39,69 @@ import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
 // import { AuthProvider, AuthConsumer } from 'src/auth/context/auth0';
 // import { AuthProvider, AuthConsumer } from 'src/auth/context/amplify';
 // import { AuthProvider, AuthConsumer } from 'src/auth/context/firebase';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import LocalizationProvider from './layouts/localization-provider';
 
 // ----------------------------------------------------------------------
 
 export default function App() {
-  const charAt = `
+  // const charAt = `
 
-  ░░░    ░░░
-  ▒▒▒▒  ▒▒▒▒
-  ▒▒ ▒▒▒▒ ▒▒
-  ▓▓  ▓▓  ▓▓
-  ██      ██
+  // ░░░    ░░░
+  // ▒▒▒▒  ▒▒▒▒
+  // ▒▒ ▒▒▒▒ ▒▒
+  // ▓▓  ▓▓  ▓▓
+  // ██      ██
 
-  `;
+  // `;
 
-  console.info(`%c${charAt}`, 'color: #5BE49B');
+  // console.info(`%c${charAt}`, 'color: #5BE49B');
 
   useScrollToTop();
 
+  const queryClient = useMemo(() => {
+    return new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnWindowFocus: false,
+          refetchOnReconnect: true,
+          suspense: true,
+        },
+      },
+    });
+  }, []);
+
   return (
-    <AuthProvider>
-      <LocalizationProvider>
-        <SettingsProvider
-          defaultSettings={{
-            themeMode: 'light', // 'light' | 'dark'
-            themeDirection: 'ltr', //  'rtl' | 'ltr'
-            themeContrast: 'default', // 'default' | 'bold'
-            themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
-            themeColorPresets: 'default', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
-            themeStretch: false,
-          }}
-        >
-          <ThemeProvider>
-            <MotionLazy>
-              <SnackbarProvider>
-                <CheckoutProvider>
-                  <SettingsDrawer />
-                  <ProgressBar />
-                  <AuthConsumer>
-                    <Router />
-                  </AuthConsumer>
-                </CheckoutProvider>
-              </SnackbarProvider>
-            </MotionLazy>
-          </ThemeProvider>
-        </SettingsProvider>
-      </LocalizationProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <LocalizationProvider>
+          <SettingsProvider
+            defaultSettings={{
+              themeMode: 'light', // 'light' | 'dark'
+              themeDirection: 'ltr', //  'rtl' | 'ltr'
+              themeContrast: 'default', // 'default' | 'bold'
+              themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
+              themeColorPresets: 'default', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
+              themeStretch: false,
+            }}
+          >
+            <ThemeProvider>
+              <MotionLazy>
+                <SnackbarProvider>
+                  <CheckoutProvider>
+                    <SettingsDrawer />
+                    <ProgressBar />
+                    <AuthConsumer>
+                      <Router />
+                    </AuthConsumer>
+                  </CheckoutProvider>
+                </SnackbarProvider>
+              </MotionLazy>
+            </ThemeProvider>
+          </SettingsProvider>
+        </LocalizationProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

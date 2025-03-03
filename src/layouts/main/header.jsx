@@ -1,7 +1,6 @@
 // @mui
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
@@ -17,14 +16,15 @@ import { bgBlur } from 'src/theme/css';
 import { paths } from 'src/routes/paths';
 // components
 import Logo from 'src/components/logo';
-import Label from 'src/components/label';
 //
 import { HEADER } from '../config-layout';
 import { navConfig } from './config-navigation';
 import NavMobile from './nav/mobile';
 import NavDesktop from './nav/desktop';
 //
-import { SettingsButton, HeaderShadow, LoginButton } from '../_common';
+import { SettingsButton, HeaderShadow} from '../_common';
+import { RouterLink } from 'src/routes/components';
+import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -66,19 +66,6 @@ export default function Header() {
                 right: -16,
               },
             }}
-            badgeContent={
-              <Link
-                href={paths.changelog}
-                target="_blank"
-                rel="noopener"
-                underline="none"
-                sx={{ ml: 1 }}
-              >
-                <Label color="info" sx={{ textTransform: 'unset', height: 22, px: 0.5 }}>
-                  v5.4.0
-                </Label>
-              </Link>
-            }
           >
             <Logo />
           </Badge>
@@ -88,8 +75,14 @@ export default function Header() {
           {mdUp && <NavDesktop offsetTop={offsetTop} data={navConfig} />}
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
-            {mdUp && <LoginButton />}
-
+            <Button
+              component={RouterLink}
+              href={paths.dashboard.user.new}
+              variant="outlined"
+            
+            >
+              Login
+            </Button>
             <SettingsButton
               sx={{
                 ml: { xs: 1, md: 0 },

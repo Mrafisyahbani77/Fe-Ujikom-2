@@ -135,9 +135,9 @@ export default function JwtLoginView() {
     <FormProvider methods={methods} onSubmit={onSubmit}>
       {renderHead}
 
-      <Alert severity="info" sx={{ mb: 3 }}>
+      {/* <Alert severity="info" sx={{ mb: 3 }}>
         Use email : <strong>demo@minimals.cc</strong> / password :<strong> demo1234</strong>
-      </Alert>
+      </Alert> */}
 
       {renderForm}
     </FormProvider>
