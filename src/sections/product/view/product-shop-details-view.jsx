@@ -88,10 +88,6 @@ export default function ProductShopDetailsView({ id }) {
       <CustomBreadcrumbs
         links={[
           { name: 'Home', href: '/' },
-          {
-            name: 'Shop',
-            href: paths.product.root,
-          },
           { name: product?.name },
         ]}
         sx={{ mb: 5 }}
@@ -183,7 +179,7 @@ export default function ProductShopDetailsView({ id }) {
         mb: 15,
       }}
     >
-      <CartIcon totalItems={checkout.totalItems} />
+      {/* <CartIcon totalItems={checkout.totalItems} /> */}
 
       {productLoading && renderSkeleton}
 

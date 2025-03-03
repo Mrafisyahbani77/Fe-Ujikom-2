@@ -16,24 +16,24 @@ export default function CartIcon({ totalItems }) {
       component={RouterLink}
       href={paths.product.checkout}
       sx={{
-        right: 0,
-        top: 112,
+        position: 'fixed',
+        right: 16,
+        bottom: 16,
         zIndex: 999,
         display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         cursor: 'pointer',
-        position: 'fixed',
-        color: 'text.primary',
-        borderTopLeftRadius: 16,
-        borderBottomLeftRadius: 16,
+        borderRadius: '50%',
         bgcolor: 'background.paper',
-        padding: (theme) => theme.spacing(1, 3, 1, 2),
+        padding: 1.5,
         boxShadow: (theme) => theme.customShadows.dropdown,
         transition: (theme) => theme.transitions.create(['opacity']),
         '&:hover': { opacity: 0.72 },
       }}
     >
       <Badge showZero badgeContent={totalItems} color="error" max={99}>
-        <Iconify icon="solar:cart-3-bold" width={24} />
+        <Iconify icon="solar:cart-3-bold" width={32} />
       </Badge>
     </Box>
   );

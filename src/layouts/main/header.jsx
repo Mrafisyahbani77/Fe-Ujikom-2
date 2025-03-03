@@ -18,11 +18,11 @@ import { paths } from 'src/routes/paths';
 import Logo from 'src/components/logo';
 //
 import { HEADER } from '../config-layout';
-import { navConfig } from './config-navigation';
 import NavMobile from './nav/mobile';
 import NavDesktop from './nav/desktop';
+import navConfig from './config-navigation';
 //
-import { SettingsButton, HeaderShadow} from '../_common';
+import { SettingsButton, HeaderShadow } from '../_common';
 import { RouterLink } from 'src/routes/components';
 import Iconify from 'src/components/iconify';
 
@@ -30,6 +30,7 @@ import Iconify from 'src/components/iconify';
 
 export default function Header() {
   const theme = useTheme();
+  const data = navConfig();
 
   const mdUp = useResponsive('up', 'md');
 
@@ -72,15 +73,10 @@ export default function Header() {
 
           <Box sx={{ flexGrow: 1 }} />
 
-          {mdUp && <NavDesktop offsetTop={offsetTop} data={navConfig} />}
+          {mdUp && <NavDesktop offsetTop={offsetTop} data={data} />}
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
-            <Button
-              component={RouterLink}
-              href={paths.dashboard.user.new}
-              variant="outlined"
-            
-            >
+            <Button component={RouterLink} href={paths.dashboard.user.new} variant="outlined">
               Login
             </Button>
             <SettingsButton
@@ -90,7 +86,7 @@ export default function Header() {
               }}
             />
 
-            {!mdUp && <NavMobile offsetTop={offsetTop} data={navConfig} />}
+            {!mdUp && <NavMobile offsetTop={offsetTop} data={data} />}
           </Stack>
         </Container>
       </Toolbar>

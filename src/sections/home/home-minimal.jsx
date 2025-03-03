@@ -1,106 +1,49 @@
 import { m } from 'framer-motion';
-// @mui
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-// components
+import Image from 'src/components/image';
 import { MotionViewport, varFade } from 'src/components/animate';
 
-// ----------------------------------------------------------------------
-
-const CARDS = [
-  {
-    icon: ' /assets/icons/home/ic_make_brand.svg',
-    title: 'Branding',
-    description: 'Consistent design makes it easy to brand your own.',
-  },
-  {
-    icon: ' /assets/icons/home/ic_design.svg',
-    title: 'UI & UX Design',
-    description:
-      'The kit is built on the principles of the atomic design system. It helps you to create projects fastest and easily customized packages for your projects.',
-  },
-  {
-    icon: ' /assets/icons/home/ic_development.svg',
-    title: 'Development',
-    description: 'Easy to customize and extend, saving you time and money.',
-  },
+// Data kategori sepatu
+const SHOES_CATEGORIES = [
+  { id: 1, name: 'Sneakers', image: '/assets/images/categories/sneakers.png' },
+  { id: 2, name: 'Running', image: '/assets/images/categories/running.png' },
+  { id: 3, name: 'Formal', image: '/assets/images/categories/formal.png' },
+  { id: 4, name: 'Boots', image: '/assets/images/categories/boots.png' },
+  { id: 5, name: 'Loafers', image: '/assets/images/categories/loafers.png' },
+  { id: 6, name: 'Slip-on', image: '/assets/images/categories/slip_on.png' },
 ];
 
-// ----------------------------------------------------------------------
-
-export default function HomeMinimal() {
+export default function ShoesCategories() {
   return (
-    <Container
-      component={MotionViewport}
-      sx={{
-        py: { xs: 10, md: 15 },
-      }}
-    >
-      <Stack
-        spacing={3}
-        sx={{
-          textAlign: 'center',
-          mb: { xs: 5, md: 10 },
-        }}
-      >
+    <Container component={MotionViewport} sx={{ py: { xs: 5, md: 10 } }}>
+      <Stack spacing={3} sx={{ mb: { xs: 5, md: 10 } }}>
         <m.div variants={varFade().inUp}>
-          <Typography component="div" variant="overline" sx={{ color: 'text.disabled' }}>
-            Minimal UI
-          </Typography>
-        </m.div>
-
-        <m.div variants={varFade().inDown}>
-          <Typography variant="h2">
-            What Minimal <br /> helps you?
+          <Typography component="div" variant="h2" sx={{ color: 'text.disabled' }}>
+            Kategori
           </Typography>
         </m.div>
       </Stack>
 
+      {/* Grid kategori sepatu */}
       <Box
-        gap={{ xs: 3, lg: 10 }}
+        gap={3}
         display="grid"
-        alignItems="center"
-        gridTemplateColumns={{
-          xs: 'repeat(1, 1fr)',
-          md: 'repeat(3, 1fr)',
-        }}
+        gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' }}
       >
-        {CARDS.map((card, index) => (
-          <m.div variants={varFade().inUp} key={card.title}>
-            <Card
-              sx={{
-                textAlign: 'center',
-                boxShadow: { md: 'none' },
-                bgcolor: 'background.default',
-                p: (theme) => theme.spacing(10, 5),
-                ...(index === 1 && {
-                  boxShadow: (theme) => ({
-                    md: `-40px 40px 80px ${
-                      theme.palette.mode === 'light'
-                        ? alpha(theme.palette.grey[500], 0.16)
-                        : alpha(theme.palette.common.black, 0.4)
-                    }`,
-                  }),
-                }),
-              }}
-            >
-              <Box
-                component="img"
-                src={card.icon}
-                alt={card.title}
-                sx={{ mx: 'auto', width: 48, height: 48 }}
+        {SHOES_CATEGORIES.map((category) => (
+          <m.div key={category.id} variants={varFade().inUp}>
+            <Stack alignItems="center" spacing={1}>
+              <Image
+                src={category.image}
+                alt={category.name}
+                sx={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
               />
-
-              <Typography variant="h5" sx={{ mt: 8, mb: 2 }}>
-                {card.title}
-              </Typography>
-
-              <Typography sx={{ color: 'text.secondary' }}>{card.description}</Typography>
-            </Card>
+              <Typography variant="subtitle1">{category.name}</Typography>
+            </Stack>
           </m.div>
         ))}
       </Box>

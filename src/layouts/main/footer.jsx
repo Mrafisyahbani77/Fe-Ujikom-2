@@ -22,23 +22,30 @@ import Iconify from 'src/components/iconify';
 
 const LINKS = [
   {
-    headline: 'Minimal',
+    headline: 'Shop',
     children: [
-      { name: 'About us', href: paths.about },
-      { name: 'Contact us', href: paths.contact },
+      { name: 'Men', href: '#' },
+      { name: 'Women', href: '#' },
+      { name: 'Kids', href: '#' },
+      { name: 'New Arrivals', href: '#' },
+      { name: 'Best Sellers', href: '#' },
+    ],
+  },
+  {
+    headline: 'Company',
+    children: [
+      { name: 'About Us', href: paths.about },
+      { name: 'Contact Us', href: paths.contact },
+      { name: 'Careers', href: '#' },
+    ],
+  },
+  {
+    headline: 'Support',
+    children: [
       { name: 'FAQs', href: paths.faqs },
+      { name: 'Shipping & Returns', href: '#' },
+      { name: 'Size Guide', href: '#' },
     ],
-  },
-  {
-    headline: 'Legal',
-    children: [
-      { name: 'Terms and Condition', href: '#' },
-      { name: 'Privacy Policy', href: '#' },
-    ],
-  },
-  {
-    headline: 'Contact',
-    children: [{ name: 'support@minimals.cc', href: '#' }],
   },
 ];
 
@@ -105,8 +112,8 @@ export default function Footer() {
                 mx: { xs: 'auto', md: 'unset' },
               }}
             >
-              The starting point for your next project with Minimal UI Kit, built on the newest
-              version of Material-UI ©, ready to be customized to your style.
+              Step into style with our premium shoes collection. Find the perfect fit for any
+              occasion.
             </Typography>
 
             <Stack
@@ -162,8 +169,8 @@ export default function Footer() {
           </Grid>
         </Grid>
 
-        <Typography variant="body2" sx={{ mt: 10 }}>
-          © 2021. All rights reserved
+        <Typography variant="body2" sx={{ mt: 10, textAlign: 'center' }}>
+          © {new Date().getFullYear()} Lorem inpsum dolor
         </Typography>
       </Container>
     </Box>

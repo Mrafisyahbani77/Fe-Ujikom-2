@@ -151,16 +151,16 @@ export default function ProductShopView() {
         mb: 15,
       }}
     >
-      <CartIcon totalItems={checkout.totalItems} />
+      {/* <CartIcon totalItems={checkout.totalItems} /> */}
 
-      <Typography
+      {/* <Typography
         variant="h4"
         sx={{
           my: { xs: 3, md: 5 },
         }}
       >
         Shop
-      </Typography>
+      </Typography> */}
 
       <Stack
         spacing={2.5}
