@@ -16,7 +16,6 @@ const Page404 = lazy(() => import('src/pages/404'));
 const FaqsPage = lazy(() => import('src/pages/faqs'));
 const AboutPage = lazy(() => import('src/pages/about-us'));
 const ContactPage = lazy(() => import('src/pages/contact-us'));
-const PricingPage = lazy(() => import('src/pages/pricing'));
 const PaymentPage = lazy(() => import('src/pages/payment'));
 // PRODUCT
 const ProductListPage = lazy(() => import('src/pages/product/list'));
