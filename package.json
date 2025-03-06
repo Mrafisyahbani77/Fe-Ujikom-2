@@ -1,6 +1,6 @@
 {
-  "name": "@minimal-kit/vite-js",
-  "author": "Minimals",
+  "name": "@barangin/vite-js",
+  "author": "Barangin",
   "version": "5.4.0",
   "description": "Vite & JavaScript",
   "private": true,
