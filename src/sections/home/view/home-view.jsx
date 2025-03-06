@@ -39,7 +39,7 @@ export default function HomeView() {
 
   return (
     <>
-      <ScrollProgress scrollYProgress={scrollYProgress} />
+      {/* <ScrollProgress scrollYProgress={scrollYProgress} /> */}
       <HomeHero />
 
       <Box
@@ -53,7 +53,7 @@ export default function HomeView() {
 
         <ProductShopView />
 
-        <HomeAdvertisement />
+        {/* <HomeAdvertisement /> */}
       </Box>
       {/* <Box sx={{ mt: 10 }}>
         <ProductListPage />

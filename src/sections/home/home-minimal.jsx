@@ -32,6 +32,14 @@ export default function ShoesCategories() {
       <Box
         gap={3}
         display="grid"
+        sx={{
+          display: 'flex',
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
+          gap: 7,
+          pb: 1,
+          '&::-webkit-scrollbar': { display: 'none' },
+        }}
         gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' }}
       >
         {SHOES_CATEGORIES.map((category) => (
