@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { register } from 'numeral';
 // config
 import { HOST_API } from 'src/config-global';
 
@@ -34,6 +35,21 @@ export const endpoints = {
     login: '/api/auth/login',
     register: '/api/auth/register',
   },
+  // auth: {
+  //   login: '/api/auth/login',
+  //   register: '/api/auth/register',
+  //   logout: '/api/auth/logout',
+  //   refreshToken: '/api/auth/refresh-token',
+  //   google: '/api/auth/google',
+  //   googleCallback: 'api/auth/google/callback',
+  // },
+  // banner: {
+  //   list: '/api/banner/',
+  //   create: '/api/banner/create',
+  //   update: '/api/banner',
+  //   delete: '/api/banner',
+  // },
+  
   mail: {
     list: '/api/mail/list',
     details: '/api/mail/details',
