@@ -15,18 +15,18 @@ export default function SearchNotFound({ query, sx, ...other }) {
       {...other}
     >
       <Typography variant="h6" gutterBottom>
-        Not Found
+        Tidak ada data barang yang di cari
       </Typography>
 
       <Typography variant="body2">
-        No results found for &nbsp;
+        tidak ada hasil ditemukan untuk &nbsp;
         <strong>&quot;{query}&quot;</strong>.
-        <br /> Try checking for typos or using complete words.
+        <br /> Cobalah memeriksa kesalahan ketik atau menggunakan kata-kata yang lengkap.
       </Typography>
     </Paper>
   ) : (
     <Typography variant="body2" sx={sx}>
-      Please enter keywords
+      Silakan masukkan kata kunci
     </Typography>
   );
 }

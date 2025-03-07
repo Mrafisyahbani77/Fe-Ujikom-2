@@ -169,7 +169,7 @@ export function CheckoutProvider({ children }) {
   const onReset = useCallback(() => {
     if (completed) {
       reset();
-      router.replace(paths.product.root);
+      router.replace("/");
     }
   }, [completed, reset, router]);
 

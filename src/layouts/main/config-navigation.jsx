@@ -3,7 +3,6 @@ import { paths } from 'src/routes/paths';
 import Iconify from 'src/components/iconify';
 import { useCheckoutContext } from 'src/sections/checkout/context';
 
-// Pastikan checkout hanya dipanggil dalam fungsi
 export default function navConfig() {
   const checkout = useCheckoutContext();
 
@@ -16,9 +15,8 @@ export default function navConfig() {
     {
       title: 'Keranjang',
       path: paths.product.checkout,
-      // Sesuai dengan CartIcon
-      icon: <Iconify icon="solar:cart-3-bold" width={24} />,
-      badge: checkout?.totalItems || 0, // Tambahkan badge untuk indikator jumlah item
+      icon: <Iconify icon="mdi:cart" width={24} />,
+      badge: checkout?.totalItems || 0,
     },
   ];
 }

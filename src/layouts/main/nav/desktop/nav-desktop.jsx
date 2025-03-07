@@ -15,7 +15,7 @@ export default function NavDesktop({ offsetTop, data }) {
           <Badge
             key={link.title}
             badgeContent={link.badge}
-            color="error"
+            color="info"
             max={99}
             overlap="rectangular"
             invisible={!link.badge}

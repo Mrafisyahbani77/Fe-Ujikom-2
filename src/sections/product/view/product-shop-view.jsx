@@ -142,7 +142,7 @@ export default function ProductShopView() {
     />
   );
 
-  const renderNotFound = <EmptyContent filled title="No Data" sx={{ py: 10 }} />;
+  const renderNotFound = <EmptyContent filled title="Tidak ada data barang" sx={{ py: 10 }} />;
 
   return (
     <Container

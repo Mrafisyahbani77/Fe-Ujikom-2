@@ -76,7 +76,12 @@ export default function Header() {
           {mdUp && <NavDesktop offsetTop={offsetTop} data={data} />}
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
-            <Button component={RouterLink} href={paths.dashboard.user.new} variant="outlined" color='primary'>
+            <Button
+              component={RouterLink}
+              href={paths.dashboard.user.new}
+              variant="outlined"
+              color="primary"
+            >
               Login
             </Button>
             <SettingsButton
