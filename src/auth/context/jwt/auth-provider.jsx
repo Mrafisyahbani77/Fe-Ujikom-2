@@ -5,6 +5,7 @@ import axios, { endpoints } from 'src/utils/axios';
 //
 import { AuthContext } from './auth-context';
 import { isValidToken, setSession } from './utils';
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -53,6 +54,7 @@ const STORAGE_KEY = 'accessToken';
 
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const router = useRouter();
 
   const initialize = useCallback(async () => {
     try {
@@ -95,25 +97,52 @@ export function AuthProvider({ children }) {
   }, [initialize]);
 
   // LOGIN
-  const login = useCallback(async (email, password) => {
-    const data = {
-      email,
-      password,
-    };
+  const login = useCallback(
+    async (email, password) => {
+      const data = { email, password };
 
-    const response = await axios.post(endpoints.auth.login, data);
+      try {
+        const response = await axiosInstance.post(endpoints.auth.login, data);
+        const { accessToken, roles, admin, user, refreshToken } = response.data;
+        sessionStorage.setItem('refreshToken', refreshToken);
 
-    const { accessToken, user } = response.data;
+        // Set session with accessToken
+        setSession(accessToken);
 
-    setSession(accessToken);
+        // Dispatch login action
+        dispatch({
+          type: 'LOGIN',
+          payload: {
+            user,
+            roles,
+            admin,
+            accessToken,
+            refreshToken,
+          },
+        });
 
-    dispatch({
-      type: 'LOGIN',
-      payload: {
-        user,
-      },
-    });
-  }, []);
+        console.log(roles);
+
+        const userRoles = roles;
+        const isSuperadmin = admin ?? false;
+
+        console.log(userRoles);
+        console.log(isSuperadmin);
+
+        if (userRoles?.includes('admin')) {
+          router.push('/dashboard');
+        } else if (userRoles?.includes('pembeli')) router.push('/');
+
+        await initialize();
+
+        return { accessToken, roles, admin, user };
+      } catch (error) {
+        console.error('Login Error:', error);
+        throw error;
+      }
+    },
+    [initialize]
+  );
 
   // REGISTER
   const register = useCallback(async (email, password, firstName, lastName) => {
@@ -149,7 +178,6 @@ export function AuthProvider({ children }) {
   // ----------------------------------------------------------------------
 
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
-
   const status = state.loading ? 'loading' : checkAuthenticated;
 
   const memoizedValue = useMemo(
@@ -159,7 +187,6 @@ export function AuthProvider({ children }) {
       loading: status === 'loading',
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
-      //
       login,
       register,
       logout,

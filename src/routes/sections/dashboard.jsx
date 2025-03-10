@@ -6,6 +6,9 @@ import { AuthGuard } from 'src/auth/guard';
 import DashboardLayout from 'src/layouts/dashboard';
 // components
 import { LoadingScreen } from 'src/components/loading-screen';
+import CategoryPage from 'src/pages/dashboard/category/category';
+import CreatePage from 'src/pages/dashboard/category/create';
+import EditPage from 'src/pages/dashboard/category/edit';
 
 // ----------------------------------------------------------------------
 
@@ -57,6 +60,15 @@ export const dashboardRoutes = [
           { path: 'new', element: <UserCreatePage /> },
           { path: ':id/edit', element: <UserEditPage /> },
           { path: 'account', element: <UserAccountPage /> },
+        ],
+      },
+      {
+        path: 'category',
+        children: [
+          { path: 'list', element: <CategoryPage />, index: true },
+          { path: 'new', element: <CreatePage /> },
+          { path: ':id/edit', element: <EditPage/> },
+          // { path: 'account', element: <UserAccountPage /> },
         ],
       },
       {

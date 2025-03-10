@@ -78,7 +78,7 @@ export default function Header() {
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
             <Button
               component={RouterLink}
-              href={paths.dashboard.user.new}
+              href={paths.auth.jwt.login}
               variant="outlined"
               color="primary"
             >

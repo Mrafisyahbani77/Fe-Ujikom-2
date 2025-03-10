@@ -100,6 +100,17 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/product/${MOCK_ID}/edit`,
       },
     },
+    category: {
+      root: `${ROOTS.DASHBOARD}/category`,
+      new: `${ROOTS.DASHBOARD}/category/new`,
+      list: `${ROOTS.DASHBOARD}/category/list`,
+      details: (id) => `${ROOTS.DASHBOARD}/category/${id}`,
+      edit: (id) => `${ROOTS.DASHBOARD}/category/${id}/edit`,
+      demo: {
+        details: `${ROOTS.DASHBOARD}/category/${MOCK_ID}`,
+        edit: `${ROOTS.DASHBOARD}/category/${MOCK_ID}/edit`,
+      },
+    },
     invoice: {
       root: `${ROOTS.DASHBOARD}/invoice`,
       new: `${ROOTS.DASHBOARD}/invoice/new`,

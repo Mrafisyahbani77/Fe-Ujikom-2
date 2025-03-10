@@ -83,6 +83,18 @@ export function useNavData() {
           ],
         },
 
+        {
+          title: 'category',
+          path: paths.dashboard.category.root,
+          icon: ICONS.user,
+          children: [
+            { title: 'list', path: paths.dashboard.category.list },
+            { title: 'create', path: paths.dashboard.category.new },
+            { title: 'edit', path: paths.dashboard.category.demo.edit },
+            // { title: 'account', path: paths.dashboard.user.account },
+          ],
+        },
+
         // PRODUCT
         {
           title: 'product',

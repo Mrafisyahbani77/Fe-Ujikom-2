@@ -19,14 +19,17 @@ import { useAuthContext } from 'src/auth/hooks';
 import { varHover } from 'src/components/animate';
 import { useSnackbar } from 'src/components/snackbar';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { useMutationLogout } from 'src/utils/auth';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 
 // ----------------------------------------------------------------------
 
 const OPTIONS = [
-  {
-    label: 'Home',
-    linkTo: '/',
-  },
+  // {
+  //   label: 'Home',
+  //   linkTo: '/',
+  // },
   {
     label: 'Profile',
     linkTo: paths.dashboard.user.account,
@@ -38,24 +41,44 @@ const OPTIONS = [
 export default function AccountPopover() {
   const router = useRouter();
 
-  const { user } = useMockedUser();
+  // const { user } = useMockedUser();
 
-  const { logout } = useAuthContext();
+  const { user } = useAuthContext();
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
+
   const popover = usePopover();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      popover.onClose();
-      router.replace('/');
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar('Unable to logout!', { variant: 'error' });
-    }
-  };
+  const { mutate: handleLogout } = useMutationLogout({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['authenticated.user'] }); // Reset cache
+      navigate('/'); // Kembali ke landing page
+      enqueueSnackbar('Logout berhasil', { variant: 'success' });
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      // setTimeout(() => {
+      //   window.location.reload(); // Refresh halaman agar reset state
+      // }, 500);
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.message, { variant: 'error' });
+    },
+  });
+
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     popover.onClose();
+  //     router.replace('/');
+  //   } catch (error) {
+  //     console.error(error);
+  //     enqueueSnackbar('Unable to logout!', { variant: 'error' });
+  //   }
+  // };
 
   const handleClickItem = (path) => {
     popover.onClose();
@@ -81,8 +104,8 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={user?.photoURL}
-          alt={user?.displayName}
+          src={user?.photo_profile}
+          alt={user?.username}
           sx={{
             width: 36,
             height: 36,
@@ -94,7 +117,7 @@ export default function AccountPopover() {
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 200, p: 0 }}>
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {user?.displayName}
+            {user?.username}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>

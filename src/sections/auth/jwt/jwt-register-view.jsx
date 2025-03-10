@@ -1,8 +1,7 @@
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-// @mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import Link from '@mui/material/Link';
 import Alert from '@mui/material/Alert';
@@ -10,156 +9,117 @@ import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
-// hooks
+import { Button, MenuItem, TextField, Select, FormControl, InputLabel } from '@mui/material';
 import { useBoolean } from 'src/hooks/use-boolean';
-// routes
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 import { useSearchParams, useRouter } from 'src/routes/hooks';
-// config
-import { PATH_AFTER_LOGIN } from 'src/config-global';
-// auth
+import { HOST_API } from 'src/config-global';
 import { useAuthContext } from 'src/auth/hooks';
-// components
 import Iconify from 'src/components/iconify';
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
-
-// ----------------------------------------------------------------------
+import { useMutationRegister } from 'src/utils/auth';
+import { enqueueSnackbar } from 'notistack';
 
 export default function JwtRegisterView() {
-  const { register } = useAuthContext();
-
   const router = useRouter();
-
   const [errorMsg, setErrorMsg] = useState('');
-
   const searchParams = useSearchParams();
-
-  const returnTo = searchParams.get('returnTo');
-
   const password = useBoolean();
 
   const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string().required('First name required'),
-    lastName: Yup.string().required('Last name required'),
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    password: Yup.string().required('Password is required'),
+    username: Yup.string().min(3, 'Username minimal 3 karakter').required('Username harus di isi'),
+    phone_number: Yup.string()
+      .matches(/^[0-9]+$/, 'Nomor telepon hanya boleh berisi angka')
+      .min(10, 'Nomor telepon minimal 10 digit')
+      .required('Nomor telepon harus di isi'),
+    email: Yup.string().required('Email harus di isi').email('Format email tidak valid'),
+    gender: Yup.string().required('Gender harus di isi'),
+    password: Yup.string().min(6, 'Password minimal 6 karakter').required('Password harus di isi'),
+    confirm_password: Yup.string()
+      .oneOf([Yup.ref('password'), null], 'Password tidak cocok')
+      .required('Konfirmasi password harus di isi'),
   });
 
-  const defaultValues = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  };
-
-  const methods = useForm({
+  const { register, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm({
     resolver: yupResolver(RegisterSchema),
-    defaultValues,
+    defaultValues: {
+      username: '',
+      phone_number: '',
+      email: '',
+      gender: '',
+      password: '',
+      confirm_password: '',
+    },
   });
 
-  const {
-    reset,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
+  const { mutate: mutationRegister } = useMutationRegister({
+    onSuccess: (response) => {
+      enqueueSnackbar('Registrasi berhasil', { variant: 'success' });
+      router.push(response.role === 'admin' ? paths.dashboard.root : '/');
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.message || 'Registrasi gagal', { variant: 'error' });
+      setErrorMsg(typeof error === 'string' ? error : error.message);
+    },
+  });
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = (data) => {
     try {
-      await register?.(data.email, data.password, data.firstName, data.lastName);
-
-      router.push(returnTo || PATH_AFTER_LOGIN);
+      mutationRegister(data);
     } catch (error) {
       console.error(error);
       reset();
       setErrorMsg(typeof error === 'string' ? error : error.message);
     }
-  });
-
-  const renderHead = (
-    <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
-      <Typography variant="h4">Get started absolutely free</Typography>
-
-      <Stack direction="row" spacing={0.5}>
-        <Typography variant="body2"> Already have an account? </Typography>
-
-        <Link href={paths.auth.jwt.login} component={RouterLink} variant="subtitle2">
-          Sign in
-        </Link>
-      </Stack>
-    </Stack>
-  );
-
-  const renderTerms = (
-    <Typography
-      component="div"
-      sx={{
-        color: 'text.secondary',
-        mt: 2.5,
-        typography: 'caption',
-        textAlign: 'center',
-      }}
-    >
-      {'By signing up, I agree to '}
-      <Link underline="always" color="text.primary">
-        Terms of Service
-      </Link>
-      {' and '}
-      <Link underline="always" color="text.primary">
-        Privacy Policy
-      </Link>
-      .
-    </Typography>
-  );
-
-  const renderForm = (
-    <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Stack spacing={2.5}>
-        {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
-
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <RHFTextField name="firstName" label="First name" />
-          <RHFTextField name="lastName" label="Last name" />
-        </Stack>
-
-        <RHFTextField name="email" label="Email address" />
-
-        <RHFTextField
-          name="password"
-          label="Password"
-          type={password.value ? 'text' : 'password'}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={password.onToggle} edge="end">
-                  <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <LoadingButton
-          fullWidth
-          color="inherit"
-          size="large"
-          type="submit"
-          variant="contained"
-          loading={isSubmitting}
-        >
-          Create account
-        </LoadingButton>
-      </Stack>
-    </FormProvider>
-  );
+  };
 
   return (
     <>
-      {renderHead}
+      <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
+        <Typography variant="h4">Get started absolutely free</Typography>
+        <Stack direction="row" spacing={0.5}>
+          <Typography variant="body2">Already have an account?</Typography>
+          <Link href={paths.auth.jwt.login} component={RouterLink} variant="subtitle2">
+            Sign in
+          </Link>
+        </Stack>
+      </Stack>
 
-      {renderForm}
-
-      {renderTerms}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={2.5}>
+          {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+          <TextField label="Username" {...register('username')} error={!!errors.username} helperText={errors.username?.message} />
+          <TextField label="Nomor Telepon" {...register('phone_number')} error={!!errors.phone_number} helperText={errors.phone_number?.message} />
+          <TextField label="Email" {...register('email')} error={!!errors.email} helperText={errors.email?.message} />
+          <FormControl>
+            <InputLabel>Jenis Kelamin</InputLabel>
+            <Select {...register('gender')} error={!!errors.gender}>
+              <MenuItem value="pria">Laki-laki</MenuItem>
+              <MenuItem value="wanita">Perempuan</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Password"
+            type={password.value ? 'text' : 'password'}
+            {...register('password')}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={password.onToggle} edge="end">
+                    <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField label="Konfirmasi Password" type="password" {...register('confirm_password')} error={!!errors.confirm_password} helperText={errors.confirm_password?.message} />
+          <LoadingButton fullWidth color="inherit" size="large" type="submit" variant="contained" loading={isSubmitting}>
+            Buat Akun
+          </LoadingButton>
+        </Stack>
+      </form>
     </>
   );
 }
