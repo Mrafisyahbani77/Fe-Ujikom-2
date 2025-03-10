@@ -110,13 +110,6 @@ export const fetcher = async (args) => {
 // ----------------------------------------------------------------------
 
 export const endpoints = {
-  chat: '/api/chat',
-  kanban: '/api/kanban',
-  calendar: '/api/calendar',
-  // auth: {
-  //   login: '/api/auth/login',
-  //   register: '/api/auth/register',
-  // },
   auth: {
     me: '/api/auth//profile',
     login: '/api/auth/login',
@@ -127,32 +120,69 @@ export const endpoints = {
     googleCallback: 'api/auth/google/callback',
   },
   banner: {
-    list: '/api/banner/',
-    create: '/api/banner/create',
+    list: '/api/banner',
+    getByid: 'api/banner',
+    create: '/api/banner/store',
     update: '/api/banner',
     delete: '/api/banner',
   },
   category: {
     list: '/api/categories',
-    getByid:'api/categories',
+    getByid: 'api/categories',
     create: '/api/categories/store',
     update: '/api/categories',
     delete: '/api/categories',
   },
-  mail: {
-    list: '/api/mail/list',
-    details: '/api/mail/details',
-    labels: '/api/mail/labels',
-  },
-  post: {
-    list: '/api/post/list',
-    details: '/api/post/details',
-    latest: '/api/post/latest',
-    search: '/api/post/search',
-  },
   product: {
-    list: '/api/product/list',
-    details: '/api/product/details',
+    list: '/api/products',
+    details: '/api/products',
+    update: '/api/products',
+    delete: '/api/products',
+    create: '/api/products/store',
     search: '/api/product/search',
+  },
+  whishlist: {
+    list: '/api/wishlist',
+    details: '/api/wishlist',
+    update: '/api/wishlist',
+    delete: '/api/wishlist',
+    create: '/api/wishlist/store',
+  },
+  cart: {
+    list: '/api/cart',
+    details: '/api/cart',
+    update: '/api/cart',
+    delete: '/api/cart',
+    create: '/api/cart/store',
+  },
+  order: {
+    list: '/api/order',
+    details: '/api/order',
+    update: '/api/order',
+    delete: '/api/order',
+    create: '/api/order/store',
+  },
+  payment: {
+    buy: '/api/payments',
+    nontification: '/api/payments/notification',
+    status: '/api/payments',
+  },
+  shippings: {
+    list: '/api/shippings',
+    details: '/api/shippings',
+    provinces: '/api/shippings/provinces',
+    city: '/api/shippings/cities', // need id provinsi
+    districts: '/api/shippings/districts', //need id city
+    update: '/api/shippings',
+    delete: '/api/shippings',
+    deleteAll: '/api/shippings',
+    create: '/api/shippings/store',
+  },
+  review: {
+    list: '/api/reviews',
+    details: '/api/reviews',
+    update: '/api/reviews',
+    delete: '/api/reviews',
+    create: '/api/reviews/store',
   },
 };
