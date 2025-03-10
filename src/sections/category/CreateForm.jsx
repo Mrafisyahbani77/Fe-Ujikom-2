@@ -4,6 +4,7 @@ import { useSnackbar } from 'notistack';
 import { useMutationCreate } from 'src/utils/category';
 import { useRouter } from 'src/routes/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import { paths } from 'src/routes/paths';
 
 export default function CreateForm() {
   const { enqueueSnackbar } = useSnackbar();
@@ -19,11 +20,17 @@ export default function CreateForm() {
       setName('');
       setImage(null);
 
-      // Jika ingin redirect ke halaman lain, sesuaikan path di bawah:
-      // router.push('/kategori');
+      router.push(paths.dashboard.category.list);
+      queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
     },
     onError: (error) => {
-      enqueueSnackbar(error?.message || 'Terjadi kesalahan', { variant: 'error' });
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+
+      if (errorMessage.includes('Kategori dengan nama tersebut sudah ada')) {
+        enqueueSnackbar('Kategori dengan nama tersebut sudah ada!', { variant: 'warning' });
+      } else {
+        enqueueSnackbar(errorMessage, { variant: 'error' });
+      }
     },
   });
 

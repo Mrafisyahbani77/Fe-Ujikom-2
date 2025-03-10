@@ -39,7 +39,7 @@ export default function CustomBreadcrumbs({
                 <LinkItem
                   key={link.name || ''}
                   link={link}
-                  activeLast={activeLast}
+                  // activeLast={activeLast}
                   disabled={link.name === lastLink}
                 />
               ))}

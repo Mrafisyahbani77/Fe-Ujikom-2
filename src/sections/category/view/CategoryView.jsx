@@ -127,17 +127,17 @@ export default function CategoryView() {
 
   const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.product.edit(id));
+      router.push(paths.dashboard.category.edit(id));
     },
     [router]
   );
 
-  const handleViewRow = useCallback(
-    (id) => {
-      router.push(paths.dashboard.product.details(id));
-    },
-    [router]
-  );
+  // const handleViewRow = useCallback(
+  //   (id) => {
+  //     router.push(paths.dashboard.product.details(id));
+  //   },
+  //   [router]
+  // );
 
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
@@ -148,7 +148,13 @@ export default function CategoryView() {
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
           heading="Daftar Kategori"
-          links={[{ name: 'Dashboard', href: paths.dashboard.root }]}
+          links={[
+            {
+              name: 'Dashboard',
+              href: paths.dashboard.root,
+            },
+            { name: 'Daftar Kategori' },
+          ]}
           action={
             <Button
               component={RouterLink}
@@ -238,7 +244,7 @@ export default function CategoryView() {
                             onSelectRow={() => table.onSelectRow(row.id)}
                             onDeleteRow={() => handleDeleteRow(row.id)}
                             onEditRow={() => handleEditRow(row.id)}
-                            onViewRow={() => handleViewRow(row.id)}
+                            // onViewRow={() => handleViewRow(row.id)}
                           />
                         ))}
                     </>

@@ -134,6 +134,7 @@ export const endpoints = {
   },
   category: {
     list: '/api/categories',
+    getByid:'api/categories',
     create: '/api/categories/store',
     update: '/api/categories',
     delete: '/api/categories',

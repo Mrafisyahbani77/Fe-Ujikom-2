@@ -42,9 +42,8 @@ export default function CategoryTableRow({
     createdAt,
     available,
     inventoryType,
+    image_url,
   } = row;
-
-  console.log(row);
 
   const confirm = useBoolean();
 
@@ -60,7 +59,7 @@ export default function CategoryTableRow({
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar
             alt={name}
-            src={coverUrl}
+            src={image_url ? image_url : 'https://via.placeholder.com/150'}
             variant="rounded"
             sx={{ width: 150, height: 70, mr: 2 }}
           />
@@ -96,7 +95,7 @@ export default function CategoryTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             onViewRow();
             popover.onClose();
@@ -104,7 +103,7 @@ export default function CategoryTableRow({
         >
           <Iconify icon="solar:eye-bold" />
           View
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => {
@@ -132,7 +131,7 @@ export default function CategoryTableRow({
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
-        content="Are you sure want to delete?"
+        content="Apa kamu ingin menghapus kategori ini?"
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
             Delete

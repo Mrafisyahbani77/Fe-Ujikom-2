@@ -90,7 +90,7 @@ export function useNavData() {
           children: [
             { title: 'list', path: paths.dashboard.category.list },
             { title: 'create', path: paths.dashboard.category.new },
-            { title: 'edit', path: paths.dashboard.category.demo.edit },
+            // { title: 'edit', path: paths.dashboard.category.demo.edit },
             // { title: 'account', path: paths.dashboard.user.account },
           ],
         },
