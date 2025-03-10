@@ -1,7 +1,14 @@
-import React from 'react'
+import { useMutation } from '@tanstack/react-query';
+import axiosInstance, { endpoints } from 'src/utils/axios';
 
-export default function useMutationDelete() {
-  return (
-    <div>useMutationDelete</div>
-  )
-}
+export const useMutationDelete = ({ onError, onSuccess }) => {
+  return useMutation({
+    mutationKey: ['delete.category'],
+    mutationFn: async (id) => {
+      const response = await axiosInstance.delete(`${endpoints.category.delete}/${id}`);
+      return response;
+    },
+    onError,
+    onSuccess,
+  });
+};

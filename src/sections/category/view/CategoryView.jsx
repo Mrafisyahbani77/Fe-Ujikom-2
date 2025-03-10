@@ -37,7 +37,9 @@ import CategoryTableRow from '../category-table-row';
 import CategoryTableToolbar from '../category-table-toolbar';
 import CategoryTableFiltersResult from '../category-table-filters-result';
 // api
-import { useFetchCategory } from 'src/utils/category';
+import { useFetchCategory, useMutationDelete } from 'src/utils/category';
+import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
@@ -57,6 +59,10 @@ const defaultFilters = {
 
 export default function CategoryView() {
   const router = useRouter();
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const queryClient = useQueryClient();
 
   const table = useTable();
 
@@ -104,26 +110,43 @@ export default function CategoryView() {
     [table]
   );
 
+  const { mutate: DeleteCategory, isPending } = useMutationDelete({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
+      enqueueSnackbar('Apartement berhasil dihapus', { variant: 'success' });
+    },
+    onError: () => {
+      enqueueSnackbar('gagal menghapus apartement', { variant: 'error' });
+    },
+  });
+
   const handleDeleteRow = useCallback(
     (id) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
-      setTableData(deleteRow);
-
-      table.onUpdatePageDeleteRow(dataInPage.length);
+      DeleteCategory(id, {
+        onSuccess: () => {
+          const deleteRow = tableData.filter((row) => row.id !== id);
+          setTableData(deleteRow);
+          table.onUpdatePageDeleteRow(dataInPage.length);
+        },
+      });
     },
-    [dataInPage.length, table, tableData]
+    [DeleteCategory, dataInPage.length, table, tableData]
   );
 
   const handleDeleteRows = useCallback(() => {
-    const deleteRows = tableData.filter((row) => !table.selected.includes(row.id));
-    setTableData(deleteRows);
+    const selectedIds = table.selected;
 
-    table.onUpdatePageDeleteRows({
-      totalRows: tableData.length,
-      totalRowsInPage: dataInPage.length,
-      totalRowsFiltered: dataFiltered.length,
+    Promise.all(selectedIds.map((id) => DeleteCategory(id))).then(() => {
+      const deleteRows = tableData.filter((row) => !selectedIds.includes(row.id));
+      setTableData(deleteRows);
+
+      table.onUpdatePageDeleteRows({
+        totalRows: tableData.length,
+        totalRowsInPage: dataInPage.length,
+        totalRowsFiltered: dataFiltered.length,
+      });
     });
-  }, [dataFiltered.length, dataInPage.length, table, tableData]);
+  }, [DeleteCategory, dataFiltered.length, dataInPage.length, table, tableData]);
 
   const handleEditRow = useCallback(
     (id) => {
