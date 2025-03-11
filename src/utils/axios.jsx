@@ -120,11 +120,11 @@ export const endpoints = {
     googleCallback: 'api/auth/google/callback',
   },
   banner: {
-    list: '/api/banner',
-    getByid: 'api/banner',
-    create: '/api/banner/store',
-    update: '/api/banner',
-    delete: '/api/banner',
+    list: '/api/banners',
+    getByid: 'api/banners',
+    create: '/api/banners/store',
+    update: '/api/banners',
+    delete: '/api/banners',
   },
   category: {
     list: '/api/categories',

@@ -6,9 +6,14 @@ import { AuthGuard } from 'src/auth/guard';
 import DashboardLayout from 'src/layouts/dashboard';
 // components
 import { LoadingScreen } from 'src/components/loading-screen';
+//category
 import CategoryPage from 'src/pages/dashboard/category/category';
 import CreatePage from 'src/pages/dashboard/category/create';
 import EditPage from 'src/pages/dashboard/category/edit';
+//banner
+import BannerPage from 'src/pages/dashboard/banner/banner';
+import CreateBannerPage from 'src/pages/dashboard/banner/create';
+import EditBannerPage from 'src/pages/dashboard/banner/edit';
 
 // ----------------------------------------------------------------------
 
@@ -67,8 +72,15 @@ export const dashboardRoutes = [
         children: [
           { path: 'list', element: <CategoryPage />, index: true },
           { path: 'new', element: <CreatePage /> },
-          { path: ':id/edit', element: <EditPage/> },
-          // { path: 'account', element: <UserAccountPage /> },
+          { path: ':id/edit', element: <EditPage /> },
+        ],
+      },
+      {
+        path: 'banner',
+        children: [
+          { path: 'list', element: <BannerPage />, index: true },
+          { path: 'new', element: <CreateBannerPage /> },
+          { path: ':id/edit', element: <EditBannerPage /> },
         ],
       },
       {

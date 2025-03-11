@@ -82,7 +82,6 @@ export function useNavData() {
             // { title: 'account', path: paths.dashboard.user.account },
           ],
         },
-
         {
           title: 'category',
           path: paths.dashboard.category.root,
@@ -94,7 +93,17 @@ export function useNavData() {
             // { title: 'account', path: paths.dashboard.user.account },
           ],
         },
-
+        {
+          title: 'banner',
+          path: paths.dashboard.banner.root,
+          icon: ICONS.user,
+          children: [
+            { title: 'list', path: paths.dashboard.banner.list },
+            { title: 'create', path: paths.dashboard.banner.new },
+            // { title: 'edit', path: paths.dashboard.category.demo.edit },
+            // { title: 'account', path: paths.dashboard.user.account },
+          ],
+        },
         // PRODUCT
         {
           title: 'product',

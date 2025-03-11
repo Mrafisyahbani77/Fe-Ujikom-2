@@ -111,6 +111,17 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/category/${MOCK_ID}/edit`,
       },
     },
+    banner: {
+      root: `${ROOTS.DASHBOARD}/banner`,
+      new: `${ROOTS.DASHBOARD}/banner/new`,
+      list: `${ROOTS.DASHBOARD}/banner/list`,
+      details: (id) => `${ROOTS.DASHBOARD}/banner/${id}`,
+      edit: (id) => `${ROOTS.DASHBOARD}/banner/${id}/edit`,
+      demo: {
+        details: `${ROOTS.DASHBOARD}/banner/${MOCK_ID}`,
+        edit: `${ROOTS.DASHBOARD}/banner/${MOCK_ID}/edit`,
+      },
+    },
     invoice: {
       root: `${ROOTS.DASHBOARD}/invoice`,
       new: `${ROOTS.DASHBOARD}/invoice/new`,
