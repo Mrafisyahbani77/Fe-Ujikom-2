@@ -29,30 +29,31 @@ import { HOST_API } from 'src/config-global';
 
 export default function JwtLoginView() {
   const { enqueueSnackbar } = useSnackbar();
+  const { login } = useAuthContext();
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState('');
   const searchParams = useSearchParams();
   const password = useBoolean();
 
-  const { mutate: mutationLogin } = useMutationLogin({
-    onSuccess: (response) => {
-      const userRole = response?.user?.role; // Ambil role dari response
-      enqueueSnackbar('Login successful', { variant: 'success' });
+  // const { mutate: mutationLogin } = useMutationLogin({
+  //   onSuccess: (response) => {
+  //     const userRole = response?.user?.role; // Ambil role dari response
+  //     enqueueSnackbar('Login successful', { variant: 'success' });
 
-      // Simpan token dan role di sessionStorage
-      sessionStorage.setItem('accessToken', response.accessToken);
-      sessionStorage.setItem('refreshToken', response.refreshToken);
+  //     // Simpan token dan role di sessionStorage
+  //     sessionStorage.setItem('accessToken', response.accessToken);
+  //     sessionStorage.setItem('refreshToken', response.refreshToken);
 
-      if (userRole?.includes('admin')) {
-        router.push('/dashboard');
-      } else if (userRole?.includes('pembeli')) router.push('/');
-    },
+  //     if (userRole?.includes('admin')) {
+  //       router.push('/dashboard');
+  //     } else if (userRole?.includes('pembeli')) router.push('/');
+  //   },
 
-    onError: (error) => {
-      enqueueSnackbar(error.message || 'Login failed', { variant: 'error' });
-      setErrorMsg(typeof error === 'string' ? error : error.message);
-    },
-  });
+  //   onError: (error) => {
+  //     enqueueSnackbar(error.message || 'Login failed', { variant: 'error' });
+  //     setErrorMsg(typeof error === 'string' ? error : error.message);
+  //   },
+  // });
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
@@ -75,9 +76,24 @@ export default function JwtLoginView() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = (data) => {
-    mutationLogin(data);
-  };
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const response = await login?.(data.email, data.password);
+      const userRole = response.user.role;
+
+      if (userRole === 'admin') {
+        router.push('/dashboard');
+        enqueueSnackbar('Login berhasil!', { variant: 'success' });
+      } else if (userRole === 'pembeli') {
+        router.push('/');
+        enqueueSnackbar('Login berhasil', { variant: 'success' });
+      } else {
+        enqueueSnackbar('Role tidak dikenal!', { variant: 'error' });
+      }
+    } catch (error) {
+      enqueueSnackbar(error?.response?.data?.message || 'Terjadi kesalahan', { variant: 'error' });
+    }
+  });
 
   // Fungsi untuk login dengan Google
   const handleGoogleLogin = () => {
@@ -101,7 +117,7 @@ export default function JwtLoginView() {
   }, []);
 
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+    <FormProvider methods={methods} onSubmit={onSubmit}>
       <Stack spacing={2} sx={{ mb: 5 }}>
         <Typography variant="h4">Sign in to Barangin</Typography>
         <Stack direction="row" spacing={0.5}>

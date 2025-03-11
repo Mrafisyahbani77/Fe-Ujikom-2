@@ -1,61 +1,62 @@
 import PropTypes from 'prop-types';
 import { useEffect, useReducer, useCallback, useMemo } from 'react';
-// utils
-import axios, { endpoints } from 'src/utils/axios';
-//
+import axiosInstance, { endpoints } from 'src/utils/axios';
 import { AuthContext } from './auth-context';
 import { isValidToken, setSession } from './utils';
 import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
-
-// NOTE:
-// We only build demo at basic level.
-// Customer will need to do some extra handling yourself if you want to extend the logic and other features...
-
-// ----------------------------------------------------------------------
-
 const initialState = {
   user: null,
+  roles: [],
+  admin: false,
   loading: true,
+  accessToken: null,
+  refreshToken: null,
 };
 
 const reducer = (state, action) => {
-  if (action.type === 'INITIAL') {
-    return {
-      loading: false,
-      user: action.payload.user,
-    };
+  switch (action.type) {
+    case 'INITIAL':
+      return {
+        ...state,
+        loading: false,
+        user: action.payload.user,
+        roles: action.payload.roles,
+        admin: action.payload.admin,
+      };
+    case 'LOGIN':
+    case 'REGISTER':
+      return {
+        ...state,
+        user: action.payload.user,
+        roles: action.payload.roles,
+        admin: action.payload.admin,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
+      };
+    case 'LOGOUT':
+      return {
+        ...state,
+        user: null,
+        roles: [],
+        admin: false,
+        accessToken: null,
+        refreshToken: null,
+      };
+    default:
+      return state;
   }
-  if (action.type === 'LOGIN') {
-    return {
-      ...state,
-      user: action.payload.user,
-    };
-  }
-  if (action.type === 'REGISTER') {
-    return {
-      ...state,
-      user: action.payload.user,
-    };
-  }
-  if (action.type === 'LOGOUT') {
-    return {
-      ...state,
-      user: null,
-    };
-  }
-  return state;
 };
 
 // ----------------------------------------------------------------------
-
 const STORAGE_KEY = 'accessToken';
 
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const router = useRouter();
 
+  // Initialize the authentication state
   const initialize = useCallback(async () => {
     try {
       const accessToken = sessionStorage.getItem(STORAGE_KEY);
@@ -63,32 +64,23 @@ export function AuthProvider({ children }) {
       if (accessToken && isValidToken(accessToken)) {
         setSession(accessToken);
 
-        const response = await axios.get(endpoints.auth.me);
-
-        const { user } = response.data;
+        const response = await axiosInstance.get(endpoints.auth.me);
+        const user = response.data?.user || null;
 
         dispatch({
           type: 'INITIAL',
           payload: {
             user,
+            roles: user?.role ? [user.role] : [],
+            admin: user?.role === 'admin',
           },
         });
       } else {
-        dispatch({
-          type: 'INITIAL',
-          payload: {
-            user: null,
-          },
-        });
+        dispatch({ type: 'INITIAL', payload: { user: null, roles: [], admin: false } });
       }
     } catch (error) {
-      console.error(error);
-      dispatch({
-        type: 'INITIAL',
-        payload: {
-          user: null,
-        },
-      });
+      console.error('Initialization Error:', error);
+      dispatch({ type: 'INITIAL', payload: { user: null, roles: [], admin: false } });
     }
   }, []);
 
@@ -96,46 +88,29 @@ export function AuthProvider({ children }) {
     initialize();
   }, [initialize]);
 
-  // LOGIN
   const login = useCallback(
     async (email, password) => {
-      const data = { email, password };
-
       try {
-        const response = await axiosInstance.post(endpoints.auth.login, data);
-        const { accessToken, roles, admin, user, refreshToken } = response.data;
-        sessionStorage.setItem('refreshToken', refreshToken);
+        const response = await axiosInstance.post(endpoints.auth.login, { email, password });
+        const { accessToken, refreshToken, user } = response.data;
 
-        // Set session with accessToken
+        sessionStorage.setItem('refreshToken', refreshToken);
         setSession(accessToken);
 
-        // Dispatch login action
         dispatch({
           type: 'LOGIN',
           payload: {
             user,
-            roles,
-            admin,
+            roles: user?.role ? [user.role] : [],
+            admin: user?.role === 'admin',
             accessToken,
             refreshToken,
           },
         });
 
-        console.log(roles);
+        await initialize(); // Panggil ulang agar state diperbarui
 
-        const userRoles = roles;
-        const isSuperadmin = admin ?? false;
-
-        console.log(userRoles);
-        console.log(isSuperadmin);
-
-        if (userRoles?.includes('admin')) {
-          router.push('/dashboard');
-        } else if (userRoles?.includes('pembeli')) router.push('/');
-
-        await initialize();
-
-        return { accessToken, roles, admin, user };
+        router.push(user.role === 'admin' ? '/dashboard' : '/');
       } catch (error) {
         console.error('Login Error:', error);
         throw error;
@@ -144,39 +119,38 @@ export function AuthProvider({ children }) {
     [initialize]
   );
 
-  // REGISTER
   const register = useCallback(async (email, password, firstName, lastName) => {
-    const data = {
-      email,
-      password,
-      firstName,
-      lastName,
-    };
+    const data = { email, password, firstName, lastName };
 
-    const response = await axios.post(endpoints.auth.register, data);
+    try {
+      const response = await axiosInstance.post(endpoints.auth.register, data);
+      const { user } = response.data;
 
-    const { accessToken, user } = response.data;
-
-    sessionStorage.setItem(STORAGE_KEY, accessToken);
-
-    dispatch({
-      type: 'REGISTER',
-      payload: {
-        user,
-      },
-    });
+      dispatch({
+        type: 'REGISTER',
+        payload: { user, roles: user.role ? [user.role] : [], admin: user.role === 'admin' },
+      });
+    } catch (error) {
+      console.error('Registration Error:', error);
+      throw error;
+    }
   }, []);
 
-  // LOGOUT
   const logout = useCallback(async () => {
-    setSession(null);
-    dispatch({
-      type: 'LOGOUT',
-    });
+    const refreshToken = sessionStorage.getItem('refreshToken');
+
+    try {
+      await axiosInstance.post(endpoints.auth.logout, { refreshToken });
+    } catch (error) {
+      console.error('Logout Error:', error);
+    } finally {
+      sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem(STORAGE_KEY);
+      dispatch({ type: 'LOGOUT' });
+    }
   }, []);
 
-  // ----------------------------------------------------------------------
-
+  // Status management
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
   const status = state.loading ? 'loading' : checkAuthenticated;
 

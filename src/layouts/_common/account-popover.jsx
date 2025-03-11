@@ -22,6 +22,8 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { useMutationLogout } from 'src/utils/auth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
+import { useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +45,11 @@ export default function AccountPopover() {
 
   // const { user } = useMockedUser();
 
+  const { logout } = useAuthContext();
+
   const { user } = useAuthContext();
+
+  const [openDialog, setOpenDialog] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -53,32 +59,42 @@ export default function AccountPopover() {
 
   const popover = usePopover();
 
-  const { mutate: handleLogout } = useMutationLogout({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['authenticated.user'] }); // Reset cache
-      navigate('/'); // Kembali ke landing page
-      enqueueSnackbar('Logout berhasil', { variant: 'success' });
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-      // setTimeout(() => {
-      //   window.location.reload(); // Refresh halaman agar reset state
-      // }, 500);
-    },
-    onError: (error) => {
-      enqueueSnackbar(error.message, { variant: 'error' });
-    },
-  });
+  // const { mutate: handleLogout } = useMutationLogout({
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['authenticated.user'] }); // Reset cache
+  //     navigate('/'); // Kembali ke landing page
+  //     enqueueSnackbar('Logout berhasil', { variant: 'success' });
+  //     sessionStorage.removeItem('accessToken');
+  //     sessionStorage.removeItem('refreshToken');
+  //     // setTimeout(() => {
+  //     //   window.location.reload(); // Refresh halaman agar reset state
+  //     // }, 500);
+  //   },
+  //   onError: (error) => {
+  //     enqueueSnackbar(error.message, { variant: 'error' });
+  //   },
+  // });
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await logout();
-  //     popover.onClose();
-  //     router.replace('/');
-  //   } catch (error) {
-  //     console.error(error);
-  //     enqueueSnackbar('Unable to logout!', { variant: 'error' });
-  //   }
-  // };
+  const handleLogoutClick = () => {
+    setOpenDialog(true);
+    popover.onClose();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setOpenDialog(false);
+      router.replace('/');
+      enqueueSnackbar('Logout Berhasil!', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Gagal log out!', { variant: 'error' });
+      setOpenDialog(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setOpenDialog(false);
+  };
 
   const handleClickItem = (path) => {
     popover.onClose();
@@ -138,12 +154,27 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <MenuItem
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           sx={{ m: 1, fontWeight: 'fontWeightBold', color: 'error.main' }}
         >
           Logout
         </MenuItem>
       </CustomPopover>
+
+      <Dialog open={openDialog} onClose={handleCancel}>
+        <DialogTitle>Konfirmasi Logout</DialogTitle>
+        <DialogContent>
+          <Typography>Apakah Anda yakin ingin keluar?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="primary">
+            Batal
+          </Button>
+          <Button onClick={handleLogout} color="error">
+            Keluar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
