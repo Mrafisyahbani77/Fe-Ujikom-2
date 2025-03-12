@@ -25,12 +25,22 @@ import navConfig from './config-navigation';
 import { SettingsButton, HeaderShadow } from '../_common';
 import { RouterLink } from 'src/routes/components';
 import Iconify from 'src/components/iconify';
+import AccountPopoverUser from '../user/account-popover-user';
+import { useAuthContext } from 'src/auth/hooks';
+import { useEffect, useState } from 'react';
 
 // ----------------------------------------------------------------------
 
 export default function Header() {
   const theme = useTheme();
   const data = navConfig();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Cek apakah token tersimpan di localStorage
+    const token = sessionStorage.getItem('accessToken');
+    setIsAuthenticated(!!token); // Jika token ada, berarti sudah login
+  }, []);
 
   const mdUp = useResponsive('up', 'md');
 
@@ -76,20 +86,24 @@ export default function Header() {
           {mdUp && <NavDesktop offsetTop={offsetTop} data={data} />}
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
-            <Button
-              component={RouterLink}
-              href={paths.auth.jwt.login}
-              variant="outlined"
-              color="primary"
-            >
-              Login
-            </Button>
-            <SettingsButton
+            {isAuthenticated ? (
+              <AccountPopoverUser />
+            ) : (
+              <Button
+                component={RouterLink}
+                href={paths.auth.jwt.login}
+                variant="outlined"
+                color="primary"
+              >
+                Login
+              </Button>
+            )}
+            {/* <SettingsButton
               sx={{
                 ml: { xs: 1, md: 0 },
                 mr: { md: 2 },
               }}
-            />
+            /> */}
 
             {!mdUp && <NavMobile offsetTop={offsetTop} data={data} />}
           </Stack>

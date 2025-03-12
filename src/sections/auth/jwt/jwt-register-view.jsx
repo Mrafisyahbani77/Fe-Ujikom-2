@@ -25,6 +25,7 @@ export default function JwtRegisterView() {
   const [errorMsg, setErrorMsg] = useState('');
   const searchParams = useSearchParams();
   const password = useBoolean();
+  
 
   const RegisterSchema = Yup.object().shape({
     username: Yup.string().min(3, 'Username minimal 3 karakter').required('Username harus di isi'),
@@ -40,7 +41,12 @@ export default function JwtRegisterView() {
       .required('Konfirmasi password harus di isi'),
   });
 
-  const { register, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting, errors },
+  } = useForm({
     resolver: yupResolver(RegisterSchema),
     defaultValues: {
       username: '',
@@ -73,6 +79,30 @@ export default function JwtRegisterView() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${HOST_API}/api/auth/google`;
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get('accessToken');
+    const refreshToken = params.get('refreshToken');
+    const role = params.get('role');
+
+    if (accessToken && refreshToken) {
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('refreshToken', refreshToken);
+
+      enqueueSnackbar('Login successful', { variant: 'success' });
+
+      if (role === 'admin') {
+        router.push(paths.dashboard.root);
+      } else {
+        router.push('/');
+      }
+    }
+  }, []);
+
   return (
     <>
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
@@ -88,9 +118,24 @@ export default function JwtRegisterView() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2.5}>
           {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
-          <TextField label="Username" {...register('username')} error={!!errors.username} helperText={errors.username?.message} />
-          <TextField label="Nomor Telepon" {...register('phone_number')} error={!!errors.phone_number} helperText={errors.phone_number?.message} />
-          <TextField label="Email" {...register('email')} error={!!errors.email} helperText={errors.email?.message} />
+          <TextField
+            label="Username"
+            {...register('username')}
+            error={!!errors.username}
+            helperText={errors.username?.message}
+          />
+          <TextField
+            label="Nomor Telepon"
+            {...register('phone_number')}
+            error={!!errors.phone_number}
+            helperText={errors.phone_number?.message}
+          />
+          <TextField
+            label="Email"
+            {...register('email')}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+          />
           <FormControl>
             <InputLabel>Jenis Kelamin</InputLabel>
             <Select {...register('gender')} error={!!errors.gender}>
@@ -114,10 +159,35 @@ export default function JwtRegisterView() {
               ),
             }}
           />
-          <TextField label="Konfirmasi Password" type="password" {...register('confirm_password')} error={!!errors.confirm_password} helperText={errors.confirm_password?.message} />
-          <LoadingButton fullWidth color="inherit" size="large" type="submit" variant="contained" loading={isSubmitting}>
+          <TextField
+            label="Konfirmasi Password"
+            type="password"
+            {...register('confirm_password')}
+            error={!!errors.confirm_password}
+            helperText={errors.confirm_password?.message}
+          />
+          <LoadingButton
+            fullWidth
+            color="inherit"
+            size="large"
+            type="submit"
+            variant="contained"
+            loading={isSubmitting}
+          >
             Buat Akun
           </LoadingButton>
+
+          <Button
+            fullWidth
+            startIcon={<Iconify icon="flat-color-icons:google" />}
+            color="primary"
+            size="large"
+            sx={{ borderRadius: 5, py: 1 }}
+            variant="contained"
+            onClick={handleGoogleLogin}
+          >
+            Login with Google
+          </Button>
         </Stack>
       </form>
     </>

@@ -101,7 +101,7 @@ export function AuthProvider({ children }) {
           type: 'LOGIN',
           payload: {
             user,
-            roles: user?.role ? [user.role] : [],
+            roles: user?.role, // Perbaikan disini
             admin: user?.role === 'admin',
             accessToken,
             refreshToken,
@@ -110,7 +110,7 @@ export function AuthProvider({ children }) {
 
         await initialize(); // Panggil ulang agar state diperbarui
 
-        router.push(user.role === 'admin' ? '/dashboard' : '/');
+        return response.data; // Pastikan login() mengembalikan response
       } catch (error) {
         console.error('Login Error:', error);
         throw error;

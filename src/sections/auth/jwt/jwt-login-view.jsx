@@ -14,7 +14,7 @@ import { Button } from '@mui/material';
 // routes
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
-import { useRouter, useSearchParams } from 'src/routes/hooks';
+import { useRouter } from 'src/routes/hooks';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // auth
@@ -32,7 +32,6 @@ export default function JwtLoginView() {
   const { login } = useAuthContext();
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState('');
-  const searchParams = useSearchParams();
   const password = useBoolean();
 
   // const { mutate: mutationLogin } = useMutationLogin({
@@ -78,29 +77,53 @@ export default function JwtLoginView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      // Validasi format email sebelum mengirim permintaan
+      const errors = methods.formState.errors;
+
+      if (errors.email) {
+        enqueueSnackbar(errors.email.message, { variant: 'error' });
+        return;
+      }
+
       const response = await login?.(data.email, data.password);
+
+      if (!response || !response.user) {
+        enqueueSnackbar('Gagal mendapatkan data user!', { variant: 'error' });
+        return;
+      }
+
       const userRole = response.user.role;
+      console.log(userRole);
 
       if (userRole === 'admin') {
         router.push('/dashboard');
-        enqueueSnackbar('Login berhasil!', { variant: 'success' });
       } else if (userRole === 'pembeli') {
         router.push('/');
-        enqueueSnackbar('Login berhasil', { variant: 'success' });
       } else {
         enqueueSnackbar('Role tidak dikenal!', { variant: 'error' });
+        return;
       }
+
+      enqueueSnackbar('Login berhasil!', { variant: 'success' });
     } catch (error) {
-      enqueueSnackbar(error?.response?.data?.message || 'Terjadi kesalahan', { variant: 'error' });
+      const errorMessage = error?.response?.data?.error || 'Terjadi kesalahan';
+
+      if (error?.response?.status === 400) {
+        if (errorMessage === 'Email tidak ditemukan') {
+          enqueueSnackbar('Email anda salah!', { variant: 'error' });
+        } else {
+          enqueueSnackbar('Password anda salah!', { variant: 'error' });
+        }
+      } else {
+        enqueueSnackbar(errorMessage, { variant: 'error' });
+      }
     }
   });
 
-  // Fungsi untuk login dengan Google
   const handleGoogleLogin = () => {
     window.location.href = `${HOST_API}/api/auth/google`;
   };
 
-  // Menangkap token dari URL setelah redirect dari backend Google
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get('accessToken');
@@ -111,8 +134,13 @@ export default function JwtLoginView() {
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('refreshToken', refreshToken);
 
-      enqueueSnackbar('Login berhasil', { variant: 'success' });
-      router.push(role === 'admin' ? paths.dashboard.root : '/');
+      enqueueSnackbar('Login successful', { variant: 'success' });
+
+      if (role === 'admin') {
+        router.push(paths.dashboard.root);
+      } else {
+        router.push('/');
+      }
     }
   }, []);
 
@@ -131,7 +159,13 @@ export default function JwtLoginView() {
       {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
       <Stack spacing={2.5}>
-        <RHFTextField name="email" label="Email address" />
+        <RHFTextField
+          name="email"
+          label="Email address"
+          error={!!methods.formState.errors.email}
+          helperText={methods.formState.errors.email?.message}
+        />
+
         <RHFTextField
           name="password"
           label="Password"
