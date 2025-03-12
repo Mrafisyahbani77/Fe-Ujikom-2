@@ -53,7 +53,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Request untuk mendapatkan refresh token
-        const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem('accessToken');
         const refreshToken = sessionStorage.getItem('refreshToken');
         if (!refreshToken) {
           throw new Error('Sesi anda telah berakhir, Silahkan login');

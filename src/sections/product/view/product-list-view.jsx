@@ -40,6 +40,7 @@ import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import ProductTableRow from '../product-table-row';
 import ProductTableToolbar from '../product-table-toolbar';
 import ProductTableFiltersResult from '../product-table-filters-result';
+import { useFetchProduct } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -76,12 +77,12 @@ export default function ProductListView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { products, productsLoading, productsEmpty } = useGetProducts();
+  const { products, productsLoading, productsEmpty } = useFetchProduct();
 
   const confirm = useBoolean();
 
   useEffect(() => {
-    if (products.length) {
+    if (products?.length) {
       setTableData(products);
     }
   }, [products]);
@@ -157,7 +158,7 @@ export default function ProductListView() {
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading="List"
+          heading="Daftar Product"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
             {

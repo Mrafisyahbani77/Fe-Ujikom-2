@@ -41,57 +41,52 @@ import FormProvider, {
   RHFAutocomplete,
   RHFMultiCheckbox,
 } from 'src/components/hook-form';
+import { useMutationCreate, useMutationUpdate } from 'src/utils/product';
+import { useQueryClient } from '@tanstack/react-query';
+import { useFetchCategory } from 'src/utils/category';
 
 // ----------------------------------------------------------------------
 
 export default function ProductNewEditForm({ currentProduct }) {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const mdUp = useResponsive('up', 'md');
-
   const { enqueueSnackbar } = useSnackbar();
-
-  const [includeTaxes, setIncludeTaxes] = useState(false);
+  // const [includeTaxes, setIncludeTaxes] = useState(false);
+  const [status, setStatus] = useState(true);
+  const { data, productsLoading, productsEmpty } = useFetchCategory();
 
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     images: Yup.array().min(1, 'Images is required'),
     tags: Yup.array().min(2, 'Must have at least 2 tags'),
-    category: Yup.string().required('Category is required'),
+    categories_id: Yup.number().required('Category is required'), // Perbaikan: ID kategori biasanya angka
     price: Yup.number().moreThan(0, 'Price should not be $0.00'),
+    stock: Yup.number().min(0, 'Stock should not be negative'),
     description: Yup.string().required('Description is required'),
-    // not required
-    taxes: Yup.number(),
-    newLabel: Yup.object().shape({
-      enabled: Yup.boolean(),
-      content: Yup.string(),
-    }),
-    saleLabel: Yup.object().shape({
-      enabled: Yup.boolean(),
-      content: Yup.string(),
-    }),
+    // taxes: Yup.number().nullable(),
+    // newLabel: Yup.object().shape({
+    //   enabled: Yup.boolean(),
+    //   content: Yup.string(),
+    // }),
+    // saleLabel: Yup.object().shape({
+    //   enabled: Yup.boolean(),
+    //   content: Yup.string(),
+    // }),
   });
 
   const defaultValues = useMemo(
     () => ({
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
-      subDescription: currentProduct?.subDescription || '',
       images: currentProduct?.images || [],
-      //
-      code: currentProduct?.code || '',
-      sku: currentProduct?.sku || '',
       price: currentProduct?.price || 0,
-      quantity: currentProduct?.quantity || 0,
-      priceSale: currentProduct?.priceSale || 0,
-      tags: currentProduct?.tags || [],
-      taxes: currentProduct?.taxes || 0,
-      gender: currentProduct?.gender || '',
-      category: currentProduct?.category || '',
-      colors: currentProduct?.colors || [],
-      sizes: currentProduct?.sizes || [],
-      newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
-      saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
+      stock: currentProduct?.stock || 0,
+      categories_id: currentProduct?.categories_id || '',
+      color: currentProduct?.color || [],
+      size: currentProduct?.size || [],
+      // newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
+      // saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
     }),
     [currentProduct]
   );
@@ -117,23 +112,76 @@ export default function ProductNewEditForm({ currentProduct }) {
     }
   }, [currentProduct, defaultValues, reset]);
 
-  useEffect(() => {
-    if (includeTaxes) {
-      setValue('taxes', 0);
-    } else {
-      setValue('taxes', currentProduct?.taxes || 0);
-    }
-  }, [currentProduct?.taxes, includeTaxes, setValue]);
+  // useEffect(() => {
+  //   if (includeTaxes) {
+  //     setValue('taxes', 0);
+  //   } else {
+  //     setValue('taxes', currentProduct?.taxes || 0);
+  //   }
+  // }, [currentProduct?.taxes, includeTaxes, setValue]);
+
+  // Create mutation hook
+  const createMutation = useMutationCreate({
+    onSuccess: () => {
+      enqueueSnackbar('Product created successfully!', { variant: 'success' });
+      router.push(paths.dashboard.product.root);
+      queryClient.invalidateQueries({ queryKey: ['fetch.products'] });
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
+  // Update mutation hook
+  const updateMutation = useMutationUpdate({
+    onSuccess: () => {
+      enqueueSnackbar('Product updated successfully!', { variant: 'success' });
+      router.push(paths.dashboard.product.root);
+      queryClient.invalidateQueries({ queryKey: ['fetch.products'] });
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      enqueueSnackbar(currentProduct ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.product.root);
-      console.info('DATA', data);
+      const formData = new FormData();
+
+      formData.append('name', data.name);
+      formData.append('description', data.description);
+      formData.append('price', data.price.toString());
+      formData.append('stock', data.stock.toString());
+      formData.append('categories_id', data.categories_id.toString());
+
+      if (data.size.length) {
+        formData.append('size', JSON.stringify(data.size));
+      }
+      if (data.color.length) {
+        formData.append('color', JSON.stringify(data.color));
+      }
+
+      // formData.append('status', status ? '1' : '0');
+
+      if (data.images.length) {
+        data.images.forEach((image, index) => {
+          if (image instanceof File) {
+            formData.append(`images[${index}]`, image);
+          } else if (typeof image === 'string') {
+            formData.append(`images[${index}]`, image); // Menangani URL gambar
+          }
+        });
+      }
+
+      if (currentProduct?.id) {
+        await updateMutation.mutateAsync({ id: currentProduct.id, data: formData });
+      } else {
+        await createMutation.mutateAsync(formData);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error submitting form:', error);
     }
   });
 
@@ -164,9 +212,13 @@ export default function ProductNewEditForm({ currentProduct }) {
     setValue('images', []);
   }, [setValue]);
 
-  const handleChangeIncludeTaxes = useCallback((event) => {
-    setIncludeTaxes(event.target.checked);
-  }, []);
+  // const handleChangeIncludeTaxes = useCallback((event) => {
+  //   setIncludeTaxes(event.target.checked);
+  // }, []);
+
+  // const handleChangeStatus = useCallback((event) => {
+  //   setStatus(event.target.checked);
+  // }, []);
 
   const renderDetails = (
     <>
@@ -188,7 +240,7 @@ export default function ProductNewEditForm({ currentProduct }) {
           <Stack spacing={3} sx={{ p: 3 }}>
             <RHFTextField name="name" label="Product Name" />
 
-            <RHFTextField name="subDescription" label="Sub Description" multiline rows={4} />
+            {/* <RHFTextField name="subDescription" label="Sub Description" multiline rows={4} /> */}
 
             <Stack spacing={1.5}>
               <Typography variant="subtitle2">Content</Typography>
@@ -241,41 +293,40 @@ export default function ProductNewEditForm({ currentProduct }) {
                 md: 'repeat(2, 1fr)',
               }}
             >
-              <RHFTextField name="code" label="Product Code" />
+              {/* <RHFTextField name="code" label="Product Code" />
 
-              <RHFTextField name="sku" label="Product SKU" />
+              <RHFTextField name="sku" label="Product SKU" /> */}
 
               <RHFTextField
-                name="quantity"
-                label="Quantity"
+                name="stock"
+                label="Stock"
                 placeholder="0"
                 type="number"
                 InputLabelProps={{ shrink: true }}
               />
 
-              <RHFSelect native name="category" label="Category" InputLabelProps={{ shrink: true }}>
-                {PRODUCT_CATEGORY_GROUP_OPTIONS.map((category) => (
-                  <optgroup key={category.group} label={category.group}>
-                    {category.classify.map((classify) => (
-                      <option key={classify} value={classify}>
-                        {classify}
-                      </option>
-                    ))}
-                  </optgroup>
+              <RHFSelect name="categories_id" label="Category">
+                <option value="" disabled>
+                  Select category
+                </option>
+                {data?.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
                 ))}
               </RHFSelect>
 
               <RHFMultiSelect
                 checkbox
-                name="colors"
+                name="color"
                 label="Colors"
                 options={PRODUCT_COLOR_NAME_OPTIONS}
               />
 
-              <RHFMultiSelect checkbox name="sizes" label="Sizes" options={PRODUCT_SIZE_OPTIONS} />
+              <RHFMultiSelect checkbox name="size" label="Sizes" options={PRODUCT_SIZE_OPTIONS} />
             </Box>
 
-            <RHFAutocomplete
+            {/* <RHFAutocomplete
               name="tags"
               label="Tags"
               placeholder="+ Tags"
@@ -300,16 +351,16 @@ export default function ProductNewEditForm({ currentProduct }) {
                   />
                 ))
               }
-            />
+            /> */}
 
-            <Stack spacing={1}>
+            {/* <Stack spacing={1}>
               <Typography variant="subtitle2">Gender</Typography>
               <RHFMultiCheckbox row name="gender" spacing={2} options={PRODUCT_GENDER_OPTIONS} />
-            </Stack>
+            </Stack> */}
 
             <Divider sx={{ borderStyle: 'dashed' }} />
 
-            <Stack direction="row" alignItems="center" spacing={3}>
+            {/* <Stack direction="row" alignItems="center" spacing={3}>
               <RHFSwitch name="saleLabel.enabled" label={null} sx={{ m: 0 }} />
               <RHFTextField
                 name="saleLabel.content"
@@ -327,7 +378,7 @@ export default function ProductNewEditForm({ currentProduct }) {
                 fullWidth
                 disabled={!values.newLabel.enabled}
               />
-            </Stack>
+            </Stack> */}
           </Stack>
         </Card>
       </Grid>
@@ -369,7 +420,7 @@ export default function ProductNewEditForm({ currentProduct }) {
               }}
             />
 
-            <RHFTextField
+            {/* <RHFTextField
               name="priceSale"
               label="Sale Price"
               placeholder="0.00"
@@ -384,9 +435,9 @@ export default function ProductNewEditForm({ currentProduct }) {
                   </InputAdornment>
                 ),
               }}
-            />
+            /> */}
 
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Switch checked={includeTaxes} onChange={handleChangeIncludeTaxes} />}
               label="Price includes taxes"
             />
@@ -408,7 +459,7 @@ export default function ProductNewEditForm({ currentProduct }) {
                   ),
                 }}
               />
-            )}
+            )} */}
           </Stack>
         </Card>
       </Grid>
@@ -419,11 +470,11 @@ export default function ProductNewEditForm({ currentProduct }) {
     <>
       {mdUp && <Grid md={4} />}
       <Grid xs={12} md={8} sx={{ display: 'flex', alignItems: 'center' }}>
-        <FormControlLabel
+        {/* <FormControlLabel
           control={<Switch defaultChecked />}
           label="Publish"
           sx={{ flexGrow: 1, pl: 3 }}
-        />
+        /> */}
 
         <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
           {!currentProduct ? 'Create Product' : 'Save Changes'}
