@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button, TextField, Card, CardContent, Typography } from '@mui/material';
+import { useRef, useState } from 'react';
+import { Button, TextField, Card, CardContent, Typography, Box } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useMutationCreate } from 'src/utils/banner';
 import { useRouter } from 'src/routes/hooks';
@@ -13,7 +13,9 @@ export default function CreateForm() {
   const [link, setLink] = useState('');
   const [priority, setPriority] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [preview, setPreview] = useState(null);
   const router = useRouter();
+  const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
 
   const mutation = useMutationCreate({
@@ -25,7 +27,7 @@ export default function CreateForm() {
       setLink('');
       setPriority('');
       setIsActive(true);
-
+      if (fileInputRef.current) fileInputRef.current.value = '';
       router.push(paths.dashboard.banner.list);
       queryClient.invalidateQueries({ queryKey: ['fetch.banner'] });
     },
@@ -34,6 +36,20 @@ export default function CreateForm() {
       enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,7 +60,7 @@ export default function CreateForm() {
 
     const formData = new FormData();
     formData.append('title', title);
-    formData.append('image_url', image);
+    formData.append('image', image);
     if (link) formData.append('link', link);
     if (priority) formData.append('priority', priority);
     formData.append('is_active', isActive);
@@ -70,9 +86,22 @@ export default function CreateForm() {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
+            ref={fileInputRef}
+            onChange={handleFileChange}
             style={{ display: 'block', marginBottom: 16 }}
           />
+          {preview && (
+            <Box sx={{ mb: 3 }}>
+              <img
+                src={preview}
+                alt="Preview"
+                style={{ width: '100%', height: 'auto', marginBottom: 16 }}
+              />
+              <Button onClick={handleRemoveImage} variant="outlined" color="secondary" fullWidth>
+                Hapus Gambar
+              </Button>
+            </Box>
+          )}
           <TextField
             fullWidth
             label="Link (Opsional)"

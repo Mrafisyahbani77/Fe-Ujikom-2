@@ -113,10 +113,10 @@ export default function BannerView() {
   const { mutate: DeleteCategory, isPending } = useMutationDelete({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
-      enqueueSnackbar('Apartement berhasil dihapus', { variant: 'success' });
+      enqueueSnackbar('Banner berhasil dihapus', { variant: 'success' });
     },
     onError: () => {
-      enqueueSnackbar('gagal menghapus apartement', { variant: 'error' });
+      enqueueSnackbar('gagal menghapus banner', { variant: 'error' });
     },
   });
 
@@ -150,7 +150,7 @@ export default function BannerView() {
 
   const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.category.edit(id));
+      router.push(paths.dashboard.banner.edit(id));
     },
     [router]
   );
@@ -170,22 +170,22 @@ export default function BannerView() {
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading="Daftar Kategori"
+          heading="Daftar Banner"
           links={[
             {
               name: 'Dashboard',
               href: paths.dashboard.root,
             },
-            { name: 'Daftar Kategori' },
+            { name: 'Daftar Banner' },
           ]}
           action={
             <Button
               component={RouterLink}
-              href={paths.dashboard.category.new}
+              href={paths.dashboard.banner.new}
               variant="contained"
               startIcon={<Iconify icon="mingcute:add-line" />}
             >
-              Buat Kategori
+              Buat Banner
             </Button>
           }
           sx={{ mb: { xs: 3, md: 5 } }}

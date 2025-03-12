@@ -27,12 +27,24 @@ import EcommerceLatestProducts from '../../e-commerce/ecommerce-latest-products'
 import EcommerceWidgetSummary from '../../e-commerce/ecommerce-widget-summary';
 import EcommerceSaleByGender from '../../e-commerce/ecommerce-sale-by-gender';
 import EcommerceYearlySales from '../../e-commerce/ecommerce-yearly-sales';
+import {
+  useFetchChartWeekly,
+  useFetchChartOrder,
+  useFetchChartProductSold,
+  useFetchChartSaleByGender,
+  useFetchChartYearly,
+} from 'src/utils/chart';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const theme = useTheme();
+  const { data, isLoading, isError } = useFetchChartWeekly();
+  const { data: total_order, isLoading: load, isError: error } = useFetchChartOrder();
+  const { data: sold, isLoading: loading, isError: Error } = useFetchChartProductSold();
+  const { data: gender, isLoading: fetching, isError: not_work } = useFetchChartSaleByGender();
+  const { data: year, isLoading: loadd, isError: ERror } = useFetchChartYearly();
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -49,7 +61,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Weekly Sales"
-            total={714000}
+            total={data}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
           />
         </Grid>
@@ -66,7 +78,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Item Orders"
-            total={1723315}
+            total={total_order}
             color="warning"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
           />

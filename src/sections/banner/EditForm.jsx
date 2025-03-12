@@ -1,98 +1,108 @@
 import PropTypes from 'prop-types';
-import * as Yup from 'yup';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import LoadingButton from '@mui/lab/LoadingButton';
-import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
-import Grid from '@mui/material/Unstable_Grid2';
-import CardHeader from '@mui/material/CardHeader';
-import Typography from '@mui/material/Typography';
-// routes
-import { paths } from 'src/routes/paths';
+import {
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+  Box,
+  FormControlLabel,
+  Switch,
+} from '@mui/material';
 // hooks
-import { useResponsive } from 'src/hooks/use-responsive';
-// components
 import { useSnackbar } from 'src/components/snackbar';
 import { useRouter } from 'src/routes/hooks';
-import FormProvider, { RHFUpload, RHFTextField } from 'src/components/hook-form';
 import { useMutationUpdate } from 'src/utils/banner';
-
-// ----------------------------------------------------------------------
 
 export default function EditForm({ currentProduct }) {
   const router = useRouter();
-  const mdUp = useResponsive('up', 'md');
   const { enqueueSnackbar } = useSnackbar();
 
+  // State
+  const [title, setTitle] = useState(currentProduct?.title || '');
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(currentProduct?.image_url || '');
+  const [link, setLink] = useState(currentProduct?.link || '');
+  const [priority, setPriority] = useState(currentProduct?.priority || '');
+  const [isActive, setIsActive] = useState(currentProduct?.is_active || false);
+  const fileInputRef = useRef(null);
 
-  // Schema validasi
-  const NewProductSchema = Yup.object().shape({
-    name: Yup.string().required('Nama kategori wajib diisi'),
-    image_url: Yup.array()
-      .min(1, 'Gambar wajib diunggah')
-      .max(1, 'Hanya boleh mengunggah satu gambar'),
+  // Schema validasi Yup
+  const validationSchema = Yup.object().shape({
+    title: Yup.string().required('Judul wajib diisi'),
+    image_url: Yup.mixed().nullable(),
+    link: Yup.string().url('Masukkan URL yang valid').nullable(),
+    priority: Yup.number().integer().min(1, 'Prioritas minimal 1').nullable(),
+    is_active: Yup.boolean(),
   });
 
-  const defaultValues = useMemo(
-    () => ({
-      id: currentProduct?.id || '', // Tambahkan ini
-      name: currentProduct?.name || '',
-      image_url: currentProduct?.image_url ? [currentProduct.image_url] : [],
-    }),
-    [currentProduct]
-  );
-
-  const methods = useForm({
-    resolver: yupResolver(NewProductSchema),
-    defaultValues,
+  const { handleSubmit, setValue } = useForm({
+    resolver: yupResolver(validationSchema),
   });
-
-  const {
-    reset,
-    watch,
-    setValue,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
-
-  const values = watch();
 
   useEffect(() => {
     if (currentProduct) {
-      reset(defaultValues);
+      setTitle(currentProduct.title);
+      setPreview(currentProduct.image_url);
+      setLink(currentProduct.link);
+      setPriority(currentProduct.priority);
+      setIsActive(currentProduct.is_active);
+      setValue('title', currentProduct.title);
+      setValue('link', currentProduct.link);
+      setValue('priority', currentProduct.priority);
+      setValue('is_active', currentProduct.is_active);
     }
-  }, [currentProduct, defaultValues, reset]);
+  }, [currentProduct, setValue]);
+
+  // Menangani perubahan file gambar
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Menghapus gambar yang dipilih
+  const handleRemoveImage = () => {
+    setImage(null);
+    setPreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const mutation = useMutationUpdate(
     {
       onSuccess: () => {
-        enqueueSnackbar('Kategori berhasil diperbarui', { variant: 'success' });
-        router.push(paths.dashboard.category.list);
+        enqueueSnackbar('Banner berhasil diperbarui', { variant: 'success' });
+        router.push('/dashboard/banner/list');
       },
       onError: (error) => {
-        const errorMessage =
-          error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
-        enqueueSnackbar(errorMessage, { variant: 'error' });
+        enqueueSnackbar(error.message || 'Terjadi kesalahan', { variant: 'error' });
       },
     },
-    currentProduct?.id // Pastikan id dikirimkan di sini
+    currentProduct?.id // Menambahkan ID sebagai parameter kedua
   );
 
-  const onSubmit = async (data) => {
+  const onSubmit = () => {
+    // if (!title || !image) {
+    //   enqueueSnackbar('Judul dan gambar harus diisi', { variant: 'warning' });
+    //   return;
+    // }
+
     try {
       const formData = new FormData();
-      //   formData.append('id', currentProduct?.id);
-      formData.append('name', data.name);
-
-      // Hanya tambahkan gambar jika ada
-      if (data.image_url?.length > 0) {
-        formData.append('image', data.image_url[0]);
-      }
-
-      console.log('Submitting FormData:', formData); // Debugging
+      formData.append('title', title);
+      if (image) formData.append('image', image);
+      if (link) formData.append('link', link);
+      if (priority) formData.append('priority', priority);
+      formData.append('is_active', isActive ? '1' : '0');
 
       mutation.mutate(formData);
     } catch (error) {
@@ -100,70 +110,74 @@ export default function EditForm({ currentProduct }) {
     }
   };
 
-  const handleDrop = useCallback(
-    (acceptedFiles) => {
-      const newFile = acceptedFiles[0]; // Ambil hanya satu file
-      if (newFile) {
-        setValue('image_url', [newFile], { shouldValidate: true });
-      }
-    },
-    [setValue]
-  );
-
-  // Remove single file
-  const handleRemoveFile = useCallback(
-    (inputFile) => {
-      const filtered = values.image_url?.filter((file) => file !== inputFile);
-      setValue('image_url', filtered);
-    },
-    [setValue, values.image_url]
-  );
-
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Grid
-        container
-        spacing={4}
-        sx={{
-          margin: 'auto',
-          mt: 5,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Grid item xs={12} md={8} sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Card sx={{ width: '100%', maxWidth: 600, textAlign: 'center' }}>
-            {!mdUp && <CardHeader title="Details" sx={{ textAlign: 'center' }} />}
-
-            <Stack spacing={3} sx={{ p: 3 }}>
-              <RHFTextField name="name" label="Nama Kategori *" fullWidth />
-
-              <Stack spacing={1.5} sx={{ width: '100%' }}>
-                <Typography variant="subtitle1">Gambar</Typography>
-                <RHFUpload
-                  thumbnail
-                  name="images"
-                  maxSize={3145728}
-                  onDrop={handleDrop}
-                  onRemove={handleRemoveFile}
-                />
-              </Stack>
-            </Stack>
-            <LoadingButton
-              sx={{ mb: 5 }}
-              type="submit"
-              variant="contained"
-              size="large"
-              loading={isSubmitting || mutation.isLoading}
-            >
-              {!currentProduct ? 'Tambah Kategori' : 'Simpan Perubahan'}
-            </LoadingButton>
-          </Card>
-        </Grid>
-      </Grid>
-    </FormProvider>
+    <Card sx={{ maxWidth: 400, margin: 'auto', mt: 5 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Edit Banner
+        </Typography>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            fullWidth
+            label="Judul Banner"
+            variant="outlined"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            style={{ display: 'block', marginBottom: 16 }}
+          />
+          {preview && (
+            <Box sx={{ mb: 3 }}>
+              <img
+                src={preview}
+                alt="Preview"
+                style={{ width: '100%', height: 'auto', marginBottom: 16 }}
+              />
+              <Button onClick={handleRemoveImage} variant="outlined" color="secondary" fullWidth>
+                Hapus Gambar
+              </Button>
+            </Box>
+          )}
+          <TextField
+            fullWidth
+            label="Link (Opsional)"
+            variant="outlined"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Prioritas (Opsional)"
+            variant="outlined"
+            type="number"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Aktif"
+            sx={{ mb: 2 }}
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Simpan
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 

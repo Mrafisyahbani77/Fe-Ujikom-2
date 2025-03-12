@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button, TextField, Card, CardContent, Typography } from '@mui/material';
+import { useState, useRef } from 'react';
+import { Button, TextField, Card, CardContent, Typography, Avatar, Box } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useMutationCreate } from 'src/utils/category';
 import { useRouter } from 'src/routes/hooks';
@@ -10,22 +10,23 @@ export default function CreateForm() {
   const { enqueueSnackbar } = useSnackbar();
   const [name, setName] = useState('');
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const fileInputRef = useRef(null);
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutationCreate({
     onSuccess: () => {
       enqueueSnackbar('Kategori berhasil dibuat', { variant: 'success' });
-
       setName('');
       setImage(null);
-
+      setPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       router.push(paths.dashboard.category.list);
       queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
-
       if (errorMessage.includes('Kategori dengan nama tersebut sudah ada')) {
         enqueueSnackbar('Kategori dengan nama tersebut sudah ada!', { variant: 'warning' });
       } else {
@@ -33,6 +34,20 @@ export default function CreateForm() {
       }
     },
   });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,9 +81,22 @@ export default function CreateForm() {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={handleFileChange}
+            ref={fileInputRef}
             style={{ display: 'block', marginBottom: 16 }}
           />
+          {preview && (
+            <Box sx={{ mb: 3 }}>
+              <img
+                src={preview}
+                alt="Preview"
+                style={{ width: '100%', height: 'auto', marginBottom: 16 }}
+              />
+              <Button onClick={handleRemoveImage} variant="outlined" color="secondary" fullWidth>
+                Hapus Gambar
+              </Button>
+            </Box>
+          )}
           <Button type="submit" variant="contained" color="primary" fullWidth>
             Simpan
           </Button>

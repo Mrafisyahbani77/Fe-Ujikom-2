@@ -17,7 +17,7 @@ export default function BannerEditView({ id }) {
         heading="Edit Banner"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
-          { name: 'daftar kategori', href: paths.dashboard.category.list },
+          { name: 'daftar banner', href: paths.dashboard.category.list },
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
