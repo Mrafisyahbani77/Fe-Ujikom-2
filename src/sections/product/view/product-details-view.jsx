@@ -28,6 +28,7 @@ import ProductDetailsSummary from '../product-details-summary';
 import ProductDetailsToolbar from '../product-details-toolbar';
 import ProductDetailsCarousel from '../product-details-carousel';
 import ProductDetailsDescription from '../product-details-description';
+import { useFetchProductById } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -52,7 +53,11 @@ const SUMMARY = [
 // ----------------------------------------------------------------------
 
 export default function ProductDetailsView({ id }) {
-  const { product, productLoading, productError } = useGetProduct(id);
+  const {
+    data: product,
+    isLoading: productLoading,
+    isError: productError,
+  } = useFetchProductById(id);
 
   const settings = useSettingsContext();
 
@@ -153,10 +158,10 @@ export default function ProductDetailsView({ id }) {
               value: 'description',
               label: 'Description',
             },
-            {
-              value: 'reviews',
-              label: `Reviews (${product.reviews.length})`,
-            },
+            // {
+            //   value: 'reviews',
+            //   label: `Reviews (${product.reviews.length})`,
+            // },
           ].map((tab) => (
             <Tab key={tab.value} value={tab.value} label={tab.label} />
           ))}

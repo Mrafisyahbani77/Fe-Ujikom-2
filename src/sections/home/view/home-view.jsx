@@ -51,7 +51,7 @@ export default function HomeView() {
       >
         <HomeMinimal />
 
-        {/* <ProductShopView /> */}
+        <ProductShopView />
 
         {/* <HomeAdvertisement /> */}
       </Box>

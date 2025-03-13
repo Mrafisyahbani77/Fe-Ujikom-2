@@ -34,14 +34,22 @@ export default function ProductTableRow({
 }) {
   const {
     name,
+    sku,
+    description,
+    stock,
+    images,
+    size,
+    color,
+    created_at,
     price,
     publish,
     coverUrl,
-    category,
+    category_id,
     quantity,
     createdAt,
     available,
     inventoryType,
+    categories_id,
   } = row;
 
   const confirm = useBoolean();
@@ -58,7 +66,7 @@ export default function ProductTableRow({
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar
             alt={name}
-            src={coverUrl}
+            src={images[0]}
             variant="rounded"
             sx={{ width: 64, height: 64, mr: 2 }}
           />
@@ -78,7 +86,7 @@ export default function ProductTableRow({
             }
             secondary={
               <Box component="div" sx={{ typography: 'body2', color: 'text.disabled' }}>
-                {category}
+                {categories_id}
               </Box>
             }
           />
@@ -86,8 +94,8 @@ export default function ProductTableRow({
 
         <TableCell>
           <ListItemText
-            primary={format(new Date(createdAt), 'dd MMM yyyy')}
-            secondary={format(new Date(createdAt), 'p')}
+            primary={format(new Date(created_at), 'dd MMM yyyy')}
+            secondary={format(new Date(created_at), 'p')}
             primaryTypographyProps={{ typography: 'body2', noWrap: true }}
             secondaryTypographyProps={{
               mt: 0.5,
@@ -97,7 +105,7 @@ export default function ProductTableRow({
           />
         </TableCell>
 
-        <TableCell sx={{ typography: 'caption', color: 'text.secondary' }}>
+        {/* <TableCell sx={{ typography: 'caption', color: 'text.secondary' }}>
           <LinearProgress
             value={(available * 100) / quantity}
             variant="determinate"
@@ -109,15 +117,15 @@ export default function ProductTableRow({
             sx={{ mb: 1, height: 6, maxWidth: 80 }}
           />
           {!!available && available} {inventoryType}
-        </TableCell>
+        </TableCell> */}
 
         <TableCell>{fCurrency(price)}</TableCell>
 
-        <TableCell>
+        {/* <TableCell>
           <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>
             {publish}
           </Label>
-        </TableCell>
+        </TableCell> */}
 
         <TableCell align="right">
           <IconButton color={popover.open ? 'primary' : 'default'} onClick={popover.onOpen}>

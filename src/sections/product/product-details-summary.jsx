@@ -39,10 +39,10 @@ export default function ProductDetailsSummary({
   const {
     id,
     name,
-    sizes,
+    size,
     price,
-    coverUrl,
-    colors,
+    images,
+    color,
     newLabel,
     available,
     priceSale,
@@ -62,11 +62,11 @@ export default function ProductDetailsSummary({
   const defaultValues = {
     id,
     name,
-    coverUrl,
+    images,
     available,
     price,
-    colors: colors[0],
-    size: sizes[4],
+    color: color[0],
+    size: size[4],
     quantity: available < 1 ? 0 : 1,
   };
 
@@ -90,7 +90,7 @@ export default function ProductDetailsSummary({
       if (!existProduct) {
         onAddCart?.({
           ...data,
-          colors: [values.colors],
+          colors: [values.color],
           subTotal: data.price * data.quantity,
         });
       }
@@ -105,7 +105,7 @@ export default function ProductDetailsSummary({
     try {
       onAddCart?.({
         ...values,
-        colors: [values.colors],
+        colors: [values.color],
         subTotal: values.price * values.quantity,
       });
     } catch (error) {
@@ -172,26 +172,26 @@ export default function ProductDetailsSummary({
     </Stack>
   );
 
-  const renderColorOptions = (
-    <Stack direction="row">
-      <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-        Color
-      </Typography>
+  // const renderColorOptions = (
+  //   <Stack direction="row">
+  //     <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
+  //       Color
+  //     </Typography>
 
-      <Controller
-        name="colors"
-        control={control}
-        render={({ field }) => (
-          <ColorPicker
-            colors={colors}
-            selected={field.value}
-            onSelectColor={(color) => field.onChange(color)}
-            limit={4}
-          />
-        )}
-      />
-    </Stack>
-  );
+  //     <Controller
+  //       name="colors"
+  //       control={control}
+  //       render={({ field }) => (
+  //         <ColorPicker
+  //           colors={color}
+  //           selected={field.value}
+  //           onSelectColor={(colors) => field.onChange(colors)}
+  //           limit={4}
+  //         />
+  //       )}
+  //     />
+  //   </Stack>
+  // );
 
   const renderSizeOptions = (
     <Stack direction="row">
@@ -216,7 +216,7 @@ export default function ProductDetailsSummary({
           },
         }}
       >
-        {sizes.map((size) => (
+        {size.map((size) => (
           <MenuItem key={size} value={size}>
             {size}
           </MenuItem>
@@ -289,12 +289,12 @@ export default function ProductDetailsSummary({
     </Stack>
   );
 
-  const renderLabels = (newLabel.enabled || saleLabel.enabled) && (
-    <Stack direction="row" alignItems="center" spacing={1}>
-      {newLabel.enabled && <Label color="info">{newLabel.content}</Label>}
-      {saleLabel.enabled && <Label color="error">{saleLabel.content}</Label>}
-    </Stack>
-  );
+  // const renderLabels = (newLabel.enabled || saleLabel.enabled) && (
+  //   <Stack direction="row" alignItems="center" spacing={1}>
+  //     {newLabel.enabled && <Label color="info">{newLabel.content}</Label>}
+  //     {saleLabel.enabled && <Label color="error">{saleLabel.content}</Label>}
+  //   </Stack>
+  // );
 
   const renderInventoryType = (
     <Box
@@ -315,26 +315,26 @@ export default function ProductDetailsSummary({
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Stack spacing={3} sx={{ pt: 3 }} {...other}>
         <Stack spacing={2} alignItems="flex-start">
-          {renderLabels}
+          {/* {renderLabels} */}
 
-          {renderInventoryType}
+          {/* {renderInventoryType} */}
 
           <Typography variant="h5">{name}</Typography>
 
-          {renderRating}
+          {/* {renderRating} */}
 
           {renderPrice}
 
-          {renderSubDescription}
+          {/* {renderSubDescription} */}
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {renderColorOptions}
+        {/* {renderColorOptions} */}
 
         {renderSizeOptions}
 
-        {renderQuantity}
+        {/* {renderQuantity} */}
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 

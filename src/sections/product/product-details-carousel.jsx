@@ -62,9 +62,10 @@ const StyledThumbnailsContainer = styled('div')(({ length, theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function ProductDetailsCarousel({ product }) {
+  console.log(product.images)
   const theme = useTheme();
 
-  const slides = product.images.map((img) => ({
+  const slides = product?.images?.map((img) => ({
     src: img,
   }));
 
@@ -83,7 +84,7 @@ export default function ProductDetailsCarousel({ product }) {
     focusOnSelect: true,
     variableWidth: true,
     centerPadding: '0px',
-    slidesToShow: slides.length > 3 ? 3 : slides.length,
+    slidesToShow: slides?.length > 3 ? 3 : slides?.length,
   });
 
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function ProductDetailsCarousel({ product }) {
         asNavFor={carouselThumb.nav}
         ref={carouselLarge.carouselRef}
       >
-        {slides.map((slide) => (
+        {slides?.map((slide) => (
           <Image
             key={slide.src}
             alt={slide.src}
@@ -125,7 +126,7 @@ export default function ProductDetailsCarousel({ product }) {
 
       <CarouselArrowIndex
         index={carouselLarge.currentIndex}
-        total={slides.length}
+        total={slides?.length}
         onNext={carouselThumb.onNext}
         onPrev={carouselThumb.onPrev}
       />
@@ -133,13 +134,13 @@ export default function ProductDetailsCarousel({ product }) {
   );
 
   const renderThumbnails = (
-    <StyledThumbnailsContainer length={slides.length}>
+    <StyledThumbnailsContainer length={slides?.length}>
       <Carousel
         {...carouselThumb.carouselSettings}
         asNavFor={carouselLarge.nav}
         ref={carouselThumb.carouselRef}
       >
-        {slides.map((item, index) => (
+        {slides?.map((item, index) => (
           <Box key={item.src} sx={{ px: 0.5 }}>
             <Avatar
               key={item.src}

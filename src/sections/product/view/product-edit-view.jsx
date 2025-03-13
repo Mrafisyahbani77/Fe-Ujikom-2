@@ -10,13 +10,14 @@ import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
 import ProductNewEditForm from '../product-new-edit-form';
+import { useFetchProductById } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
 export default function ProductEditView({ id }) {
   const settings = useSettingsContext();
 
-  const { product: currentProduct } = useGetProduct(id);
+  const { data: currentProduct } = useFetchProductById(id);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>

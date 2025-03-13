@@ -166,12 +166,8 @@ export default function ProductNewEditForm({ currentProduct }) {
       // formData.append('status', status ? '1' : '0');
 
       if (data.images.length) {
-        data.images.forEach((image, index) => {
-          if (image instanceof File) {
-            formData.append(`images[${index}]`, image);
-          } else if (typeof image === 'string') {
-            formData.append(`images[${index}]`, image); // Menangani URL gambar
-          }
+        data.images.forEach((image) => {
+          formData.append('images', image);
         });
       }
 

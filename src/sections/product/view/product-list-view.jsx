@@ -77,7 +77,7 @@ export default function ProductListView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { products, productsLoading, productsEmpty } = useFetchProduct();
+  const { data: products, productsLoading, productsEmpty } = useFetchProduct();
 
   const confirm = useBoolean();
 
@@ -86,6 +86,8 @@ export default function ProductListView() {
       setTableData(products);
     }
   }, [products]);
+
+  console.log(products);
 
   const dataFiltered = applyFilter({
     inputData: tableData,

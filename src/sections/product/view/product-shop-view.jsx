@@ -31,6 +31,7 @@ import ProductSort from '../product-sort';
 import ProductSearch from '../product-search';
 import ProductFilters from '../product-filters';
 import ProductFiltersResult from '../product-filters-result';
+import { useFetchProduct } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -59,7 +60,8 @@ export default function ProductShopView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { products, productsLoading, productsEmpty } = useGetProducts();
+  const { data: products, productsLoading, productsEmpty } = useFetchProduct();
+  // console.log(products)
 
   const { searchResults, searchLoading } = useSearchProducts(debouncedQuery);
 

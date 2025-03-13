@@ -45,8 +45,8 @@ const ColorPicker = forwardRef(
         }}
         {...other}
       >
-        {colors.map((color) => {
-          const hasSelected = singleSelect ? selected === color : selected.includes(color);
+        {colors?.map((color) => {
+          const hasSelected = singleSelect ? selected === color : selected?.includes(color);
 
           return (
             <ButtonBase

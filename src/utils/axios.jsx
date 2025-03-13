@@ -7,16 +7,16 @@ import { HOST_API } from 'src/config-global';
 
 const axiosInstance = axios.create({ baseURL: HOST_API, withCredentials: true });
 
-const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    if (token) {
-      prom.resolve(token);
-    } else {
-      prom.reject(error);
-    }
-  });
-  failedQueue = [];
-};
+// const processQueue = (error, token = null) => {
+//   failedQueue.forEach((prom) => {
+//     if (token) {
+//       prom.resolve(token);
+//     } else {
+//       prom.reject(error);
+//     }
+//   });
+//   failedQueue = [];
+// };
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -35,7 +35,6 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Jika error 401 dan request belum dicoba ulang
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -52,31 +51,29 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Request untuk mendapatkan refresh token
+        // Ambil token lama dari sessionStorage
         const token = sessionStorage.getItem('accessToken');
         const refreshToken = sessionStorage.getItem('refreshToken');
+
         if (!refreshToken) {
-          throw new Error('Sesi anda telah berakhir, Silahkan login');
+          throw new Error('Sesi anda telah berakhir, silakan login kembali');
         }
 
-        const { data } = await axiosInstance.post(
-          '/api/auth/refresh-token',
-          {
-            refreshToken: refreshToken,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const newToken = data.new_access_token;
-        const newRefreshToken = data.new_refresh_token;
+        // Kirim request refresh token
+        const { data } = await axiosInstance.post('/api/auth/refresh-token', {
+          refreshToken,
+        });
 
+        const newToken = data.accessToken; // Sesuai dengan backend
+        const newRefreshToken = data.refreshToken; // Sesuai dengan backend
+
+        // Simpan token baru
         sessionStorage.setItem('accessToken', newToken);
         sessionStorage.setItem('refreshToken', newRefreshToken);
 
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+        // Jalankan ulang request yang tertunda
         processQueue(null, newToken);
         return axiosInstance(originalRequest);
       } catch (err) {
@@ -84,7 +81,7 @@ axiosInstance.interceptors.response.use(
         alert(err);
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('refreshToken');
-        window.location.href = '/auth/jwt/login'; // Redirect ke halaman login
+        window.location.href = '/auth/jwt/login'; // Redirect ke login
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
@@ -94,6 +91,19 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+const processQueue = (error, token) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 
 export default axiosInstance;
 

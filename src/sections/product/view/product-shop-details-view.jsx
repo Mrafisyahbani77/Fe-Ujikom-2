@@ -27,6 +27,7 @@ import ProductDetailsSummary from '../product-details-summary';
 import ProductDetailsCarousel from '../product-details-carousel';
 import ProductDetailsDescription from '../product-details-description';
 import { useCheckoutContext } from '../../checkout/context';
+import { useFetchProduct, useFetchProductById } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ export default function ProductShopDetailsView({ id }) {
 
   const [currentTab, setCurrentTab] = useState('description');
 
-  const { product, productLoading, productError } = useGetProduct(id);
+  const { data, isLoading: productLoading, isError: productError } = useFetchProductById(id);
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
@@ -83,24 +84,21 @@ export default function ProductShopDetailsView({ id }) {
     />
   );
 
-  const renderProduct = product && (
+  const renderProduct = data && (
     <>
       <CustomBreadcrumbs
-        links={[
-          { name: 'Home', href: '/' },
-          { name: product?.name },
-        ]}
+        links={[{ name: 'Home', href: '/' }, { name: data?.name }]}
         sx={{ mb: 5 }}
       />
 
       <Grid container spacing={{ xs: 3, md: 5, lg: 8 }}>
         <Grid xs={12} md={6} lg={7}>
-          <ProductDetailsCarousel product={product} />
+          <ProductDetailsCarousel product={data} />
         </Grid>
 
         <Grid xs={12} md={6} lg={5}>
           <ProductDetailsSummary
-            product={product}
+            product={data}
             items={checkout.items}
             onAddCart={checkout.onAddToCart}
             onGotoStep={checkout.onGotoStep}
@@ -146,25 +144,25 @@ export default function ProductShopDetailsView({ id }) {
               value: 'description',
               label: 'Description',
             },
-            {
-              value: 'reviews',
-              label: `Reviews (${product.reviews.length})`,
-            },
+            // {
+            //   value: 'reviews',
+            //   label: `Reviews (${product.reviews.length})`,
+            // },
           ].map((tab) => (
             <Tab key={tab.value} value={tab.value} label={tab.label} />
           ))}
         </Tabs>
 
         {currentTab === 'description' && (
-          <ProductDetailsDescription description={product?.description} />
+          <ProductDetailsDescription description={data?.description} />
         )}
 
         {currentTab === 'reviews' && (
           <ProductDetailsReview
-            ratings={product.ratings}
-            reviews={product.reviews}
-            totalRatings={product.totalRatings}
-            totalReviews={product.totalReviews}
+            ratings={data.ratings}
+            reviews={data.reviews}
+            totalRatings={data.totalRatings}
+            totalReviews={data.totalReviews}
           />
         )}
       </Card>
@@ -185,7 +183,7 @@ export default function ProductShopDetailsView({ id }) {
 
       {productError && renderError}
 
-      {product && renderProduct}
+      {data && renderProduct}
     </Container>
   );
 }
