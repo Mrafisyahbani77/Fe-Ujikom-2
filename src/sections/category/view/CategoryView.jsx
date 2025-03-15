@@ -113,10 +113,10 @@ export default function CategoryView() {
   const { mutate: DeleteCategory, isPending } = useMutationDelete({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
-      enqueueSnackbar('Apartement berhasil dihapus', { variant: 'success' });
+      enqueueSnackbar('Kategori berhasil dihapus', { variant: 'success' });
     },
     onError: () => {
-      enqueueSnackbar('gagal menghapus apartement', { variant: 'error' });
+      enqueueSnackbar('gagal menghapus kategori', { variant: 'error' });
     },
   });
 

@@ -51,6 +51,7 @@ export default function ProductDetailsSummary({
     totalReviews,
     inventoryType,
     subDescription,
+    stock,
   } = product;
 
   const existProduct = !!items?.length && items.map((item) => item.id).includes(id);
@@ -65,7 +66,7 @@ export default function ProductDetailsSummary({
     images,
     available,
     price,
-    color: color[0],
+    color: [color[0]],
     size: size[4],
     quantity: available < 1 ? 0 : 1,
   };
@@ -172,26 +173,26 @@ export default function ProductDetailsSummary({
     </Stack>
   );
 
-  // const renderColorOptions = (
-  //   <Stack direction="row">
-  //     <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-  //       Color
-  //     </Typography>
+  const renderColorOptions = (
+    <Stack direction="row">
+      <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
+        Color
+      </Typography>
 
-  //     <Controller
-  //       name="colors"
-  //       control={control}
-  //       render={({ field }) => (
-  //         <ColorPicker
-  //           colors={color}
-  //           selected={field.value}
-  //           onSelectColor={(colors) => field.onChange(colors)}
-  //           limit={4}
-  //         />
-  //       )}
-  //     />
-  //   </Stack>
-  // );
+      <Controller
+        name="colors"
+        control={control}
+        render={({ field }) => (
+          <ColorPicker
+            colors={color} // Pastikan nilai di sini sesuai format yang didukung
+            selected={field.value}
+            onSelectColor={(colors) => field.onChange(colors)}
+            limit={4}
+          />
+        )}
+      />
+    </Stack>
+  );
 
   const renderSizeOptions = (
     <Stack direction="row">
@@ -242,7 +243,7 @@ export default function ProductDetailsSummary({
         />
 
         <Typography variant="caption" component="div" sx={{ textAlign: 'right' }}>
-          Available: {available}
+          {stock.status} {stock.quantity}
         </Typography>
       </Stack>
     </Stack>
@@ -321,7 +322,7 @@ export default function ProductDetailsSummary({
 
           <Typography variant="h5">{name}</Typography>
 
-          {/* {renderRating} */}
+          {renderRating}
 
           {renderPrice}
 
@@ -330,11 +331,11 @@ export default function ProductDetailsSummary({
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {/* {renderColorOptions} */}
+        {/* {renderColorOptions}   */}
 
         {renderSizeOptions}
 
-        {/* {renderQuantity} */}
+        {renderQuantity}
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 

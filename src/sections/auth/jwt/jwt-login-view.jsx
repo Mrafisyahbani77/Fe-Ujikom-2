@@ -124,23 +124,24 @@ export default function JwtLoginView() {
     window.location.href = `${HOST_API}/api/auth/google`;
   };
 
+  // Menangkap token dari URL setelah redirect dari backend Google
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+      window.location.search || window.location.hash.replace('#', '?')
+    );
+
     const accessToken = params.get('accessToken');
     const refreshToken = params.get('refreshToken');
     const role = params.get('role');
+
+    console.log('Token dari URL:', { accessToken, refreshToken, role }); // Debugging
 
     if (accessToken && refreshToken) {
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('refreshToken', refreshToken);
 
-      enqueueSnackbar('Login successful', { variant: 'success' });
-
-      if (role === 'admin') {
-        router.push(paths.dashboard.root);
-      } else {
-        router.push('/');
-      }
+      enqueueSnackbar('Login berhasil', { variant: 'success' });
+      router.push(role === 'admin' ? paths.dashboard.root : '/');
     }
   }, []);
 

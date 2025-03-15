@@ -53,7 +53,7 @@ export default function ProductNewEditForm({ currentProduct }) {
   const mdUp = useResponsive('up', 'md');
   const { enqueueSnackbar } = useSnackbar();
   // const [includeTaxes, setIncludeTaxes] = useState(false);
-  const [status, setStatus] = useState(true);
+  const [status, setStatus] = useState('publish'); // Default ke 'publish'
   const { data, productsLoading, productsEmpty } = useFetchCategory();
 
   const NewProductSchema = Yup.object().shape({
@@ -123,7 +123,7 @@ export default function ProductNewEditForm({ currentProduct }) {
   // Create mutation hook
   const createMutation = useMutationCreate({
     onSuccess: () => {
-      enqueueSnackbar('Product created successfully!', { variant: 'success' });
+      enqueueSnackbar('Produk berhasil dibuat!', { variant: 'success' });
       router.push(paths.dashboard.product.root);
       queryClient.invalidateQueries({ queryKey: ['fetch.products'] });
     },
@@ -136,7 +136,7 @@ export default function ProductNewEditForm({ currentProduct }) {
   // Update mutation hook
   const updateMutation = useMutationUpdate({
     onSuccess: () => {
-      enqueueSnackbar('Product updated successfully!', { variant: 'success' });
+      enqueueSnackbar('Produk berhasil di perbarui!', { variant: 'success' });
       router.push(paths.dashboard.product.root);
       queryClient.invalidateQueries({ queryKey: ['fetch.products'] });
     },
@@ -163,7 +163,7 @@ export default function ProductNewEditForm({ currentProduct }) {
         formData.append('color', JSON.stringify(data.color));
       }
 
-      // formData.append('status', status ? '1' : '0');
+      formData.append('status', status);
 
       if (data.images.length) {
         data.images.forEach((image) => {
@@ -212,39 +212,28 @@ export default function ProductNewEditForm({ currentProduct }) {
   //   setIncludeTaxes(event.target.checked);
   // }, []);
 
-  // const handleChangeStatus = useCallback((event) => {
-  //   setStatus(event.target.checked);
-  // }, []);
+  const handleChangeStatus = useCallback((event) => {
+    setStatus(event.target.checked ? 'publish' : 'private');
+  }, []);
 
-  const renderDetails = (
+  const renderForm = (
     <>
-      {mdUp && (
-        <Grid md={4}>
-          <Typography variant="h6" sx={{ mb: 0.5 }}>
-            Details
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Title, short description, image...
-          </Typography>
-        </Grid>
-      )}
-
       <Grid xs={12} md={8}>
         <Card>
-          {!mdUp && <CardHeader title="Details" />}
+          {/* {!mdUp && <CardHeader title="Details" />} */}
 
           <Stack spacing={3} sx={{ p: 3 }}>
-            <RHFTextField name="name" label="Product Name" />
+            <RHFTextField name="name" label="Nama Produk" />
 
             {/* <RHFTextField name="subDescription" label="Sub Description" multiline rows={4} /> */}
 
             <Stack spacing={1.5}>
-              <Typography variant="subtitle2">Content</Typography>
+              <Typography variant="subtitle2">Deskripsi</Typography>
               <RHFEditor simple name="description" />
             </Stack>
 
             <Stack spacing={1.5}>
-              <Typography variant="subtitle2">Images</Typography>
+              <Typography variant="subtitle2">Gambar Produk</Typography>
               <RHFUpload
                 multiple
                 thumbnail
@@ -257,27 +246,8 @@ export default function ProductNewEditForm({ currentProduct }) {
               />
             </Stack>
           </Stack>
-        </Card>
-      </Grid>
-    </>
-  );
 
-  const renderProperties = (
-    <>
-      {mdUp && (
-        <Grid md={4}>
-          <Typography variant="h6" sx={{ mb: 0.5 }}>
-            Properties
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Additional functions and attributes...
-          </Typography>
-        </Grid>
-      )}
-
-      <Grid xs={12} md={8}>
-        <Card>
-          {!mdUp && <CardHeader title="Properties" />}
+          {/* {!mdUp && <CardHeader title="Properties" />} */}
 
           <Stack spacing={3} sx={{ p: 3 }}>
             <Box
@@ -295,13 +265,13 @@ export default function ProductNewEditForm({ currentProduct }) {
 
               <RHFTextField
                 name="stock"
-                label="Stock"
+                label="Stok"
                 placeholder="0"
                 type="number"
                 InputLabelProps={{ shrink: true }}
               />
 
-              <RHFSelect name="categories_id" label="Category">
+              <RHFSelect name="categories_id" label="Kategori">
                 <option value="" disabled>
                   Select category
                 </option>
@@ -315,11 +285,11 @@ export default function ProductNewEditForm({ currentProduct }) {
               <RHFMultiSelect
                 checkbox
                 name="color"
-                label="Colors"
+                label="Warna"
                 options={PRODUCT_COLOR_NAME_OPTIONS}
               />
 
-              <RHFMultiSelect checkbox name="size" label="Sizes" options={PRODUCT_SIZE_OPTIONS} />
+              <RHFMultiSelect checkbox name="size" label="Ukuran" options={PRODUCT_SIZE_OPTIONS} />
             </Box>
 
             {/* <RHFAutocomplete
@@ -376,41 +346,18 @@ export default function ProductNewEditForm({ currentProduct }) {
               />
             </Stack> */}
           </Stack>
-        </Card>
-      </Grid>
-    </>
-  );
-
-  const renderPricing = (
-    <>
-      {mdUp && (
-        <Grid md={4}>
-          <Typography variant="h6" sx={{ mb: 0.5 }}>
-            Pricing
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Price related inputs
-          </Typography>
-        </Grid>
-      )}
-
-      <Grid xs={12} md={8}>
-        <Card>
-          {!mdUp && <CardHeader title="Pricing" />}
 
           <Stack spacing={3} sx={{ p: 3 }}>
             <RHFTextField
               name="price"
-              label="Regular Price"
-              placeholder="0.00"
+              label="Harga"
+              placeholder="Rp.0000"
               type="number"
               InputLabelProps={{ shrink: true }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Box component="span" sx={{ color: 'text.disabled' }}>
-                      $
-                    </Box>
+                    <Box component="span" sx={{ color: 'text.disabled' }}></Box>
                   </InputAdornment>
                 ),
               }}
@@ -459,18 +406,12 @@ export default function ProductNewEditForm({ currentProduct }) {
           </Stack>
         </Card>
       </Grid>
-    </>
-  );
-
-  const renderActions = (
-    <>
       {mdUp && <Grid md={4} />}
       <Grid xs={12} md={8} sx={{ display: 'flex', alignItems: 'center' }}>
-        {/* <FormControlLabel
-          control={<Switch defaultChecked />}
-          label="Publish"
-          sx={{ flexGrow: 1, pl: 3 }}
-        /> */}
+        <FormControlLabel
+          control={<Switch checked={status === 'publish'} onChange={handleChangeStatus} />}
+          label={status === 'publish' ? 'Publish' : 'Private'}
+        />
 
         <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
           {!currentProduct ? 'Create Product' : 'Save Changes'}
@@ -481,14 +422,19 @@ export default function ProductNewEditForm({ currentProduct }) {
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Grid container spacing={3}>
-        {renderDetails}
-
-        {renderProperties}
-
-        {renderPricing}
-
-        {renderActions}
+      <Grid
+        container
+        spacing={4}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          minHeight: '100vh', // Jika ingin di tengah layar
+        }}
+      >
+        {renderForm}
       </Grid>
     </FormProvider>
   );

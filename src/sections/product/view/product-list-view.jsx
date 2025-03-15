@@ -40,7 +40,7 @@ import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import ProductTableRow from '../product-table-row';
 import ProductTableToolbar from '../product-table-toolbar';
 import ProductTableFiltersResult from '../product-table-filters-result';
-import { useFetchProduct } from 'src/utils/product';
+import { useFetchProduct, useMutationDelete } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -117,26 +117,44 @@ export default function ProductListView() {
     [table]
   );
 
-  const handleDeleteRow = useCallback(
-    (id) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
-      setTableData(deleteRow);
-
-      table.onUpdatePageDeleteRow(dataInPage.length);
-    },
-    [dataInPage.length, table, tableData]
-  );
-
-  const handleDeleteRows = useCallback(() => {
-    const deleteRows = tableData.filter((row) => !table.selected.includes(row.id));
-    setTableData(deleteRows);
-
-    table.onUpdatePageDeleteRows({
-      totalRows: tableData.length,
-      totalRowsInPage: dataInPage.length,
-      totalRowsFiltered: dataFiltered.length,
-    });
-  }, [dataFiltered.length, dataInPage.length, table, tableData]);
+  const { mutate: DeleteProduct, isPending } = useMutationDelete({
+     onSuccess: () => {
+       queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
+       enqueueSnackbar('Produk berhasil dihapus', { variant: 'success' });
+     },
+     onError: () => {
+       enqueueSnackbar('gagal menghapus produk', { variant: 'error' });
+     },
+   });
+ 
+   const handleDeleteRow = useCallback(
+     (id) => {
+       DeleteProduct(id, {
+         onSuccess: () => {
+           const deleteRow = tableData.filter((row) => row.id !== id);
+           setTableData(deleteRow);
+           table.onUpdatePageDeleteRow(dataInPage.length);
+         },
+       });
+     },
+     [DeleteProduct, dataInPage.length, table, tableData]
+   );
+ 
+   const handleDeleteRows = useCallback(() => {
+     const selectedIds = table.selected;
+ 
+     Promise.all(selectedIds.map((id) => DeleteProduct(id))).then(() => {
+       const deleteRows = tableData.filter((row) => !selectedIds.includes(row.id));
+       setTableData(deleteRows);
+ 
+       table.onUpdatePageDeleteRows({
+         totalRows: tableData.length,
+         totalRowsInPage: dataInPage.length,
+         totalRowsFiltered: dataFiltered.length,
+       });
+     });
+   }, [DeleteProduct, dataFiltered.length, dataInPage.length, table, tableData]);
+ 
 
   const handleEditRow = useCallback(
     (id) => {

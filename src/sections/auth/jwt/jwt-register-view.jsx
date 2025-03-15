@@ -25,7 +25,6 @@ export default function JwtRegisterView() {
   const [errorMsg, setErrorMsg] = useState('');
   const searchParams = useSearchParams();
   const password = useBoolean();
-  
 
   const RegisterSchema = Yup.object().shape({
     username: Yup.string().min(3, 'Username minimal 3 karakter').required('Username harus di isi'),
@@ -61,7 +60,21 @@ export default function JwtRegisterView() {
   const { mutate: mutationRegister } = useMutationRegister({
     onSuccess: (response) => {
       enqueueSnackbar('Registrasi berhasil', { variant: 'success' });
-      router.push(response.role === 'admin' ? paths.dashboard.root : '/');
+
+      if (response.isGoogle) {
+        // Jika pengguna daftar via Google, langsung login dengan menyimpan token
+        sessionStorage.setItem('accessToken', response.accessToken);
+        sessionStorage.setItem('refreshToken', response.refreshToken);
+
+        if (response.role === 'admin') {
+          router.push(paths.dashboard.root);
+        } else {
+          router.push('/');
+        }
+      } else {
+        // Jika daftar manual, arahkan ke login
+        router.push(paths.auth.jwt.login);
+      }
     },
     onError: (error) => {
       enqueueSnackbar(error.message || 'Registrasi gagal', { variant: 'error' });
@@ -88,6 +101,8 @@ export default function JwtRegisterView() {
     const accessToken = params.get('accessToken');
     const refreshToken = params.get('refreshToken');
     const role = params.get('role');
+
+    console.log('Tokens:', { accessToken, refreshToken, role }); // Debugging
 
     if (accessToken && refreshToken) {
       sessionStorage.setItem('accessToken', accessToken);

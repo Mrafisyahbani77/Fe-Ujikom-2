@@ -115,19 +115,17 @@ export default function ProductShopDetailsView({ id }) {
         }}
         sx={{ my: 10 }}
       >
-        {SUMMARY.map((item) => (
-          <Box key={item.title} sx={{ textAlign: 'center', px: 5 }}>
-            <Iconify icon={item.icon} width={32} sx={{ color: 'primary.main' }} />
+        <Box key={data.name} sx={{ textAlign: 'center', px: 5 }}>
+          <Iconify icon={data.icon} width={32} sx={{ color: 'primary.main' }} />
 
-            <Typography variant="subtitle1" sx={{ mb: 1, mt: 2 }}>
-              {item.title}
-            </Typography>
+          <Typography variant="subtitle1" sx={{ mb: 1, mt: 2 }}>
+            {data.name}
+          </Typography>
 
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              {item.description}
-            </Typography>
-          </Box>
-        ))}
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {data.description}
+          </Typography>
+        </Box>
       </Box>
 
       <Card>

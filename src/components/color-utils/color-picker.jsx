@@ -11,17 +11,21 @@ import Iconify from '../iconify';
 
 const ColorPicker = forwardRef(
   ({ colors, selected, onSelectColor, limit = 'auto', sx, ...other }, ref) => {
-    const singleSelect = typeof selected === 'string';
+    const singleSelect = typeof selected === 'string' || typeof selected === 'object';
+
+    const stringifyColor = (color) =>
+      typeof color === 'string' ? color : JSON.stringify(color, Object.keys(color).sort());
 
     const handleSelect = useCallback(
       (color) => {
+        const colorStr = stringifyColor(color);
         if (singleSelect) {
-          if (color !== selected) {
+          if (colorStr !== stringifyColor(selected)) {
             onSelectColor(color);
           }
         } else {
-          const newSelected = selected.includes(color)
-            ? selected.filter((value) => value !== color)
+          const newSelected = selected.some((s) => stringifyColor(s) === colorStr)
+            ? selected.filter((value) => stringifyColor(value) !== colorStr)
             : [...selected, color];
 
           onSelectColor(newSelected);
@@ -46,11 +50,15 @@ const ColorPicker = forwardRef(
         {...other}
       >
         {colors?.map((color) => {
-          const hasSelected = singleSelect ? selected === color : selected?.includes(color);
+          const hasSelected =
+            selected &&
+            (singleSelect
+              ? stringifyColor(selected) === stringifyColor(color)
+              : selected.some((s) => stringifyColor(s) === stringifyColor(color)));
 
           return (
             <ButtonBase
-              key={color}
+              key={stringifyColor(color)}
               sx={{
                 width: 36,
                 height: 36,
@@ -66,7 +74,7 @@ const ColorPicker = forwardRef(
                 sx={{
                   width: 20,
                   height: 20,
-                  bgcolor: color,
+                  bgcolor: typeof color === 'string' ? color : color.hex || stringifyColor(color),
                   borderRadius: '50%',
                   border: (theme) => `solid 1px ${alpha(theme.palette.grey[500], 0.16)}`,
                   ...(hasSelected && {
@@ -101,10 +109,14 @@ const ColorPicker = forwardRef(
 );
 
 ColorPicker.propTypes = {
-  colors: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  limit: PropTypes.number,
-  onSelectColor: PropTypes.func,
-  selected: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  colors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object])).isRequired,
+  limit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onSelectColor: PropTypes.func.isRequired,
+  selected: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object])),
+  ]),
   sx: PropTypes.object,
 };
 

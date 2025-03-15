@@ -24,7 +24,7 @@ import { useCheckoutContext } from '../checkout/context';
 export default function ProductItem({ product }) {
   const { onAddToCart } = useCheckoutContext();
 
-  const { id, name, images, price, color, available, sizes, priceSale, newLabel, saleLabel } =
+  const { id, name, images, price, color, stock, sizes, priceSale, newLabel, saleLabel } =
     product;
 
   const linkTo = paths.product.details(id);
@@ -34,7 +34,7 @@ export default function ProductItem({ product }) {
       id,
       name,
       images,
-      available,
+      stock,
       price,
       color: [color[0]],
       size: sizes[0],
@@ -69,7 +69,7 @@ export default function ProductItem({ product }) {
 
   const renderImg = (
     <Box sx={{ position: 'relative', p: 1 }}>
-      {/* {!!available && (
+      {/* {!!stock && (
        
       )} */}
       <Fab
@@ -93,20 +93,20 @@ export default function ProductItem({ product }) {
         <Iconify icon="solar:cart-plus-bold" width={24} />
       </Fab>
 
-      {/* <Tooltip title={!available && 'Out of stock'} placement="bottom-end"> */}
+      <Tooltip title={!stock && 'Out of stock'} placement="bottom-end">
       <Image
         alt={name}
         src={images[0]}
         ratio="1/1"
         sx={{
           borderRadius: 1.5,
-          ...(!available && {
+          ...(!stock && {
             opacity: 0.48,
             filter: 'grayscale(1)',
           }),
         }}
       />
-      {/* </Tooltip> */}
+      </Tooltip>
     </Box>
   );
 

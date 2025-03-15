@@ -19,8 +19,10 @@ import CheckoutCartProductList from './checkout-cart-product-list';
 
 export default function CheckoutCart() {
   const checkout = useCheckoutContext();
+  console.log(checkout)
 
   const empty = !checkout.items.length;
+  
 
   return (
     <Grid container spacing={3}>
