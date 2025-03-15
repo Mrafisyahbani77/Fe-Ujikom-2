@@ -47,7 +47,7 @@ export function CheckoutProvider({ children }) {
   const mutationAddToCart = useMutationCreate({
     onSuccess: () => {
       enqueueSnackbar('Produk berhasil ditambahkan ke keranjang', { variant: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['cart.id', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['fetch.cart'] });
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
@@ -58,7 +58,7 @@ export function CheckoutProvider({ children }) {
   const mutationDeleteCart = useMutationDelete({
     onSuccess: () => {
       enqueueSnackbar('Produk berhasil dihapus dari keranjang', { variant: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['cart.id'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch.cart'] });
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';

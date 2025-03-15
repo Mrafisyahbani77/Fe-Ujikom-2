@@ -63,7 +63,7 @@ export default function CheckoutCart() {
           color="inherit"
           startIcon={<Iconify icon="eva:arrow-ios-back-fill" />}
         >
-          Continue Shopping
+          Lanjut Belanja
         </Button>
       </Grid>
 

@@ -20,12 +20,12 @@ import IncrementerButton from '../product/common/incrementer-button';
 // ----------------------------------------------------------------------
 
 export default function CheckoutCartProduct({ row, onDelete, onDecrease, onIncrease }) {
-  const { name, size, price, color, coverUrl, quantity, available } = row;
+  const { name, size, price, color, product_image, quantity, stockStatus} = row;
 
   return (
     <TableRow>
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar variant="rounded" alt={name} src={coverUrl} sx={{ width: 64, height: 64, mr: 2 }} />
+        <Avatar variant="rounded" alt={name} src={product_image} sx={{ width: 64, height: 64, mr: 2 }} />
 
         <Stack spacing={0.5}>
           <Typography noWrap variant="subtitle2" sx={{ maxWidth: 240 }}>
@@ -53,11 +53,11 @@ export default function CheckoutCartProduct({ row, onDelete, onDecrease, onIncre
             onDecrease={onDecrease}
             onIncrease={onIncrease}
             disabledDecrease={quantity <= 1}
-            disabledIncrease={quantity >= available}
+            disabledIncrease={quantity >= stockStatus?.available}
           />
 
           <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mt: 1 }}>
-            available: {available}
+            available: {stockStatus?.available}
           </Typography>
         </Box>
       </TableCell>
