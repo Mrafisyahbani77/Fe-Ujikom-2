@@ -6,18 +6,11 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Image from 'src/components/image';
 import { MotionViewport, varFade } from 'src/components/animate';
-
-// Data kategori sepatu
-const SHOES_CATEGORIES = [
-  { id: 1, name: 'Sneakers', image: '/assets/images/categories/sneakers.png' },
-  { id: 2, name: 'Running', image: '/assets/images/categories/running.png' },
-  { id: 3, name: 'Formal', image: '/assets/images/categories/formal.png' },
-  { id: 4, name: 'Boots', image: '/assets/images/categories/boots.png' },
-  { id: 5, name: 'Loafers', image: '/assets/images/categories/loafers.png' },
-  { id: 6, name: 'Slip-on', image: '/assets/images/categories/slip_on.png' },
-];
+import { fetchCategory } from 'src/utils/category';
 
 export default function ShoesCategories() {
+  const { data } = fetchCategory();
+
   return (
     <Container component={MotionViewport} sx={{ py: { xs: 5, md: 10 } }}>
       <Stack spacing={3} sx={{ mb: { xs: 5, md: 10 } }}>
@@ -42,11 +35,11 @@ export default function ShoesCategories() {
         }}
         gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' }}
       >
-        {SHOES_CATEGORIES.map((category) => (
+        {data.map((category) => (
           <m.div key={category.id} variants={varFade().inUp}>
             <Stack alignItems="center" spacing={1}>
               <Image
-                src={category.image}
+                src={category.image_url}
                 alt={category.name}
                 sx={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
               />

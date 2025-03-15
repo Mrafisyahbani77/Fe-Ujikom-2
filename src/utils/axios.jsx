@@ -119,12 +119,16 @@ export const endpoints = {
     google: '/api/auth/google',
     googleCallback: 'api/auth/google/callback',
   },
+  public: {
+    fetchAllCategory: '/api/categories',
+    fetchByIdCategory: '/api/categories',
+  },
   statistik: {
     total_order: '/api/chart/total-orders',
     sale_weekly: '/api/chart/sales-weekly',
     products_sold: 'api/chart/products-sold',
-    sales_by_gender:'api/chart/sales-by-gender',
-    sales_yearly:'api/chart/sales-yearly',
+    sales_by_gender: 'api/chart/sales-by-gender',
+    sales_yearly: 'api/chart/sales-yearly',
   },
   banner: {
     list: '/api/banners',
