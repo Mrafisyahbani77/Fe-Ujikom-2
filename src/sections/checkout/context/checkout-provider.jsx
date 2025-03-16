@@ -31,19 +31,6 @@ export function CheckoutProvider({ children }) {
 
   const { data: cartData } = useFetchCart(user?.id);
 
-  // Parsing size & color dari database dengan error handling
-  let availableSizes = [];
-  let availableColors = [];
-
-  try {
-    availableSizes =
-      typeof product.size === 'string' ? JSON.parse(product.size) : product.size || [];
-    availableColors =
-      typeof product.color === 'string' ? JSON.parse(product.color) : product.color || [];
-  } catch (error) {
-    console.error('Error parsing size or color:', error);
-  }
-
   const mutationAddToCart = useMutationCreate({
     onSuccess: () => {
       enqueueSnackbar('Produk berhasil ditambahkan ke keranjang', { variant: 'success' });

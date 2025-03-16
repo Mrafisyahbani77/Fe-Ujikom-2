@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Image from 'src/components/image';
 import { MotionViewport, varFade } from 'src/components/animate';
 import { fetchCategory } from 'src/utils/category';
+import { Link } from 'react-router-dom';
 
 export default function ShoesCategories() {
   const { data } = fetchCategory();
@@ -37,14 +38,16 @@ export default function ShoesCategories() {
       >
         {data.map((category) => (
           <m.div key={category.id} variants={varFade().inUp}>
-            <Stack alignItems="center" spacing={1}>
-              <Image
-                src={category.image_url}
-                alt={category.name}
-                sx={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
-              />
-              <Typography variant="subtitle1">{category.name}</Typography>
-            </Stack>
+            <Link to={`/category/${category?.id}`}>
+              <Stack alignItems="center" spacing={1}>
+                <Image
+                  src={category.image_url}
+                  alt={category.name}
+                  sx={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
+                />
+                <Typography variant="subtitle1">{category.name}</Typography>
+              </Stack>
+            </Link>
           </m.div>
         ))}
       </Box>

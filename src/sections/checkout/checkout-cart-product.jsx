@@ -21,6 +21,7 @@ import IncrementerButton from '../product/common/incrementer-button';
 
 export default function CheckoutCartProduct({ row, onDelete, onDecrease, onIncrease }) {
   const { name, size, price, color, product_image, quantity, stockStatus} = row;
+  console.log(color)
 
   return (
     <TableRow>

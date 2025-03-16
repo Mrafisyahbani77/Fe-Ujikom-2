@@ -3,11 +3,11 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 
 export const fetchCategoryById = (id) =>
   useQuery({
-    queryKey: ['public.category_id'], // Tambahkan id agar cache unik untuk setiap permintaan
+    queryKey: ['public.category_id'],
     queryFn: async () => {
-      if (!id) return null; // Hindari fetch jika id tidak tersedia
+      if (!id) return null;
       const response = await axiosInstance.get(`${endpoints.public.fetchByIdCategory}/${id}`);
       return response.data.data;
     },
-    enabled: !!id, // Pastikan query hanya berjalan jika id tersedia
+    enabled: !!id,
   });
