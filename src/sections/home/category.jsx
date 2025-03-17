@@ -3,12 +3,13 @@ import { useParams } from 'react-router';
 import { MotionViewport } from 'src/components/animate';
 import Image from 'src/components/image';
 import { LoadingScreen } from 'src/components/loading-screen';
-import { useFetchCategory } from 'src/utils/category'; // Pastikan ini adalah custom hook yang mengembalikan { data, isLoading, isError }
+import { useFetchCategoryBySlug } from 'src/utils/category'; // Pastikan ini adalah custom hook yang mengembalikan { data, isLoading, isError }
+import ProductSlug from './product-slug';
 
 export default function Category() {
-  const { id } = useParams();
+  const { slug } = useParams();
 
-  const { data, isLoading, isError } = useFetchCategory(id); // Pastikan ini sesuai
+  const { data, isLoading, isError } = useFetchCategoryBySlug(slug);
 
   if (isLoading) {
     return (
@@ -22,22 +23,31 @@ export default function Category() {
     return <Typography>Error loading category</Typography>;
   }
 
-  if (!data || !Array.isArray(data)) {
+  // Pastikan data tersedia dan sesuai dengan struktur API
+  const category = data?.category;
+  const products = data?.products;
+
+  // console.log(category)
+
+  if (!category) {
     return <Typography>No category data available</Typography>;
   }
 
   return (
-  <Container component={MotionViewport} sx={{ py: { xs: 5, md: 10 } }}>
-      {data.map((category, index) => (
-        <Box key={index}>
-          <Image
-            src={category.image_url}
-            alt={category.name}
-            sx={{ width: '100%', height: 80, objectFit: 'cover' }}
-          />
-          <Typography variant="h1">Category: {category.name}</Typography>
-        </Box>
-      ))}
+    <Container component={MotionViewport} sx={{ py: { xs: 5, md: 10 } }}>
+      <Typography color="gray" variant="body1">
+        Kategori {category.name}
+      </Typography>
+      <Box>
+        <Image
+          src={category.image_url}
+          alt={category.name}
+          sx={{ width: '100%', height: 300, objectFit: 'cover' }}
+        />
+      </Box>
+      <Box sx={{ py: { xs: 5, md: 10 } }}>
+        <ProductSlug slug={slug} />
+      </Box>
     </Container>
   );
 }

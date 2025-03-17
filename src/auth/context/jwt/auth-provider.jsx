@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useReducer, useCallback, useMemo } from 'react';
 import axiosInstance, { endpoints } from 'src/utils/axios';
 import { AuthContext } from './auth-context';
-import { isValidToken, setSession } from './utils';
+import { setSession } from './utils';
 import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
@@ -56,12 +56,11 @@ export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const router = useRouter();
 
-  // Initialize the authentication state
   const initialize = useCallback(async () => {
     try {
       const accessToken = sessionStorage.getItem(STORAGE_KEY);
 
-      if (accessToken && isValidToken(accessToken)) {
+      if (accessToken) {
         setSession(accessToken);
 
         const response = await axiosInstance.get(endpoints.auth.me);
@@ -88,36 +87,31 @@ export function AuthProvider({ children }) {
     initialize();
   }, [initialize]);
 
-  const login = useCallback(
-    async (email, password) => {
-      try {
-        const response = await axiosInstance.post(endpoints.auth.login, { email, password });
-        const { accessToken, refreshToken, user } = response.data;
+  const login = useCallback(async (email, password) => {
+    try {
+      const response = await axiosInstance.post(endpoints.auth.login, { email, password });
+      const { accessToken, refreshToken, user } = response.data;
 
-        sessionStorage.setItem('refreshToken', refreshToken);
-        setSession(accessToken);
+      sessionStorage.setItem('refreshToken', refreshToken);
+      setSession(accessToken, refreshToken);
 
-        dispatch({
-          type: 'LOGIN',
-          payload: {
-            user,
-            roles: user?.role, // Perbaikan disini
-            admin: user?.role === 'admin',
-            accessToken,
-            refreshToken,
-          },
-        });
+      dispatch({
+        type: 'LOGIN',
+        payload: {
+          user,
+          roles: user?.role ? [user.role] : [],
+          admin: user?.role === 'admin',
+          accessToken,
+          refreshToken,
+        },
+      });
 
-        await initialize(); // Panggil ulang agar state diperbarui
-
-        return response.data; // Pastikan login() mengembalikan response
-      } catch (error) {
-        console.error('Login Error:', error);
-        throw error;
-      }
-    },
-    [initialize]
-  );
+      return response.data;
+    } catch (error) {
+      console.error('Login Error:', error);
+      throw error;
+    }
+  }, []);
 
   const register = useCallback(async (email, password, firstName, lastName) => {
     const data = { email, password, firstName, lastName };
@@ -144,13 +138,14 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error('Logout Error:', error);
     } finally {
+      setSession(null, null);
       sessionStorage.removeItem('refreshToken');
       sessionStorage.removeItem(STORAGE_KEY);
       dispatch({ type: 'LOGOUT' });
+      router.push('/login');
     }
-  }, []);
+  }, [router]);
 
-  // Status management
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
   const status = state.loading ? 'loading' : checkAuthenticated;
 

@@ -24,14 +24,13 @@ import { useGetProducts, useSearchProducts } from 'src/api/product';
 import EmptyContent from 'src/components/empty-content';
 import { useSettingsContext } from 'src/components/settings';
 //
-import { useCheckoutContext } from '../../checkout/context';
-import CartIcon from '../common/cart-icon';
-import ProductList from '../product-list';
-import ProductSort from '../product-sort';
-import ProductSearch from '../product-search';
-import ProductFilters from '../product-filters';
-import ProductFiltersResult from '../product-filters-result';
-import { useFetchProduct } from 'src/utils/product';
+import { useFetchCategoryBySlug } from 'src/utils/category';
+import { useCheckoutContext } from '../checkout/context';
+import ProductList from '../product/product-list';
+import ProductSort from '../product/product-sort';
+import ProductSearch from '../product/product-search';
+import ProductFilters from '../product/product-filters';
+import ProductFiltersResult from '../product/product-filters-result';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +44,7 @@ const defaultFilters = {
 
 // ----------------------------------------------------------------------
 
-export default function ProductShopView() {
+export default function ProductSlug({ slug }) {
   const settings = useSettingsContext();
 
   const checkout = useCheckoutContext();
@@ -60,8 +59,9 @@ export default function ProductShopView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { data: products, productsLoading, productsEmpty } = useFetchProduct();
-  console.log(products)
+  const { data: category, productsLoading, productsEmpty } = useFetchCategoryBySlug(slug);
+  const product = category?.products || [];
+  console.log(product);
 
   const { searchResults, searchLoading } = useSearchProducts(debouncedQuery);
 
@@ -73,10 +73,11 @@ export default function ProductShopView() {
   }, []);
 
   const dataFiltered = applyFilter({
-    inputData: products,
+    inputData: product,
     filters,
     sortBy,
   });
+  console.log(dataFiltered)
 
   const canReset = !isEqual(defaultFilters, filters);
 
@@ -177,7 +178,7 @@ export default function ProductShopView() {
 
       {(notFound || productsEmpty) && renderNotFound}
 
-      <ProductList products={dataFiltered} loading={productsLoading} />
+      <ProductList product={dataFiltered} loading={productsLoading} />
     </Container>
   );
 }
@@ -185,59 +186,62 @@ export default function ProductShopView() {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, filters, sortBy }) {
+  console.log('applyFilter - inputData:', inputData);
+  console.log('applyFilter - filters:', filters);
+  console.log('applyFilter - sortBy:', sortBy);
+
+  if (!Array.isArray(inputData)) {
+    console.error('applyFilter - inputData bukan array!', inputData);
+    return [];
+  }
+
+  let filteredData = [...inputData]; // Salin data agar tidak mengubah aslinya
+
   const { gender, category, colors, priceRange, rating } = filters;
-
   const min = priceRange[0];
-
   const max = priceRange[1];
 
-  // SORT BY
+  // Sorting
   if (sortBy === 'featured') {
-    inputData = orderBy(inputData, ['totalSold'], ['desc']);
+    filteredData = orderBy(filteredData, ['totalSold'], ['desc']);
   }
-
   if (sortBy === 'newest') {
-    inputData = orderBy(inputData, ['createdAt'], ['desc']);
+    filteredData = orderBy(filteredData, ['createdAt'], ['desc']);
   }
-
   if (sortBy === 'priceDesc') {
-    inputData = orderBy(inputData, ['price'], ['desc']);
+    filteredData = orderBy(filteredData, ['price'], ['desc']);
   }
-
   if (sortBy === 'priceAsc') {
-    inputData = orderBy(inputData, ['price'], ['asc']);
+    filteredData = orderBy(filteredData, ['price'], ['asc']);
   }
 
-  // FILTERS
+  // Filtering
   if (gender.length) {
-    inputData = inputData.filter((product) => gender.includes(product.gender));
+    filteredData = filteredData.filter((product) => gender.includes(product.gender));
   }
-
   if (category !== 'all') {
-    inputData = inputData.filter((product) => product.category === category);
+    filteredData = filteredData.filter((product) => product.category === category);
   }
-
   if (colors.length) {
-    inputData = inputData.filter((product) =>
-      product.colors.some((color) => colors.includes(color))
+    filteredData = filteredData.filter((product) =>
+      product.color.some((color) => colors.includes(color))
     );
   }
-
   if (min !== 0 || max !== 200) {
-    inputData = inputData.filter((product) => product.price >= min && product.price <= max);
+    filteredData = filteredData.filter((product) => product.price >= min && product.price <= max);
   }
-
   if (rating) {
-    inputData = inputData.filter((product) => {
+    filteredData = filteredData.filter((product) => {
       const convertRating = (value) => {
         if (value === 'up4Star') return 4;
         if (value === 'up3Star') return 3;
         if (value === 'up2Star') return 2;
         return 1;
       };
-      return product.totalRatings > convertRating(rating);
+      return product.total_review > convertRating(rating);
     });
   }
 
-  return inputData;
+  console.log('applyFilter - filteredData:', filteredData);
+  return filteredData;
 }

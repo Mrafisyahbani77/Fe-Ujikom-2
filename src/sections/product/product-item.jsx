@@ -24,8 +24,9 @@ import { useCheckoutContext } from '../checkout/context';
 export default function ProductItem({ product }) {
   const { onAddToCart } = useCheckoutContext();
 
-  const { id, name, images, price, color, stock, sizes, priceSale, newLabel, saleLabel } =
-    product;
+  const { id, name, images, price, color, stock, sizes, priceSale, newLabel, saleLabel } = product;
+
+  console.log(product);
 
   const linkTo = paths.product.details(id);
 
@@ -94,18 +95,18 @@ export default function ProductItem({ product }) {
       </Fab>
 
       <Tooltip title={!stock && 'Out of stock'} placement="bottom-end">
-      <Image
-        alt={name}
-        src={images[0]}
-        ratio="1/1"
-        sx={{
-          borderRadius: 1.5,
-          ...(!stock && {
-            opacity: 0.48,
-            filter: 'grayscale(1)',
-          }),
-        }}
-      />
+        <Image
+          alt={name}
+          src={images[0]}
+          ratio="1/1"
+          sx={{
+            borderRadius: 1.5,
+            ...(!stock && {
+              opacity: 0.48,
+              filter: 'grayscale(1)',
+            }),
+          }}
+        />
       </Tooltip>
     </Box>
   );

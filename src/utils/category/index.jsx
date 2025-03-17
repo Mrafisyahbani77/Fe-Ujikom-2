@@ -5,4 +5,5 @@ export * from './useMutationUpdate'
 export * from './useFetchCategoryById'
 export * from './public/fetchCategory'
 export * from './public/fetchCategoryById'
+export * from './useFetchCategoryBySlug'
 

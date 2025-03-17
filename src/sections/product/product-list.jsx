@@ -9,6 +9,10 @@ import { ProductItemSkeleton } from './product-skeleton';
 // ----------------------------------------------------------------------
 
 export default function ProductList({ products, loading, ...other }) {
+
+  
+  console.log(products)
+
   const renderSkeleton = (
     <>
       {[...Array(16)].map((_, index) => (
@@ -19,7 +23,7 @@ export default function ProductList({ products, loading, ...other }) {
 
   const renderList = (
     <>
-      {products.map((product) => (
+      {products?.map((product) => (
         <ProductItem key={product.id} product={product} />
       ))}
     </>
@@ -41,7 +45,7 @@ export default function ProductList({ products, loading, ...other }) {
         {loading ? renderSkeleton : renderList}
       </Box>
 
-      {products.length > 8 && (
+      {products?.length > 8 && (
         <Pagination
           count={8}
           sx={{

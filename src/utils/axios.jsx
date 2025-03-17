@@ -1,12 +1,17 @@
-import axios from 'axios';
-import { register } from 'numeral';
-// config
-import { HOST_API } from 'src/config-global';
+import axios from "axios";
+import { HOST_API } from "src/config-global";
 
-// ----------------------------------------------------------------------
+// Buat instance axios dengan konfigurasi awal
+const axiosInstance = axios.create({
+  baseURL: HOST_API,
+  withCredentials: true, // Untuk mengirimkan cookie (refresh token)
+});
 
-const axiosInstance = axios.create({ baseURL: HOST_API, withCredentials: true });
+// Menyimpan status refresh token
+let isRefreshing = false;
+let failedQueue = [];
 
+// Fungsi untuk memproses antrian request yang tertunda
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (token) {
@@ -18,9 +23,10 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// Interceptor request: Tambahkan access token ke setiap request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem('accessToken');
+    const token = sessionStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,7 +35,7 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Interceptor response: Tangani error 401 (Unauthorized)
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -52,39 +58,32 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Request untuk mendapatkan refresh token
-        const token = sessionStorage.getItem('accessToken');
-        const refreshToken = sessionStorage.getItem('refreshToken');
-        if (!refreshToken) {
-          throw new Error('Sesi anda telah berakhir, Silahkan login');
-        }
+        // Panggil endpoint refresh token
+        const { data } = await axiosInstance.post("/api/auth/refresh-token");
 
-        const { data } = await axiosInstance.post(
-          '/api/auth/refresh-token',
-          {
-            refreshToken: refreshToken,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const newToken = data.new_access_token;
-        const newRefreshToken = data.new_refresh_token;
+        // Gunakan nama yang sesuai dengan backend
+        const { accessToken: newToken } = data;
 
-        sessionStorage.setItem('accessToken', newToken);
-        sessionStorage.setItem('refreshToken', newRefreshToken);
+        // Simpan token baru di sessionStorage
+        sessionStorage.setItem("accessToken", newToken);
 
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        // Perbarui header di request asli
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+        // Perbarui default header axios
+        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+
+        // Jalankan ulang antrian request yang tertunda
         processQueue(null, newToken);
+
         return axiosInstance(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        alert(err);
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
-        window.location.href = '/auth/jwt/login'; // Redirect ke halaman login
+
+        // Hapus sesi jika refresh token gagal
+        sessionStorage.removeItem("accessToken");
+        window.location.href = "/auth/jwt/login"; // Redirect ke halaman login
+
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
@@ -98,14 +97,12 @@ axiosInstance.interceptors.response.use(
 export default axiosInstance;
 
 // ----------------------------------------------------------------------
-
 export const fetcher = async (args) => {
   const [url, config] = Array.isArray(args) ? args : [args];
-
   const res = await axiosInstance.get(url, { ...config });
-
   return res.data;
 };
+
 
 // ----------------------------------------------------------------------
 
@@ -140,6 +137,7 @@ export const endpoints = {
   category: {
     list: '/api/categories',
     getByid: 'api/categories',
+    getBySlug: 'api/categories',
     create: '/api/categories/store',
     update: '/api/categories',
     delete: '/api/categories',

@@ -40,7 +40,7 @@ export const mainRoutes = [
       { path: 'contact-us', element: <ContactPage /> },
       { path: 'faqs', element: <FaqsPage /> },
       { path: 'profile', element: <AccountUser /> },
-      { path: 'category/:id', element: <Category /> },
+      { path: 'category/:slug', element: <Category /> },
       {
         path: 'product',
         children: [

@@ -36,9 +36,9 @@ export default function ShoesCategories() {
         }}
         gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' }}
       >
-        {data.map((category) => (
+        {data?.map((category) => (
           <m.div key={category.id} variants={varFade().inUp}>
-            <Link to={`/category/${category?.id}`}>
+            <Link to={`/category/${category?.slug}`}>
               <Stack alignItems="center" spacing={1}>
                 <Image
                   src={category.image_url}
