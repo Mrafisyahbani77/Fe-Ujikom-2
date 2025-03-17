@@ -19,6 +19,7 @@ const ROOTS = {
 export const paths = {
   payment: '/payment',
   about: '/about-us',
+  success: '/success',
   contact: '/contact-us',
   category: '/category/:slug',
   profile: `/profile`,

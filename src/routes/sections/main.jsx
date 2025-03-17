@@ -8,6 +8,7 @@ import CompactLayout from 'src/layouts/compact';
 import { SplashScreen } from 'src/components/loading-screen';
   import AccountUser from 'src/pages/account-user';
 import Category from 'src/sections/home/category';
+import Success from 'src/sections/home/success';
 
 // ----------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ export const mainRoutes = [
       { path: 'faqs', element: <FaqsPage /> },
       { path: 'profile', element: <AccountUser /> },
       { path: 'category/:slug', element: <Category /> },
+      { path: 'success', element: <Success /> },
       {
         path: 'product',
         children: [

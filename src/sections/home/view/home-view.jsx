@@ -9,6 +9,8 @@ import HomeHero from '../home-hero';
 import HomeMinimal from '../home-minimal';
 import HomeAdvertisement from '../home-advertisement';
 import { ProductShopView } from 'src/sections/product/view';
+import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +38,17 @@ const StyledPolygon = styled('div')(({ anchor = 'top', theme }) => ({
 
 export default function HomeView() {
   const { scrollYProgress } = useScroll();
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    // Cek apakah perlu menampilkan notifikasi login berhasil
+    if (sessionStorage.getItem("showLoginSuccess")) {
+      enqueueSnackbar("Login Berhasil!", { variant: "success" });
+
+      // Hapus flag agar tidak muncul lagi di refresh berikutnya
+      sessionStorage.removeItem("showLoginSuccess");
+    }
+  }, [enqueueSnackbar]);
 
   return (
     <>
