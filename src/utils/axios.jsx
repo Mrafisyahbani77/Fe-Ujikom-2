@@ -1,5 +1,5 @@
-import axios from "axios";
-import { HOST_API } from "src/config-global";
+import axios from 'axios';
+import { HOST_API } from 'src/config-global';
 
 // Buat instance axios dengan konfigurasi awal
 const axiosInstance = axios.create({
@@ -26,7 +26,7 @@ const processQueue = (error, token = null) => {
 // Interceptor request: Tambahkan access token ke setiap request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -59,19 +59,19 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Panggil endpoint refresh token
-        const { data } = await axiosInstance.post("/api/auth/refresh-token");
+        const { data } = await axiosInstance.post('/api/auth/refresh-token');
 
         // Gunakan nama yang sesuai dengan backend
         const { accessToken: newToken } = data;
 
-        // Simpan token baru di sessionStorage
-        sessionStorage.setItem("accessToken", newToken);
+        // Simpan token baru di localStorage
+        localStorage.setItem('accessToken', newToken);
 
         // Perbarui header di request asli
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
         // Perbarui default header axios
-        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
 
         // Jalankan ulang antrian request yang tertunda
         processQueue(null, newToken);
@@ -81,8 +81,8 @@ axiosInstance.interceptors.response.use(
         processQueue(err, null);
 
         // Hapus sesi jika refresh token gagal
-        sessionStorage.removeItem("accessToken");
-        window.location.href = "/auth/jwt/login"; // Redirect ke halaman login
+        localStorage.removeItem('accessToken');
+        window.location.href = '/auth/jwt/login'; // Redirect ke halaman login
 
         return Promise.reject(err);
       } finally {
@@ -102,7 +102,6 @@ export const fetcher = async (args) => {
   const res = await axiosInstance.get(url, { ...config });
   return res.data;
 };
-
 
 // ----------------------------------------------------------------------
 

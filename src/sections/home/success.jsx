@@ -11,13 +11,20 @@ export default function Success() {
     const accessToken = params.get('accessToken');
     const refreshToken = params.get('refreshToken');
 
+    console.log('Access Token from URL:', accessToken);
+    console.log('Refresh Token from URL:', refreshToken);
+
     if (accessToken && refreshToken) {
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+    //   sessionStorage.setItem('refreshToken', refreshToken);
 
-      sessionStorage.setItem('showLoginSuccess', 'true');
+      console.log('Stored Access Token:', localStorage.getItem('accessToken'));
+      console.log('Stored Refresh Token:', localStorage.getItem('refreshToken'));
 
-      window.location.replace('/');
+      localStorage.setItem('showLoginSuccess', 'true');
+
+      window.location.href = '/';
     } else {
       navigate('/error?reason=missing_tokens');
     }

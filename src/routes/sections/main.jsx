@@ -9,6 +9,7 @@ import { SplashScreen } from 'src/components/loading-screen';
   import AccountUser from 'src/pages/account-user';
 import Category from 'src/sections/home/category';
 import Success from 'src/sections/home/success';
+import Error from 'src/sections/home/error';
 
 // ----------------------------------------------------------------------
 
@@ -43,6 +44,7 @@ export const mainRoutes = [
       { path: 'profile', element: <AccountUser /> },
       { path: 'category/:slug', element: <Category /> },
       { path: 'success', element: <Success /> },
+      { path: 'error', element: <Error /> },
       {
         path: 'product',
         children: [

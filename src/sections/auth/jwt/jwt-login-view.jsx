@@ -39,9 +39,9 @@ export default function JwtLoginView() {
   //     const userRole = response?.user?.role; // Ambil role dari response
   //     enqueueSnackbar('Login successful', { variant: 'success' });
 
-  //     // Simpan token dan role di sessionStorage
-  //     sessionStorage.setItem('accessToken', response.accessToken);
-  //     sessionStorage.setItem('refreshToken', response.refreshToken);
+  //     // Simpan token dan role di localStorage
+  //     localStorage.setItem('accessToken', response.accessToken);
+  //     localStorage.setItem('refreshToken', response.refreshToken);
 
   //     if (userRole?.includes('admin')) {
   //       router.push('/dashboard');
@@ -124,26 +124,26 @@ export default function JwtLoginView() {
     window.location.href = `${HOST_API}/api/auth/google`;
   };
 
-  // Menangkap token dari URL setelah redirect dari backend Google
-  useEffect(() => {
-    const params = new URLSearchParams(
-      window.location.search || window.location.hash.replace('#', '?')
-    );
+  // // Menangkap token dari URL setelah redirect dari backend Google
+  // useEffect(() => {
+  //   const params = new URLSearchParams(
+  //     window.location.search || window.location.hash.replace('#', '?')
+  //   );
 
-    const accessToken = params.get('accessToken');
-    const refreshToken = params.get('refreshToken');
-    const role = params.get('role');
+  //   const accessToken = params.get('accessToken');
+  //   const refreshToken = params.get('refreshToken');
+  //   const role = params.get('role');
 
-    console.log('Token dari URL:', { accessToken, refreshToken, role }); // Debugging
+  //   console.log('Token dari URL:', { accessToken, refreshToken, role }); // Debugging
 
-    if (accessToken && refreshToken) {
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('refreshToken', refreshToken);
+  //   if (accessToken && refreshToken) {
+  //     localStorage.setItem('accessToken', accessToken);
+  //     localStorage.setItem('refreshToken', refreshToken);
 
-      enqueueSnackbar('Login berhasil', { variant: 'success' });
-      router.push(role === 'admin' ? paths.dashboard.root : '/');
-    }
-  }, []);
+  //     enqueueSnackbar('Login berhasil', { variant: 'success' });
+  //     router.push(role === 'admin' ? paths.dashboard.root : '/');
+  //   }
+  // }, []);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>

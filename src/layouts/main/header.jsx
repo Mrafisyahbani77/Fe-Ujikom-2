@@ -38,7 +38,7 @@ export default function Header() {
 
   useEffect(() => {
     // Cek apakah token tersimpan di localStorage
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
     setIsAuthenticated(!!token); // Jika token ada, berarti sudah login
   }, []);
 

@@ -58,23 +58,24 @@ export function AuthProvider({ children }) {
 
   const initialize = useCallback(async () => {
     try {
-      const accessToken = sessionStorage.getItem(STORAGE_KEY);
+      const accessToken = localStorage.getItem(STORAGE_KEY);
+      const refreshToken =
+        localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
 
-      if (accessToken) {
-        setSession(accessToken);
+      console.log('Initializing with:', { accessToken, refreshToken });
+
+      if (accessToken && refreshToken) {
+        setSession(accessToken, refreshToken);
 
         const response = await axiosInstance.get(endpoints.auth.me);
         const user = response.data?.user || null;
 
         dispatch({
           type: 'INITIAL',
-          payload: {
-            user,
-            roles: user?.role ? [user.role] : [],
-            admin: user?.role === 'admin',
-          },
+          payload: { user, roles: user?.role ? [user.role] : [], admin: user?.role === 'admin' },
         });
       } else {
+        console.warn('No tokens found during initialization');
         dispatch({ type: 'INITIAL', payload: { user: null, roles: [], admin: false } });
       }
     } catch (error) {
@@ -92,7 +93,16 @@ export function AuthProvider({ children }) {
       const response = await axiosInstance.post(endpoints.auth.login, { email, password });
       const { accessToken, refreshToken, user } = response.data;
 
-      sessionStorage.setItem('refreshToken', refreshToken);
+      console.log('Before saving:', { accessToken, refreshToken });
+
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
+        console.log('RefreshToken saved:', refreshToken);
+      } else {
+        console.error('Missing refreshToken!');
+      }
+
       setSession(accessToken, refreshToken);
 
       dispatch({
@@ -131,7 +141,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    const refreshToken = sessionStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem('refreshToken');
 
     try {
       await axiosInstance.post(endpoints.auth.logout, { refreshToken });
@@ -139,8 +149,8 @@ export function AuthProvider({ children }) {
       console.error('Logout Error:', error);
     } finally {
       setSession(null, null);
-      sessionStorage.removeItem('refreshToken');
-      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem(STORAGE_KEY);
       dispatch({ type: 'LOGOUT' });
       router.push('/login');
     }

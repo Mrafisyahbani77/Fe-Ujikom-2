@@ -42,11 +42,11 @@ export default function HomeView() {
 
   useEffect(() => {
     // Cek apakah perlu menampilkan notifikasi login berhasil
-    if (sessionStorage.getItem("showLoginSuccess")) {
-      enqueueSnackbar("Login Berhasil!", { variant: "success" });
+    if (localStorage.getItem('showLoginSuccess')) {
+      enqueueSnackbar('Login Berhasil!', { variant: 'success' });
 
       // Hapus flag agar tidak muncul lagi di refresh berikutnya
-      sessionStorage.removeItem("showLoginSuccess");
+      localStorage.removeItem('showLoginSuccess');
     }
   }, [enqueueSnackbar]);
 

@@ -56,8 +56,8 @@ export const tokenExpired = (exp) => {
 
 export const setSession = (accessToken, refreshToken) => {
   if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken);
-    sessionStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
 
     axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
@@ -71,7 +71,7 @@ export const setSession = (accessToken, refreshToken) => {
 // ----------------------------------------------------------------------
 
 export const refreshAccessToken = async () => {
-  const refreshToken = sessionStorage.getItem('refreshToken');
+  const refreshToken = localStorage.getItem('refreshToken');
 
   if (!refreshToken) {
     throw new Error('Refresh token tidak tersedia');
@@ -93,8 +93,8 @@ export const refreshAccessToken = async () => {
 // ----------------------------------------------------------------------
 
 // export const logoutUser = () => {
-//   sessionStorage.removeItem('accessToken');
-//   sessionStorage.removeItem('refreshToken');
+//   localStorage.removeItem('accessToken');
+//   localStorage.removeItem('refreshToken');
 //   delete axios.defaults.headers.common.Authorization;
 //   window.location.href = paths.auth.jwt.login;
 // };

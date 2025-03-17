@@ -63,8 +63,8 @@ export default function JwtRegisterView() {
 
       if (response.isGoogle) {
         // Jika pengguna daftar via Google, langsung login dengan menyimpan token
-        sessionStorage.setItem('accessToken', response.accessToken);
-        sessionStorage.setItem('refreshToken', response.refreshToken);
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
 
         if (response.role === 'admin') {
           router.push(paths.dashboard.root);
@@ -105,8 +105,8 @@ export default function JwtRegisterView() {
     console.log('Tokens:', { accessToken, refreshToken, role }); // Debugging
 
     if (accessToken && refreshToken) {
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
 
       enqueueSnackbar('Login successful', { variant: 'success' });
 

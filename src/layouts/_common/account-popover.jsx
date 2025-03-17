@@ -64,8 +64,8 @@ export default function AccountPopover() {
   //     queryClient.invalidateQueries({ queryKey: ['authenticated.user'] }); // Reset cache
   //     navigate('/'); // Kembali ke landing page
   //     enqueueSnackbar('Logout berhasil', { variant: 'success' });
-  //     sessionStorage.removeItem('accessToken');
-  //     sessionStorage.removeItem('refreshToken');
+  //     localStorage.removeItem('accessToken');
+  //     localStorage.removeItem('refreshToken');
   //     // setTimeout(() => {
   //     //   window.location.reload(); // Refresh halaman agar reset state
   //     // }, 500);

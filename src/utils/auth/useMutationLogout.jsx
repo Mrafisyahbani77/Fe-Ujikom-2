@@ -5,12 +5,12 @@ export const useMutationLogout = ({ onSuccess, onError }) =>
   useMutation({
     mutationKey: ['auth.logout'],
     mutationFn: async () => {
-      const token_refresh = sessionStorage.getItem('refreshToken');
+      const token_refresh = localStorage.getItem('refreshToken');
       const response = await axiosInstance.post(endpoints.auth.logout, {
         refreshToken: token_refresh,
       });
-      sessionStorage.clear('accessToken');
-      sessionStorage.clear('refreshToken');
+      localStorage.clear('accessToken');
+      localStorage.clear('refreshToken');
       return response.data;
     },
     onSuccess,

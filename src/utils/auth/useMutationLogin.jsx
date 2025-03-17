@@ -13,10 +13,10 @@ export const useMutationLogin = ({ onSuccess, onError }) =>
         user: { id, name },
       } = response.data;
       if (success) {
-        sessionStorage.setItem('username', name);
-        sessionStorage.setItem('token', accessToken);
-        sessionStorage.setItem('refresh_token', refreshToken);
-        sessionStorage.setItem('user_id', id);
+        localStorage.setItem('username', name);
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
+        localStorage.setItem('user_id', id);
       }
       return response.data;
     },

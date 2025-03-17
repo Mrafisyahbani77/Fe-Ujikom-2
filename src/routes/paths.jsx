@@ -20,6 +20,7 @@ export const paths = {
   payment: '/payment',
   about: '/about-us',
   success: '/success',
+  error:'/error',
   contact: '/contact-us',
   category: '/category/:slug',
   profile: `/profile`,
