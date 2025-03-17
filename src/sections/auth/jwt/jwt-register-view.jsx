@@ -60,12 +60,12 @@ export default function JwtRegisterView() {
   const { mutate: mutationRegister } = useMutationRegister({
     onSuccess: (response) => {
       enqueueSnackbar('Registrasi berhasil', { variant: 'success' });
-
+  
       if (response.isGoogle) {
         // Jika pengguna daftar via Google, langsung login dengan menyimpan token
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
-
+  
         if (response.role === 'admin') {
           router.push(paths.dashboard.root);
         } else {
@@ -77,10 +77,29 @@ export default function JwtRegisterView() {
       }
     },
     onError: (error) => {
-      enqueueSnackbar(error.message || 'Registrasi gagal', { variant: 'error' });
-      setErrorMsg(typeof error === 'string' ? error : error.message);
+      let errorMessage = 'Registrasi gagal';
+  
+      if (error?.response) {
+        const { status, data } = error.response;
+  
+        if (status === 400) {
+          if (data?.message?.includes('Username, email, atau nomor telepon sudah terdaftar')) {
+            errorMessage = 'Username, email, atau nomor telepon sudah terdaftar! Silakan gunakan data lain.';
+          } else {
+            errorMessage = data?.message || 'Input tidak valid. Periksa kembali data Anda.';
+          }
+        } else if (status === 500) {
+          errorMessage = 'Terjadi kesalahan pada server. Silakan coba lagi nanti.';
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+  
+      setErrorMsg(errorMessage);
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
+  
 
   const onSubmit = (data) => {
     try {

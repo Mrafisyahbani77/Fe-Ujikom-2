@@ -60,13 +60,13 @@ export function AuthProvider({ children }) {
     try {
       const accessToken = localStorage.getItem(STORAGE_KEY);
       const refreshToken =
-        localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+        localStorage.getItem('refreshToken') || localStorage.getItem('refreshToken');
 
       console.log('Initializing with:', { accessToken, refreshToken });
 
       if (accessToken && refreshToken) {
         setSession(accessToken, refreshToken);
-
+        
         const response = await axiosInstance.get(endpoints.auth.me);
         const user = response.data?.user || null;
 
@@ -97,7 +97,7 @@ export function AuthProvider({ children }) {
 
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken);
-        sessionStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('refreshToken', refreshToken);
         console.log('RefreshToken saved:', refreshToken);
       } else {
         console.error('Missing refreshToken!');
