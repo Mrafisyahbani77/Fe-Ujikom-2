@@ -178,19 +178,40 @@ export default function ProductDetailsSummary({
       <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
         Color
       </Typography>
-
-      <Controller
-        name="colors"
-        control={control}
-        render={({ field }) => (
-          <ColorPicker
-            colors={color} // Pastikan nilai di sini sesuai format yang didukung
-            selected={field.value}
-            onSelectColor={(colors) => field.onChange(colors)}
-            limit={4}
-          />
-        )}
-      />
+      
+      <RHFSelect
+        name="color"
+        size="small"
+        sx={{
+          maxWidth: 120,
+        }}
+      >
+        {[
+          { name: 'Red', value: 'red' },
+          { name: 'Blue', value: 'blue' },
+          { name: 'Green', value: 'green' },
+          { name: 'Yellow', value: 'yellow' },
+          { name: 'Cyan', value: 'cyan' },
+          { name: 'Violet', value: 'violet' },
+          { name: 'Black', value: 'black' },
+          { name: 'White', value: 'white' }
+        ].map((color) => (
+          <MenuItem key={color.value} value={color.value}>
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                backgroundColor: color.value,
+                display: 'inline-block',
+                marginRight: 1,
+                borderRadius: '50%',
+                border: '1px solid #ddd'
+              }}
+            />
+            {color.name}
+          </MenuItem>
+        ))}
+      </RHFSelect>
     </Stack>
   );
 
@@ -331,7 +352,7 @@ export default function ProductDetailsSummary({
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {/* {renderColorOptions}   */}
+        {renderColorOptions}  
 
         {renderSizeOptions}
 

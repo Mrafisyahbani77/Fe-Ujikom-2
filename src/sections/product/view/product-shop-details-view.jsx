@@ -122,9 +122,17 @@ export default function ProductShopDetailsView({ id }) {
             {data.name}
           </Typography>
 
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {data.description}
-          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'text.secondary',
+              '& p': { 
+                margin: 0,
+                display: 'inline'
+              } 
+            }}
+            dangerouslySetInnerHTML={{ __html: data.description }}
+          />
         </Box>
       </Box>
 
