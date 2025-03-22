@@ -14,6 +14,10 @@ import EditPage from 'src/pages/dashboard/category/edit';
 import BannerPage from 'src/pages/dashboard/banner/banner';
 import CreateBannerPage from 'src/pages/dashboard/banner/create';
 import EditBannerPage from 'src/pages/dashboard/banner/edit';
+//discount
+import DiscountPage from 'src/pages/dashboard/discount/discount';
+import CreateDiscountPage from 'src/pages/dashboard/discount/create';
+import EditDiscountPage from 'src/pages/dashboard/discount/edit';
 
 // ----------------------------------------------------------------------
 
@@ -73,6 +77,14 @@ export const dashboardRoutes = [
           { path: 'list', element: <CategoryPage />, index: true },
           { path: 'new', element: <CreatePage /> },
           { path: ':id/edit', element: <EditPage /> },
+        ],
+      },
+      {
+        path: 'discount',
+        children: [
+          { path: 'list', element: <DiscountPage />, index: true },
+          { path: 'new', element: <CreateDiscountPage /> },
+          { path: ':id/edit', element: <EditDiscountPage /> },
         ],
       },
       {

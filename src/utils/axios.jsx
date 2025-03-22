@@ -141,6 +141,14 @@ export const endpoints = {
     update: '/api/categories',
     delete: '/api/categories',
   },
+  discount: {
+    list: '/api/discount',
+    getByid: 'api/discount',
+    getBySlug: 'api/discount',
+    create: '/api/discount/store',
+    update: '/api/discount',
+    delete: '/api/discount',
+  },
   product: {
     list: '/api/products/users/all',
     details: '/api/products/users',

@@ -87,11 +87,12 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} md={4}>
           <EcommerceWidgetSummary
             title="Product Sold"
-            percent={2.6}
-            total={765}
+            percent={sold?.percent_change || 0}
+            total={sold?.total_sold || 0}
             chart={{
-              series: [22, 8, 35, 50, 82, 84, 77, 12, 87, 43],
+              series: sold?.chart_data || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }}
+            loading={loading}
           />
         </Grid>
 
@@ -181,13 +182,14 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} md={6} lg={4}>
           <EcommerceSaleByGender
             title="Sale By Gender"
-            total={2324}
+            total={gender?.total || 0}
             chart={{
-              series: [
-                { label: 'Mens', value: 44 },
-                { label: 'Womens', value: 75 },
+              series: gender?.series || [
+                { label: 'Mens', value: 0 },
+                { label: 'Womens', value: 0 }
               ],
             }}
+            loading={fetching}
           />
         </Grid>
 

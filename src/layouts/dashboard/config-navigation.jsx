@@ -94,6 +94,17 @@ export function useNavData() {
           ],
         },
         {
+          title: 'discount',
+          path: paths.dashboard.discount.root,
+          icon: ICONS.user,
+          children: [
+            { title: 'list', path: paths.dashboard.discount.list },
+            { title: 'create', path: paths.dashboard.discount.new },
+            // { title: 'edit', path: paths.dashboard.category.demo.edit },
+            // { title: 'account', path: paths.dashboard.user.account },
+          ],
+        },
+        {
           title: 'banner',
           path: paths.dashboard.banner.root,
           icon: ICONS.user,
