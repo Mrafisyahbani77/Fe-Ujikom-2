@@ -201,4 +201,11 @@ export const endpoints = {
     delete: '/api/reviews',
     create: '/api/reviews/store',
   },
+  discount: {
+    list: '/api/discounts',
+    details: '/api/discounts',
+    update: '/api/discounts',
+    delete: '/api/discounts',
+    create: '/api/discounts/store',
+  },
 };
