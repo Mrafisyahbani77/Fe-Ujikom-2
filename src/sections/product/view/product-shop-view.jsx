@@ -19,7 +19,7 @@ import {
   PRODUCT_CATEGORY_OPTIONS,
 } from 'src/_mock';
 // api
-import { useGetProducts, useSearchProducts } from 'src/api/product';
+// import { useGetProducts, useSearchProducts } from 'src/api/product';
 // components
 import EmptyContent from 'src/components/empty-content';
 import { useSettingsContext } from 'src/components/settings';
@@ -32,6 +32,7 @@ import ProductSearch from '../product-search';
 import ProductFilters from '../product-filters';
 import ProductFiltersResult from '../product-filters-result';
 import { useFetchProduct } from 'src/utils/product';
+import { useSearch } from 'src/utils/product/useSearch';
 
 // ----------------------------------------------------------------------
 
@@ -61,9 +62,9 @@ export default function ProductShopView() {
   const [filters, setFilters] = useState(defaultFilters);
 
   const { data: products, productsLoading, productsEmpty } = useFetchProduct();
-  console.log(products)
+  console.log(products);
 
-  const { searchResults, searchLoading } = useSearchProducts(debouncedQuery);
+  const { searchResults, searchLoading } = useSearch(debouncedQuery);
 
   const handleFilters = useCallback((name, value) => {
     setFilters((prevState) => ({
