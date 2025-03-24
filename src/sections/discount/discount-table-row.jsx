@@ -33,16 +33,18 @@ export default function DiscountTableRow({
   onViewRow,
 }) {
   const {
-    name,
-    price,
-    publish,
-    coverUrl,
-    category,
-    quantity,
-    createdAt,
-    available,
-    inventoryType,
-    image_url,
+    code,
+    description,
+    discount_type,
+    discount_value,
+    min_order_amount,
+    max_discount_amount,
+    start_date,
+    end_date,
+    usage_limit,
+    used_count,
+    status,
+    created_at,
   } = row;
 
   const confirm = useBoolean();
@@ -56,30 +58,12 @@ export default function DiscountTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar
-            alt={name}
-            src={image_url ? image_url : 'https://via.placeholder.com/150'}
-            variant="rounded"
-            sx={{ width: 150, height: 70, mr: 2 }}
-          />
+        <TableCell sx={{ alignItems: 'center' }}>
+          <ListItemText>{code}</ListItemText>
         </TableCell>
 
         <TableCell sx={{ alignItems: 'center' }}>
-          <ListItemText
-            disableTypography
-            primary={
-              <Link
-                noWrap
-                color="inherit"
-                variant="subtitle2"
-                onClick={onViewRow}
-                sx={{ cursor: 'pointer' }}
-              >
-                {name}
-              </Link>
-            }
-          />
+          <ListItemText>{discount_type}</ListItemText>
         </TableCell>
 
         <TableCell align="right">
@@ -95,7 +79,7 @@ export default function DiscountTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {/* <MenuItem
+        <MenuItem
           onClick={() => {
             onViewRow();
             popover.onClose();
@@ -103,7 +87,7 @@ export default function DiscountTableRow({
         >
           <Iconify icon="solar:eye-bold" />
           View
-        </MenuItem> */}
+        </MenuItem>
 
         <MenuItem
           onClick={() => {

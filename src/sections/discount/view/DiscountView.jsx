@@ -44,8 +44,9 @@ import { useQueryClient } from '@tanstack/react-query';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'Image', label: 'Image' },
-  { id: 'Name', label: 'Nama', width: 160 },
+  { id: 'code', label: 'Code Diskon', width: 160 },
+  // { id: 'description', label: 'Deskripsi', width: 160 },
+  { id: 'discount_type', label: 'Tipe Diskon', width: 160 },
   { id: '', width: 88 },
 ];
 
@@ -113,7 +114,7 @@ export default function DiscountView() {
   const { mutate: DeleteDiscount, isPending } = useMutationDelete({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fetch.discount'] });
-      enqueueSnackbar('Kategori berhasil dihapus', { variant: 'success' });
+      enqueueSnackbar('Diskon berhasil dihapus', { variant: 'success' });
     },
     onError: () => {
       enqueueSnackbar('gagal menghapus kategori', { variant: 'error' });
@@ -155,12 +156,12 @@ export default function DiscountView() {
     [router]
   );
 
-  // const handleViewRow = useCallback(
-  //   (id) => {
-  //     router.push(paths.dashboard.product.details(id));
-  //   },
-  //   [router]
-  // );
+  const handleViewRow = useCallback(
+    (id) => {
+      router.push(paths.dashboard.discount.details(id));
+    },
+    [router]
+  );
 
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
@@ -170,13 +171,13 @@ export default function DiscountView() {
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading="Daftar Kategori"
+          heading="Daftar Diskon"
           links={[
             {
               name: 'Dashboard',
               href: paths.dashboard.root,
             },
-            { name: 'Daftar Kategori' },
+            { name: 'Daftar Diskon' },
           ]}
           action={
             <Button
@@ -185,7 +186,7 @@ export default function DiscountView() {
               variant="contained"
               startIcon={<Iconify icon="mingcute:add-line" />}
             >
-              Buat Kategori
+              Buat Diskon
             </Button>
           }
           sx={{ mb: { xs: 3, md: 5 } }}
@@ -267,7 +268,7 @@ export default function DiscountView() {
                             onSelectRow={() => table.onSelectRow(row.id)}
                             onDeleteRow={() => handleDeleteRow(row.id)}
                             onEditRow={() => handleEditRow(row.id)}
-                            // onViewRow={() => handleViewRow(row.id)}
+                            onViewRow={() => handleViewRow(row.id)}
                           />
                         ))}
                     </>
@@ -326,30 +327,30 @@ export default function DiscountView() {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name, stock, publish } = filters;
+  const { code, stock, publish } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
-  stabilizedThis.sort((a, b) => {
+  stabilizedThis?.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
 
-  inputData = stabilizedThis.map((el) => el[0]);
+  inputData = stabilizedThis?.map((el) => el[0]);
 
-  if (name) {
+  if (code) {
     inputData = inputData.filter(
-      (product) => product.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (discount) => discount.code.toLowerCase().indexOf(code.toLowerCase()) !== -1
     );
   }
 
   if (stock.length) {
-    inputData = inputData.filter((product) => stock.includes(product.inventoryType));
+    inputData = inputData.filter((discount) => stock.includes(discount.inventoryType));
   }
 
   if (publish.length) {
-    inputData = inputData.filter((product) => publish.includes(product.publish));
+    inputData = inputData.filter((discount) => publish.includes(discount.publish));
   }
 
   return inputData;

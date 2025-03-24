@@ -11,7 +11,7 @@ export default function DiscountCreateView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Daftar Diskon"
+        heading="Buat Diskon"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
           { name: 'daftar diskon', href: paths.dashboard.discount.list },

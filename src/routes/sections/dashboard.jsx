@@ -18,6 +18,7 @@ import EditBannerPage from 'src/pages/dashboard/banner/edit';
 import DiscountPage from 'src/pages/dashboard/discount/discount';
 import CreateDiscountPage from 'src/pages/dashboard/discount/create';
 import EditDiscountPage from 'src/pages/dashboard/discount/edit';
+import DiscountDetailsPage from 'src/pages/dashboard/discount/detail';
 
 // ----------------------------------------------------------------------
 
@@ -85,6 +86,8 @@ export const dashboardRoutes = [
           { path: 'list', element: <DiscountPage />, index: true },
           { path: 'new', element: <CreateDiscountPage /> },
           { path: ':id/edit', element: <EditDiscountPage /> },
+          { path: ':id', element: <DiscountDetailsPage /> },
+
         ],
       },
       {
