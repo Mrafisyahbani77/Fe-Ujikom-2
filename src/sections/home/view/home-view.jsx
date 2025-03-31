@@ -11,6 +11,8 @@ import HomeAdvertisement from '../home-advertisement';
 import { ProductShopView } from 'src/sections/product/view';
 import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +41,23 @@ const StyledPolygon = styled('div')(({ anchor = 'top', theme }) => ({
 export default function HomeView() {
   const { scrollYProgress } = useScroll();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get('accessToken');
+    const refreshToken = params.get('refreshToken');
+
+    if (accessToken && refreshToken) {
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('showLoginSuccess', 'true');
+
+      // Hapus token dari URL agar lebih bersih
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     // Cek apakah perlu menampilkan notifikasi login berhasil
@@ -63,9 +82,7 @@ export default function HomeView() {
         }}
       >
         <HomeMinimal />
-
         <ProductShopView />
-
         {/* <HomeAdvertisement /> */}
       </Box>
       {/* <Box sx={{ mt: 10 }}>
