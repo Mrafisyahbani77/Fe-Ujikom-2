@@ -127,6 +127,10 @@ export const endpoints = {
     sales_yearly: 'api/chart/sales-yearly',
   },
   banner: {
+    public: {
+      list: '/api/banners/public',
+      detail: '/api/banners/public', //need id
+    },
     list: '/api/banners',
     getByid: 'api/banners',
     create: '/api/banners/store',

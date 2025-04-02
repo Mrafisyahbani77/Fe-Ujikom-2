@@ -61,7 +61,9 @@ export default function ProductShopView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { data: products, productsLoading, productsEmpty } = useFetchProduct();
+  const { data: products, isLoading: productsLoading } = useFetchProduct();
+  const productsEmpty = products.length === 0;
+
   console.log(products);
 
   const { searchResults, searchLoading } = useSearch(debouncedQuery);

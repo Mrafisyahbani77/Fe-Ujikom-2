@@ -63,21 +63,25 @@ export default function ProductReviewNewForm({ onClose, ...other }) {
   }, [onClose, reset]);
 
   return (
-    <Dialog onClose={onClose} {...other}>
+    <Dialog onClose={onClose} fullWidth maxWidth="xs" {...other}>
       <FormProvider methods={methods} onSubmit={onSubmit}>
         <DialogTitle> Add Review </DialogTitle>
 
         <DialogContent>
-          <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1.5}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            flexWrap="wrap"
+            alignItems="center"
+            spacing={1.5}
+          >
             <Typography variant="body2">Your review about this product:</Typography>
-
             <Controller
               name="rating"
               control={control}
               render={({ field }) => (
                 <Rating
                   {...field}
-                  size="small"
+                  size="medium"
                   value={Number(field.value)}
                   onChange={(event, newValue) => {
                     field.onChange(newValue);
@@ -86,22 +90,27 @@ export default function ProductReviewNewForm({ onClose, ...other }) {
               )}
             />
           </Stack>
+          {!!errors.rating && <FormHelperText error>{errors.rating?.message}</FormHelperText>}
 
-          {!!errors.rating && <FormHelperText error> {errors.rating?.message}</FormHelperText>}
-
-          <RHFTextField name="review" label="Review *" multiline rows={3} sx={{ mt: 3 }} />
-
-          <RHFTextField name="name" label="Name *" sx={{ mt: 3 }} />
-
-          <RHFTextField name="email" label="Email *" sx={{ mt: 3 }} />
+          <Stack spacing={2} sx={{ mt: 3 }}>
+            <RHFTextField
+              name="review"
+              label="Review *"
+              multiline
+              rows={3}
+              fullWidth
+              sx={{ mt: 3 }}
+            />
+            <RHFTextField name="name" label="Name *" fullWidth sx={{ mt: 3 }} />
+            <RHFTextField name="email" label="Email *" fullWidth sx={{ mt: 3 }} />
+          </Stack>
         </DialogContent>
 
-        <DialogActions>
-          <Button color="inherit" variant="outlined" onClick={onCancel}>
+        <DialogActions sx={{ justifyContent: 'space-between', p: 2 }}>
+          <Button color="inherit" variant="outlined" onClick={onCancel} fullWidth>
             Cancel
           </Button>
-
-          <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+          <LoadingButton type="submit" variant="contained" loading={isSubmitting} fullWidth>
             Post
           </LoadingButton>
         </DialogActions>

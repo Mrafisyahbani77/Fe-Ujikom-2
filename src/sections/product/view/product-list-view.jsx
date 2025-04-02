@@ -77,7 +77,8 @@ export default function ProductListView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { data: products, productsLoading, productsEmpty } = useFetchProduct();
+  const { data: products, isLoading: productsLoading } = useFetchProduct();
+  const productsEmpty = products.length === 0;
 
   const confirm = useBoolean();
 
@@ -118,43 +119,42 @@ export default function ProductListView() {
   );
 
   const { mutate: DeleteProduct, isPending } = useMutationDelete({
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
-       enqueueSnackbar('Produk berhasil dihapus', { variant: 'success' });
-     },
-     onError: () => {
-       enqueueSnackbar('gagal menghapus produk', { variant: 'error' });
-     },
-   });
- 
-   const handleDeleteRow = useCallback(
-     (id) => {
-       DeleteProduct(id, {
-         onSuccess: () => {
-           const deleteRow = tableData.filter((row) => row.id !== id);
-           setTableData(deleteRow);
-           table.onUpdatePageDeleteRow(dataInPage.length);
-         },
-       });
-     },
-     [DeleteProduct, dataInPage.length, table, tableData]
-   );
- 
-   const handleDeleteRows = useCallback(() => {
-     const selectedIds = table.selected;
- 
-     Promise.all(selectedIds.map((id) => DeleteProduct(id))).then(() => {
-       const deleteRows = tableData.filter((row) => !selectedIds.includes(row.id));
-       setTableData(deleteRows);
- 
-       table.onUpdatePageDeleteRows({
-         totalRows: tableData.length,
-         totalRowsInPage: dataInPage.length,
-         totalRowsFiltered: dataFiltered.length,
-       });
-     });
-   }, [DeleteProduct, dataFiltered.length, dataInPage.length, table, tableData]);
- 
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fetch.category'] });
+      enqueueSnackbar('Produk berhasil dihapus', { variant: 'success' });
+    },
+    onError: () => {
+      enqueueSnackbar('gagal menghapus produk', { variant: 'error' });
+    },
+  });
+
+  const handleDeleteRow = useCallback(
+    (id) => {
+      DeleteProduct(id, {
+        onSuccess: () => {
+          const deleteRow = tableData.filter((row) => row.id !== id);
+          setTableData(deleteRow);
+          table.onUpdatePageDeleteRow(dataInPage.length);
+        },
+      });
+    },
+    [DeleteProduct, dataInPage.length, table, tableData]
+  );
+
+  const handleDeleteRows = useCallback(() => {
+    const selectedIds = table.selected;
+
+    Promise.all(selectedIds.map((id) => DeleteProduct(id))).then(() => {
+      const deleteRows = tableData.filter((row) => !selectedIds.includes(row.id));
+      setTableData(deleteRows);
+
+      table.onUpdatePageDeleteRows({
+        totalRows: tableData.length,
+        totalRowsInPage: dataInPage.length,
+        totalRowsFiltered: dataFiltered.length,
+      });
+    });
+  }, [DeleteProduct, dataFiltered.length, dataInPage.length, table, tableData]);
 
   const handleEditRow = useCallback(
     (id) => {

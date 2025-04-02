@@ -54,12 +54,12 @@ export default function ProductDetailsReview({ totalRatings, totalReviews, ratin
       }}
     >
       {ratings
-        .slice(0)
+        ?.slice(0)
         .reverse()
         .map((rating) => (
-          <Stack key={rating.name} direction="row" alignItems="center">
+          <Stack key={rating.user_name} direction="row" alignItems="center">
             <Typography variant="subtitle2" component="span" sx={{ width: 42 }}>
-              {rating.name}
+              {rating.user_name}
             </Typography>
 
             <LinearProgress
@@ -124,7 +124,7 @@ export default function ProductDetailsReview({ totalRatings, totalReviews, ratin
 
       <ProductReviewList reviews={reviews} />
 
-      <ProductReviewNewForm open={review.value} onClose={review.onFalse} />
+      <ProductReviewNewForm  open={review.value} onClose={review.onFalse} />
     </>
   );
 }

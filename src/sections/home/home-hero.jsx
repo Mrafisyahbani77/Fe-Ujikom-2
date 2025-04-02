@@ -1,14 +1,12 @@
-import { styled, useTheme, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useResponsive } from 'src/hooks/use-responsive';
 import { MotionContainer } from 'src/components/animate';
 import Button from '@mui/material/Button';
 import Image from 'src/components/image';
 import Carousel, { useCarousel } from 'src/components/carousel';
-import { _ecommerceNewProducts } from 'src/_mock';
-import { useFetchBanner } from 'src/utils/banner';
+import { useFetchBanner } from 'src/utils/banner/public/useFetchBanner';
 
 const StyledRoot = styled('div')(() => ({
   width: '100vw',
@@ -31,11 +29,12 @@ const StyledOverlay = styled('div')(() => ({
 }));
 
 export default function HomeHero() {
-  // const { data, isLoading, isError } = useFetchBanner();
-  // console.log(data)
+  const { data, isLoading, isError } = useFetchBanner();
+  console.log(data);
+
   return (
     <StyledRoot>
-      <BackgroundCarousel list={_ecommerceNewProducts} />
+      <BackgroundCarousel list={data} />
 
       <StyledOverlay />
 
@@ -79,8 +78,8 @@ function CarouselItem({ item }) {
   return (
     <Box sx={{ width: '100vw', height: '100vh' }}>
       <Image
-        alt={item.name}
-        src={item.coverUrl}
+        alt={item.title}
+        src={item.image_url}
         sx={{
           width: '100%',
           height: '100%',

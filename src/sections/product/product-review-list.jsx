@@ -9,7 +9,7 @@ import ProductReviewItem from './product-review-item';
 export default function ProductReviewList({ reviews }) {
   return (
     <>
-      {reviews.map((review) => (
+      {reviews?.map((review) => (
         <ProductReviewItem key={review.id} review={review} />
       ))}
 

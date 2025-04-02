@@ -340,7 +340,7 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     inputData = inputData.filter(
-      (product) => product.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (product) => product?.title?.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 

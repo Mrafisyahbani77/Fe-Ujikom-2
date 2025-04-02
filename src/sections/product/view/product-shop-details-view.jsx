@@ -60,8 +60,8 @@ export default function ProductShopDetailsView({ id }) {
   const [currentTab, setCurrentTab] = useState('description');
 
   const { data, isLoading: productLoading, isError: productError } = useFetchProductById(id);
-  // const { data: review, isLoading: reviewLoading, isError: reviewError } = usefetchReviewById(id);
-  // console.log(review);
+  const { data: review, isLoading: reviewLoading, isError: reviewError } = usefetchReviewById(id);
+  console.log(review);
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
@@ -109,7 +109,7 @@ export default function ProductShopDetailsView({ id }) {
         </Grid>
       </Grid>
 
-      <Box
+      {/* <Box
         gap={5}
         display="grid"
         gridTemplateColumns={{
@@ -137,9 +137,9 @@ export default function ProductShopDetailsView({ id }) {
             dangerouslySetInnerHTML={{ __html: data.description }}
           />
         </Box>
-      </Box>
+      </Box> */}
 
-      <Card>
+      <Card sx={{ mt: 10 }}>
         <Tabs
           value={currentTab}
           onChange={handleChangeTab}
@@ -151,27 +151,27 @@ export default function ProductShopDetailsView({ id }) {
           {[
             {
               value: 'description',
-              label: 'Description',
+              label: 'Deskripsi',
             },
-            // {
-            //   value: 'reviews',
-            //   label: `Reviews (${product.reviews.length})`,
-            // },
+            {
+              value: 'reviews',
+              label: `Review (${review?.length})`,
+            },
           ].map((tab) => (
             <Tab key={tab.value} value={tab.value} label={tab.label} />
           ))}
         </Tabs>
 
         {currentTab === 'description' && (
-          <ProductDetailsDescription description={data?.description} />
+          <ProductDetailsDescription description={data?.description} data={data}/>
         )}
 
         {currentTab === 'reviews' && (
           <ProductDetailsReview
-            ratings={data.ratings}
-            reviews={data.reviews}
-            totalRatings={data.totalRatings}
-            totalReviews={data.totalReviews}
+            ratings={review.rating}
+            reviews={review.review}
+            totalRatings={data?.review?.average_rating}
+            totalReviews={data?.review?.total_review}
           />
         )}
       </Card>
