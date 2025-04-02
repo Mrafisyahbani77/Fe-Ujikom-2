@@ -1,4 +1,3 @@
-import { m } from 'framer-motion';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -9,6 +8,7 @@ import Button from '@mui/material/Button';
 import Image from 'src/components/image';
 import Carousel, { useCarousel } from 'src/components/carousel';
 import { _ecommerceNewProducts } from 'src/_mock';
+import { useFetchBanner } from 'src/utils/banner';
 
 const StyledRoot = styled('div')(() => ({
   width: '100vw',
@@ -31,6 +31,8 @@ const StyledOverlay = styled('div')(() => ({
 }));
 
 export default function HomeHero() {
+  // const { data, isLoading, isError } = useFetchBanner();
+  // console.log(data)
   return (
     <StyledRoot>
       <BackgroundCarousel list={_ecommerceNewProducts} />

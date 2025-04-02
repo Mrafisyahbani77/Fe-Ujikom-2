@@ -1,5 +1,4 @@
 import { m } from 'framer-motion';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
@@ -13,7 +12,7 @@ export default function ShoesCategories() {
   const { data } = fetchCategory();
 
   return (
-    <Container component={MotionViewport} sx={{ py: { xs: 5, md: 10 } }}>
+    <Container component={MotionViewport} sx={{ py: { xs: 5, md: 5 } }}>
       <Stack spacing={3} sx={{ mb: { xs: 5, md: 10 } }}>
         <m.div variants={varFade().inUp}>
           <Typography component="div" variant="h2" sx={{ color: 'text.disabled' }}>
@@ -22,7 +21,6 @@ export default function ShoesCategories() {
         </m.div>
       </Stack>
 
-      {/* Grid kategori sepatu */}
       <Box
         gap={3}
         display="grid"
@@ -38,7 +36,13 @@ export default function ShoesCategories() {
       >
         {data?.map((category) => (
           <m.div key={category.id} variants={varFade().inUp}>
-            <Link to={`/category/${category?.slug}`}>
+            <Link
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+              to={`/category/${category?.slug}`}
+            >
               <Stack alignItems="center" spacing={1}>
                 <Image
                   src={category.image_url}

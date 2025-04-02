@@ -50,6 +50,7 @@ export default function ProductDetailsSummary({
     totalRatings,
     totalReviews,
     inventoryType,
+    review,
     subDescription,
     stock,
   } = product;
@@ -178,7 +179,7 @@ export default function ProductDetailsSummary({
       <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
         Color
       </Typography>
-      
+
       <RHFSelect
         name="color"
         size="small"
@@ -194,7 +195,7 @@ export default function ProductDetailsSummary({
           { name: 'Cyan', value: 'cyan' },
           { name: 'Violet', value: 'violet' },
           { name: 'Black', value: 'black' },
-          { name: 'White', value: 'white' }
+          { name: 'White', value: 'white' },
         ].map((color) => (
           <MenuItem key={color.value} value={color.value}>
             <Box
@@ -205,7 +206,7 @@ export default function ProductDetailsSummary({
                 display: 'inline-block',
                 marginRight: 1,
                 borderRadius: '50%',
-                border: '1px solid #ddd'
+                border: '1px solid #ddd',
               }}
             />
             {color.name}
@@ -306,8 +307,8 @@ export default function ProductDetailsSummary({
         typography: 'body2',
       }}
     >
-      <Rating size="small" value={totalRatings} precision={0.1} readOnly sx={{ mr: 1 }} />
-      {`(${fShortenNumber(totalReviews)} reviews)`}
+      <Rating size="small" value={review.average_rating} precision={0.1} readOnly sx={{ mr: 1 }} />
+      {`(${fShortenNumber(review.total_review)} review)`}
     </Stack>
   );
 
@@ -352,7 +353,7 @@ export default function ProductDetailsSummary({
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {renderColorOptions}  
+        {renderColorOptions}
 
         {renderSizeOptions}
 

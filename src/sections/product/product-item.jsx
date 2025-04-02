@@ -68,40 +68,43 @@ export default function ProductItem({ product }) {
   //   </Stack>
   // );
 
+  const isOutOfStock = !stock || stock.quantity <= 0 || stock.status !== 'available';
+
   const renderImg = (
     <Box sx={{ position: 'relative', p: 1 }}>
-      {/* {!!stock && (
-       
-      )} */}
-      <Fab
-        color="warning"
-        size="medium"
-        className="add-cart-btn"
-        onClick={handleAddCart}
-        sx={{
-          right: 16,
-          bottom: 16,
-          zIndex: 9,
-          opacity: 0,
-          position: 'absolute',
-          transition: (theme) =>
-            theme.transitions.create('all', {
-              easing: theme.transitions.easing.easeInOut,
-              duration: theme.transitions.duration.shorter,
-            }),
-        }}
-      >
-        <Iconify icon="solar:cart-plus-bold" width={24} />
-      </Fab>
+      {/* Tombol "Add to Cart" hanya muncul jika stok tersedia */}
+      {!isOutOfStock && (
+        <Fab
+          color="warning"
+          size="medium"
+          className="add-cart-btn"
+          onClick={handleAddCart}
+          sx={{
+            right: 16,
+            bottom: 16,
+            zIndex: 9,
+            opacity: 0,
+            position: 'absolute',
+            transition: (theme) =>
+              theme.transitions.create('all', {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.shorter,
+              }),
+          }}
+        >
+          <Iconify icon="solar:cart-plus-bold" width={24} />
+        </Fab>
+      )}
 
-      <Tooltip title={!stock && 'Out of stock'} placement="bottom-end">
+      {/* Gambar Produk dengan validasi stok */}
+      <Tooltip title={isOutOfStock ? 'Out of stock' : ''} placement="bottom-end">
         <Image
           alt={name}
           src={images[0]}
           ratio="1/1"
           sx={{
             borderRadius: 1.5,
-            ...(!stock && {
+            ...(isOutOfStock && {
               opacity: 0.48,
               filter: 'grayscale(1)',
             }),

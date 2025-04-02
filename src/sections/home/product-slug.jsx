@@ -59,9 +59,13 @@ export default function ProductSlug({ slug }) {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { data: category, productsLoading, productsEmpty } = useFetchCategoryBySlug(slug);
+  const { data: category, isLoading: productsLoading } = useFetchCategoryBySlug(slug);
+
   const product = category?.products || [];
-  console.log(product);
+  const productsEmpty = product.length === 0;
+
+  console.log('Produk:', product);
+  // console.log('Produk kosong?', productsEmpty);
 
   const { searchResults, searchLoading } = useSearchProducts(debouncedQuery);
 
@@ -77,7 +81,7 @@ export default function ProductSlug({ slug }) {
     filters,
     sortBy,
   });
-  console.log(dataFiltered)
+  console.log(dataFiltered);
 
   const canReset = !isEqual(defaultFilters, filters);
 
@@ -178,7 +182,7 @@ export default function ProductSlug({ slug }) {
 
       {(notFound || productsEmpty) && renderNotFound}
 
-      <ProductList product={dataFiltered} loading={productsLoading} />
+      <ProductList products={dataFiltered} loading={productsLoading} />
     </Container>
   );
 }

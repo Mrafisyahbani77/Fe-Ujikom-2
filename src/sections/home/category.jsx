@@ -5,6 +5,8 @@ import Image from 'src/components/image';
 import { LoadingScreen } from 'src/components/loading-screen';
 import { useFetchCategoryBySlug } from 'src/utils/category'; // Pastikan ini adalah custom hook yang mengembalikan { data, isLoading, isError }
 import ProductSlug from './product-slug';
+import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
+import { paths } from 'src/routes/paths';
 
 export default function Category() {
   const { slug } = useParams();
@@ -35,14 +37,28 @@ export default function Category() {
 
   return (
     <Container component={MotionViewport} sx={{ py: { xs: 5, md: 10 } }}>
-      <Typography color="gray" variant="body1">
-        Kategori {category.name}
-      </Typography>
+      <CustomBreadcrumbs
+        heading={`Daftar kategori ${category.name}`}
+        links={[
+          {
+            name: 'Home',
+            href: '/',
+          },
+          { name: `${category.name}` },
+        ]}
+        sx={{ mb: { xs: 3, md: 5 } }}
+      />
       <Box>
         <Image
           src={category.image_url}
           alt={category.name}
-          sx={{ width: '100%', height: 300, objectFit: 'cover' }}
+          sx={{
+            width: '100%',
+            height: { xs: 200, md: 400 }, // Adjust height based on screen size
+            objectFit: 'cover', // Ensures the image covers the area without distortion
+            borderRadius: 2, // Optional: Adds rounded corners for a more modern feel
+            boxShadow: 3, // Optional: Adds a subtle shadow to make it stand out
+          }}
         />
       </Box>
       <Box sx={{ py: { xs: 5, md: 10 } }}>

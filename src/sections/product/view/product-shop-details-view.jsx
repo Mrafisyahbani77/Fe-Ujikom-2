@@ -28,6 +28,7 @@ import ProductDetailsCarousel from '../product-details-carousel';
 import ProductDetailsDescription from '../product-details-description';
 import { useCheckoutContext } from '../../checkout/context';
 import { useFetchProduct, useFetchProductById } from 'src/utils/product';
+import { usefetchReviewById } from 'src/utils/review';
 
 // ----------------------------------------------------------------------
 
@@ -59,6 +60,8 @@ export default function ProductShopDetailsView({ id }) {
   const [currentTab, setCurrentTab] = useState('description');
 
   const { data, isLoading: productLoading, isError: productError } = useFetchProductById(id);
+  // const { data: review, isLoading: reviewLoading, isError: reviewError } = usefetchReviewById(id);
+  // console.log(review);
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
@@ -122,14 +125,14 @@ export default function ProductShopDetailsView({ id }) {
             {data.name}
           </Typography>
 
-          <Typography 
-            variant="body2" 
-            sx={{ 
+          <Typography
+            variant="body2"
+            sx={{
               color: 'text.secondary',
-              '& p': { 
+              '& p': {
                 margin: 0,
-                display: 'inline'
-              } 
+                display: 'inline',
+              },
             }}
             dangerouslySetInnerHTML={{ __html: data.description }}
           />

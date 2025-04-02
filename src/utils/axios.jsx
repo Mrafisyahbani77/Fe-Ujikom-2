@@ -195,6 +195,10 @@ export const endpoints = {
     create: '/api/shippings/store',
   },
   review: {
+    public: {
+      // list: '/api/reviews',
+      details: '/api/reviews/product',
+    },
     list: '/api/reviews',
     details: '/api/reviews',
     update: '/api/reviews',
