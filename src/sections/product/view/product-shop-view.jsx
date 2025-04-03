@@ -33,6 +33,7 @@ import ProductFilters from '../product-filters';
 import ProductFiltersResult from '../product-filters-result';
 import { useFetchProduct } from 'src/utils/product';
 import { useSearch } from 'src/utils/product/useSearch';
+import { fetchCategory } from 'src/utils/category';
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +42,7 @@ const defaultFilters = {
   colors: [],
   rating: '',
   category: 'all',
-  priceRange: [0, 200],
+  priceRange: [0, 0],
 };
 
 // ----------------------------------------------------------------------
@@ -62,6 +63,7 @@ export default function ProductShopView() {
   const [filters, setFilters] = useState(defaultFilters);
 
   const { data: products, isLoading: productsLoading } = useFetchProduct();
+  const { data } = fetchCategory();
   const productsEmpty = products.length === 0;
 
   console.log(products);
@@ -84,6 +86,9 @@ export default function ProductShopView() {
   const canReset = !isEqual(defaultFilters, filters);
 
   const notFound = !dataFiltered.length && canReset;
+
+  const minPrice = Math.min(...products.map((p) => p.price));
+  const maxPrice = Math.max(...products.map((p) => p.price));
 
   const handleSortBy = useCallback((newValue) => {
     setSortBy(newValue);
@@ -127,7 +132,9 @@ export default function ProductShopView() {
           colorOptions={PRODUCT_COLOR_OPTIONS}
           ratingOptions={PRODUCT_RATING_OPTIONS}
           genderOptions={PRODUCT_GENDER_OPTIONS}
-          categoryOptions={['all', ...PRODUCT_CATEGORY_OPTIONS]}
+          categoryOptions={[...data]}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
         />
 
         <ProductSort sort={sortBy} onSort={handleSortBy} sortOptions={PRODUCT_SORT_OPTIONS} />
@@ -188,59 +195,71 @@ export default function ProductShopView() {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, filters, sortBy }) {
+  console.log('applyFilter - inputData:', inputData);
+  console.log('applyFilter - filters:', filters);
+  console.log('applyFilter - sortBy:', sortBy);
+
+  if (!Array.isArray(inputData)) {
+    console.error('applyFilter - inputData bukan array!', inputData);
+    return [];
+  }
+
+  let filteredData = [...inputData]; // Salin data agar tidak mengubah aslinya
+
   const { gender, category, colors, priceRange, rating } = filters;
-
+  console.log(filters);
   const min = priceRange[0];
-
   const max = priceRange[1];
 
-  // SORT BY
+  // Sorting
   if (sortBy === 'featured') {
-    inputData = orderBy(inputData, ['totalSold'], ['desc']);
+    filteredData = orderBy(filteredData, ['totalSold'], ['desc']);
   }
-
   if (sortBy === 'newest') {
-    inputData = orderBy(inputData, ['createdAt'], ['desc']);
+    filteredData = orderBy(filteredData, ['createdAt'], ['desc']);
   }
-
   if (sortBy === 'priceDesc') {
-    inputData = orderBy(inputData, ['price'], ['desc']);
+    filteredData = orderBy(filteredData, ['price'], ['desc']);
   }
-
   if (sortBy === 'priceAsc') {
-    inputData = orderBy(inputData, ['price'], ['asc']);
+    filteredData = orderBy(filteredData, ['price'], ['asc']);
   }
 
-  // FILTERS
+  // Filtering
   if (gender.length) {
-    inputData = inputData.filter((product) => gender.includes(product.gender));
+    filteredData = filteredData.filter((product) => gender.includes(product.gender));
   }
-
   if (category !== 'all') {
-    inputData = inputData.filter((product) => product.category === category);
+    filteredData = filteredData.filter((product) => product?.categories?.name === category);
   }
 
   if (colors.length) {
-    inputData = inputData.filter((product) =>
-      product.colors.some((color) => colors.includes(color))
+    filteredData = filteredData.filter((product) =>
+      product?.color?.some((color) => colors.includes(color))
     );
   }
 
-  if (min !== 0 || max !== 200) {
-    inputData = inputData.filter((product) => product.price >= min && product.price <= max);
-  }
+  const minPrice = priceRange[0];
+  const maxPrice = priceRange[1];
 
+  // Filtering products based on price range
+  if (minPrice !== 0 || maxPrice !== 0) {
+    filteredData = filteredData.filter(
+      (product) => product.price >= minPrice && product.price <= maxPrice
+    );
+  }
   if (rating) {
-    inputData = inputData.filter((product) => {
+    filteredData = filteredData.filter((product) => {
       const convertRating = (value) => {
         if (value === 'up4Star') return 4;
         if (value === 'up3Star') return 3;
         if (value === 'up2Star') return 2;
         return 1;
       };
-      return product.totalRatings > convertRating(rating);
+      return product.total_review > convertRating(rating);
     });
   }
 
-  return inputData;
+  console.log('applyFilter - filteredData:', filteredData);
+  return filteredData;
 }

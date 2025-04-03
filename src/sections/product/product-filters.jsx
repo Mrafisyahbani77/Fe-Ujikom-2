@@ -38,6 +38,8 @@ export default function ProductFilters({
   genderOptions,
   ratingOptions,
   categoryOptions,
+  minPrice,
+  maxPrice,
 }) {
   const marksLabel = [...Array(21)].map((_, index) => {
     const value = index * 10;
@@ -81,6 +83,26 @@ export default function ProductFilters({
     [onFilters]
   );
 
+  const handleMinPriceChange = (event) => {
+    const value = event.target.value;
+    if (!isNaN(value) && value !== '') {
+      onFilters({
+        ...filters,
+        minPrice: parseFloat(value), // Update min price
+      });
+    }
+  };
+
+  const handleMaxPriceChange = (event) => {
+    const value = event.target.value;
+    if (!isNaN(value) && value !== '') {
+      onFilters({
+        ...filters,
+        maxPrice: parseFloat(value), // Update max price
+      });
+    }
+  };
+
   const handleFilterRating = useCallback(
     (newValue) => {
       onFilters('rating', newValue);
@@ -96,7 +118,7 @@ export default function ProductFilters({
       sx={{ py: 2, pr: 1, pl: 2.5 }}
     >
       <Typography variant="h6" sx={{ flexGrow: 1 }}>
-        Filters
+        Filter
       </Typography>
 
       <Tooltip title="Reset">
@@ -138,18 +160,31 @@ export default function ProductFilters({
       <Typography variant="subtitle2" sx={{ mb: 1 }}>
         Category
       </Typography>
-      {categoryOptions.map((option) => (
+      <FormControlLabel
+        key="all"
+        control={
+          <Radio
+            checked={filters.category === 'all'} // Check if 'All' is selected
+            onClick={() => handleFilterCategory('all')} // Handle 'All' category click
+          />
+        }
+        label="All"
+        sx={{
+          textTransform: 'capitalize',
+        }}
+      />
+      {categoryOptions.map((category) => (
         <FormControlLabel
-          key={option}
+          key={category.id}
           control={
             <Radio
-              checked={option === filters.category}
-              onClick={() => handleFilterCategory(option)}
+              checked={category.name === filters.category} // Check if this category is selected
+              onClick={() => handleFilterCategory(category.name)} // Handle category click
             />
           }
-          label={option}
+          label={category.name}
           sx={{
-            ...(option === 'all' && {
+            ...(category.name === 'all' && {
               textTransform: 'capitalize',
             }),
           }}
@@ -175,20 +210,23 @@ export default function ProductFilters({
   const renderPrice = (
     <Stack>
       <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-        Price
+        Batas Harga
       </Typography>
 
       <Stack direction="row" spacing={5} sx={{ my: 2 }}>
+        {/* Input for Min Price */}
         <InputRange type="min" value={filters.priceRange} onFilters={onFilters} />
+
+        {/* Input for Max Price */}
         <InputRange type="max" value={filters.priceRange} onFilters={onFilters} />
       </Stack>
 
-      <Slider
+      {/* <Slider
         value={filters.priceRange}
         onChange={handleFilterPriceRange}
-        step={10}
-        min={0}
-        max={200}
+        step={10} 
+        min={0} // Set the dynamic minimum price
+        max={0} // Set the dynamic maximum price
         marks={marksLabel}
         getAriaValueText={(value) => `$${value}`}
         valueLabelFormat={(value) => `$${value}`}
@@ -196,7 +234,7 @@ export default function ProductFilters({
           alignSelf: 'center',
           width: `calc(100% - 24px)`,
         }}
-      />
+      /> */}
     </Stack>
   );
 
@@ -293,22 +331,22 @@ ProductFilters.propTypes = {
 // ----------------------------------------------------------------------
 
 function InputRange({ type, value, onFilters }) {
-  const min = value[0];
-
-  const max = value[1];
+  const min = value[0]; // Get the current min price
+  const max = value[1]; // Get the current max price
 
   const handleBlurInputRange = useCallback(() => {
+    // Ensure min and max values are within valid ranges
     if (min < 0) {
       onFilters('priceRange', [0, max]);
     }
-    if (min > 200) {
-      onFilters('priceRange', [200, max]);
+    if (min > max) {
+      onFilters('priceRange', [max, max]); // Min cannot be greater than max
     }
     if (max < 0) {
       onFilters('priceRange', [min, 0]);
     }
     if (max > 200) {
-      onFilters('priceRange', [min, 200]);
+      onFilters('priceRange', [min, 200]); // Max cannot exceed 200
     }
   }, [max, min, onFilters]);
 
@@ -316,14 +354,9 @@ function InputRange({ type, value, onFilters }) {
     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: 1 }}>
       <Typography
         variant="caption"
-        sx={{
-          flexShrink: 0,
-          color: 'text.disabled',
-          textTransform: 'capitalize',
-          fontWeight: 'fontWeightSemiBold',
-        }}
+        sx={{ flexShrink: 0, color: 'text.disabled', textTransform: 'capitalize' }}
       >
-        {`${type} ($)`}
+        {`${type === 'min' ? 'Min' : 'Max'} (Rp)`}
       </Typography>
 
       <InputBase
@@ -334,13 +367,12 @@ function InputRange({ type, value, onFilters }) {
             ? onFilters('priceRange', [Number(event.target.value), max])
             : onFilters('priceRange', [min, Number(event.target.value)])
         }
-        onBlur={handleBlurInputRange}
+        onBlur={handleBlurInputRange} // Handle onBlur to validate the input
         inputProps={{
           step: 10,
           min: 0,
           max: 200,
           type: 'number',
-          'aria-labelledby': 'input-slider',
         }}
         sx={{
           maxWidth: 48,

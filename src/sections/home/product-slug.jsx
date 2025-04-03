@@ -24,13 +24,14 @@ import { useGetProducts, useSearchProducts } from 'src/api/product';
 import EmptyContent from 'src/components/empty-content';
 import { useSettingsContext } from 'src/components/settings';
 //
-import { useFetchCategoryBySlug } from 'src/utils/category';
+import { fetchCategory, useFetchCategoryBySlug } from 'src/utils/category';
 import { useCheckoutContext } from '../checkout/context';
 import ProductList from '../product/product-list';
 import ProductSort from '../product/product-sort';
 import ProductSearch from '../product/product-search';
 import ProductFilters from '../product/product-filters';
 import ProductFiltersResult from '../product/product-filters-result';
+import { useSearch } from 'src/utils/product/useSearch';
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ const defaultFilters = {
   colors: [],
   rating: '',
   category: 'all',
-  priceRange: [0, 200],
+  priceRange: [0, 0],
 };
 
 // ----------------------------------------------------------------------
@@ -60,6 +61,7 @@ export default function ProductSlug({ slug }) {
   const [filters, setFilters] = useState(defaultFilters);
 
   const { data: category, isLoading: productsLoading } = useFetchCategoryBySlug(slug);
+  const { data } = fetchCategory();
 
   const product = category?.products || [];
   const productsEmpty = product.length === 0;
@@ -67,7 +69,7 @@ export default function ProductSlug({ slug }) {
   console.log('Produk:', product);
   // console.log('Produk kosong?', productsEmpty);
 
-  const { searchResults, searchLoading } = useSearchProducts(debouncedQuery);
+  const { searchResults, searchLoading } = useSearch(debouncedQuery);
 
   const handleFilters = useCallback((name, value) => {
     setFilters((prevState) => ({
@@ -84,6 +86,9 @@ export default function ProductSlug({ slug }) {
   console.log(dataFiltered);
 
   const canReset = !isEqual(defaultFilters, filters);
+
+  const minPrice = Math.min(...product.map((p) => p.price));
+  const maxPrice = Math.max(...product.map((p) => p.price));
 
   const notFound = !dataFiltered.length && canReset;
 
@@ -129,7 +134,9 @@ export default function ProductSlug({ slug }) {
           colorOptions={PRODUCT_COLOR_OPTIONS}
           ratingOptions={PRODUCT_RATING_OPTIONS}
           genderOptions={PRODUCT_GENDER_OPTIONS}
-          categoryOptions={['all', ...PRODUCT_CATEGORY_OPTIONS]}
+          categoryOptions={[...data]}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
         />
 
         <ProductSort sort={sortBy} onSort={handleSortBy} sortOptions={PRODUCT_SORT_OPTIONS} />
@@ -202,6 +209,7 @@ function applyFilter({ inputData, filters, sortBy }) {
   let filteredData = [...inputData]; // Salin data agar tidak mengubah aslinya
 
   const { gender, category, colors, priceRange, rating } = filters;
+  console.log(filters);
   const min = priceRange[0];
   const max = priceRange[1];
 
@@ -224,15 +232,23 @@ function applyFilter({ inputData, filters, sortBy }) {
     filteredData = filteredData.filter((product) => gender.includes(product.gender));
   }
   if (category !== 'all') {
-    filteredData = filteredData.filter((product) => product.category === category);
+    filteredData = filteredData.filter((product) => product?.categories?.name === category);
   }
+
   if (colors.length) {
     filteredData = filteredData.filter((product) =>
-      product.color.some((color) => colors.includes(color))
+      product?.color?.some((color) => colors.includes(color))
     );
   }
-  if (min !== 0 || max !== 200) {
-    filteredData = filteredData.filter((product) => product.price >= min && product.price <= max);
+
+  const minPrice = priceRange[0];
+  const maxPrice = priceRange[1];
+
+  // Filtering products based on price range
+  if (minPrice !== 0 || maxPrice !== 0) {
+    filteredData = filteredData.filter(
+      (product) => product.price >= minPrice && product.price <= maxPrice
+    );
   }
   if (rating) {
     filteredData = filteredData.filter((product) => {

@@ -89,7 +89,7 @@ export default function ProductSearch({ query, results, onSearch, hrefItem, load
             <Avatar
               key={product.id}
               alt={product.name}
-              src={product.coverUrl}
+              src={product.images[0]}
               variant="rounded"
               sx={{
                 width: 48,

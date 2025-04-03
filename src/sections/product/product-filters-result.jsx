@@ -72,7 +72,7 @@ export default function ProductFiltersResult({
           </Block>
         )}
 
-        {!!filters.colors.length && (
+        {!!Array.isArray(filters.colors) && filters.colors.length > 0 && (
           <Block label="Colors:">
             {filters.colors.map((item) => (
               <Chip

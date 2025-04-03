@@ -3,25 +3,24 @@ import { useMemo } from 'react';
 import axiosInstance, { endpoints } from 'src/utils/axios';
 
 export const useSearch = (query) => {
-  const { data, error, isLoading, isFetching } = useQuery({
-    queryKey: ['fetch.product', query], // Menambahkan query sebagai dependency
+  const { data, error, isError, isLoading, isFetching } = useQuery({
+    queryKey: ['search.product', query],
     queryFn: async () => {
       const response = await axiosInstance.get(`${endpoints.product.list}?query=${query}`);
       return response.data.data;
     },
-    enabled: !!query, // Hanya fetch jika query ada
+    enabled: !!query,
   });
 
-  // Menggunakan useMemo untuk mengoptimalkan hasil pencarian
   const memoizedValue = useMemo(
     () => ({
-      searchResults: data || [], // Pastikan data tidak undefined
+      searchResults: Array.isArray(data) ? data : [],
       searchLoading: isLoading,
-      searchError: error,
+      searchError: isError ? error?.message || 'Terjadi kesalahan' : null,
       searchFetching: isFetching,
-      searchEmpty: !isLoading && (!data || data.length === 0),
+      searchEmpty: !isLoading && (!Array.isArray(data) || data.length === 0),
     }),
-    [data, error, isLoading, isFetching]
+    [data, isError, error, isLoading, isFetching]
   );
 
   return memoizedValue;
