@@ -29,26 +29,9 @@ import ProductDetailsToolbar from '../product-details-toolbar';
 import ProductDetailsCarousel from '../product-details-carousel';
 import ProductDetailsDescription from '../product-details-description';
 import { useFetchProductById } from 'src/utils/product';
+import { usefetchReviewById } from 'src/utils/review';
 
 // ----------------------------------------------------------------------
-
-const SUMMARY = [
-  {
-    title: '100% Original',
-    description: 'Chocolate bar candy canes ice cream toffee cookie halvah.',
-    icon: 'solar:verified-check-bold',
-  },
-  {
-    title: '10 Day Replacement',
-    description: 'Marshmallow biscuit donut dragée fruitcake wafer.',
-    icon: 'solar:clock-circle-bold',
-  },
-  {
-    title: 'Year Warranty',
-    description: 'Cotton candy gingerbread cake I love sugar sweet.',
-    icon: 'solar:shield-check-bold',
-  },
-];
 
 // ----------------------------------------------------------------------
 
@@ -58,6 +41,7 @@ export default function ProductDetailsView({ id }) {
     isLoading: productLoading,
     isError: productError,
   } = useFetchProductById(id);
+  const { data: review, isLoading: reviewLoading, isError: reviewError } = usefetchReviewById(id);
 
   const settings = useSettingsContext();
 
@@ -92,7 +76,7 @@ export default function ProductDetailsView({ id }) {
           startIcon={<Iconify icon="eva:arrow-ios-back-fill" width={16} />}
           sx={{ mt: 3 }}
         >
-          Back to List
+          Kembali ke daftar produk
         </Button>
       }
       sx={{ py: 10 }}
@@ -129,7 +113,7 @@ export default function ProductDetailsView({ id }) {
         }}
         sx={{ my: 10 }}
       >
-        {SUMMARY.map((item) => (
+        {/* {SUMMARY.map((item) => (
           <Box key={item.title} sx={{ textAlign: 'center', px: 5 }}>
             <Iconify icon={item.icon} width={32} sx={{ color: 'primary.main' }} />
 
@@ -141,10 +125,10 @@ export default function ProductDetailsView({ id }) {
               {item.description}
             </Typography>
           </Box>
-        ))}
+        ))} */}
       </Box>
 
-      <Card>
+      <Card sx={{ mt: 10 }}>
         <Tabs
           value={currentTab}
           onChange={handleChangeTab}
@@ -156,27 +140,27 @@ export default function ProductDetailsView({ id }) {
           {[
             {
               value: 'description',
-              label: 'Description',
+              label: 'Deskripsi',
             },
-            // {
-            //   value: 'reviews',
-            //   label: `Reviews (${product.reviews.length})`,
-            // },
+            {
+              value: 'reviews',
+              label: `Review (${review?.length})`,
+            },
           ].map((tab) => (
             <Tab key={tab.value} value={tab.value} label={tab.label} />
           ))}
         </Tabs>
 
         {currentTab === 'description' && (
-          <ProductDetailsDescription description={product?.description} />
+          <ProductDetailsDescription description={product?.description} data={product} />
         )}
 
         {currentTab === 'reviews' && (
           <ProductDetailsReview
-            ratings={product.ratings}
-            reviews={product.reviews}
-            totalRatings={product.totalRatings}
-            totalReviews={product.totalReviews}
+            ratings={review.rating}
+            reviews={review.review}
+            totalRatings={product?.review?.average_rating}
+            totalReviews={product?.review?.total_review}
           />
         )}
       </Card>

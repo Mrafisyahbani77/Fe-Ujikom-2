@@ -11,7 +11,7 @@ import Label from 'src/components/label';
 // ----------------------------------------------------------------------
 
 export default function AddressItem({ address, action, sx, ...other }) {
-  const { name, fullAddress, addressType, phoneNumber, primary } = address;
+  const { recipient_name, fullAddress, addressType, phone_number, primary } = address;
 
   return (
     <Stack
@@ -28,7 +28,7 @@ export default function AddressItem({ address, action, sx, ...other }) {
       <Stack flexGrow={1} spacing={1}>
         <Stack direction="row" alignItems="center">
           <Typography variant="subtitle2">
-            {name}
+            {recipient_name}
             <Box component="span" sx={{ ml: 0.5, typography: 'body2', color: 'text.secondary' }}>
               ({addressType})
             </Box>
@@ -46,7 +46,7 @@ export default function AddressItem({ address, action, sx, ...other }) {
         </Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {phoneNumber}
+          {phone_number}
         </Typography>
       </Stack>
 

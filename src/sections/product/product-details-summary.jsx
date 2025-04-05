@@ -23,6 +23,8 @@ import { ColorPicker } from 'src/components/color-utils';
 import FormProvider, { RHFSelect } from 'src/components/hook-form';
 //
 import IncrementerButton from './common/incrementer-button';
+import { useAuthContext } from 'src/auth/hooks';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +37,8 @@ export default function ProductDetailsSummary({
   ...other
 }) {
   const router = useRouter();
+  const { user } = useAuthContext(); // Cek user login
+  const { enqueueSnackbar } = useSnackbar(); // Buat notif
 
   const {
     id,
@@ -68,7 +72,7 @@ export default function ProductDetailsSummary({
     available,
     price,
     color: [color[0]],
-    size: size[4],
+    size: size[0],
     quantity: available < 1 ? 0 : 1,
   };
 
@@ -104,6 +108,17 @@ export default function ProductDetailsSummary({
   });
 
   const handleAddCart = useCallback(() => {
+    if (!user) {
+      enqueueSnackbar('Anda harus login dulu', { variant: 'warning' });
+      router.push('/auth/jwt/login');
+      return;
+    }
+
+    // if (!data.size) {
+    //   enqueueSnackbar('Silakan pilih ukuran terlebih dahulu', { variant: 'error' });
+    //   return;
+    // }
+
     try {
       onAddCart?.({
         ...values,
@@ -136,7 +151,7 @@ export default function ProductDetailsSummary({
 
   const renderShare = (
     <Stack direction="row" spacing={3} justifyContent="center">
-      <Link
+      {/* <Link
         variant="subtitle2"
         sx={{
           color: 'text.secondary',
@@ -146,7 +161,7 @@ export default function ProductDetailsSummary({
       >
         <Iconify icon="mingcute:add-line" width={16} sx={{ mr: 1 }} />
         Compare
-      </Link>
+      </Link> */}
 
       <Link
         variant="subtitle2"
@@ -283,20 +298,22 @@ export default function ProductDetailsSummary({
         onClick={handleAddCart}
         sx={{ whiteSpace: 'nowrap' }}
       >
-        Add to Cart
+        <Typography variant="button" sx={{ fontSize: '0.75rem' }}>
+          Masukan keranjang
+        </Typography>
       </Button>
 
       <Button fullWidth size="large" type="submit" variant="contained" disabled={disabledActions}>
-        Buy Now
+        Beli sekarang
       </Button>
     </Stack>
   );
 
-  const renderSubDescription = (
-    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-      {subDescription}
-    </Typography>
-  );
+  // const renderSubDescription = (
+  //   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+  //     {subDescription}
+  //   </Typography>
+  // );
 
   const renderRating = (
     <Stack
@@ -319,20 +336,20 @@ export default function ProductDetailsSummary({
   //   </Stack>
   // );
 
-  const renderInventoryType = (
-    <Box
-      component="span"
-      sx={{
-        typography: 'overline',
-        color:
-          (inventoryType === 'out of stock' && 'error.main') ||
-          (inventoryType === 'low stock' && 'warning.main') ||
-          'success.main',
-      }}
-    >
-      {inventoryType}
-    </Box>
-  );
+  // const renderInventoryType = (
+  //   <Box
+  //     component="span"
+  //     sx={{
+  //       typography: 'overline',
+  //       color:
+  //         (stock.status === 'out of stock' && 'error.main') ||
+  //         (stock.status === 'low stock' && 'warning.main') ||
+  //         'success.main',
+  //     }}
+  //   >
+  //     {stock.status}
+  //   </Box>
+  // );
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -341,8 +358,13 @@ export default function ProductDetailsSummary({
           {/* {renderLabels} */}
 
           {/* {renderInventoryType} */}
+          <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
+            <Typography variant="h5" noWrap>
+              {name}
+            </Typography>
 
-          <Typography variant="h5">{name}</Typography>
+            {renderShare}
+          </Box>
 
           {renderRating}
 
@@ -362,8 +384,6 @@ export default function ProductDetailsSummary({
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         {renderActions}
-
-        {renderShare}
       </Stack>
     </FormProvider>
   );

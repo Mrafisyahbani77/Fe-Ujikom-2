@@ -1,41 +1,35 @@
-import PropTypes from 'prop-types';
 import * as Yup from 'yup';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-// @mui
-import LoadingButton from '@mui/lab/LoadingButton';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-
-// assets
-import { countries } from 'src/assets/data';
-// components
-import Iconify from 'src/components/iconify';
-import FormProvider, {
-  RHFCheckbox,
-  RHFTextField,
-  RHFRadioGroup,
-  RHFAutocomplete,
-} from 'src/components/hook-form';
 import {
+  useMutationCreateShippings,
   useFetchProvinces,
   useFetchCity,
   useFetchDistricts,
   useFetchVillage,
 } from 'src/utils/shippings';
-import { useState } from 'react';
+import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Stack,
+  MenuItem,
+} from '@mui/material';
 
-// ----------------------------------------------------------------------
+export default function AddressNewForm({ open, onClose }) {
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
 
-export default function AddressNewForm({ open, onClose, onCreate }) {
   const [provinceId, setProvinceId] = useState('');
   const [cityId, setCityId] = useState('');
   const [districtId, setDistrictId] = useState('');
+  const [villageId, setVillageId] = useState(''); // ⬅️ tambahkan ini
 
   const { data: provinces = [] } = useFetchProvinces();
   const { data: cities = [] } = useFetchCity(provinceId);
@@ -46,122 +40,175 @@ export default function AddressNewForm({ open, onClose, onCreate }) {
     recipient_name: Yup.string().required('Nama penerima wajib diisi'),
     phone_number: Yup.string().required('Nomor HP wajib diisi'),
     address: Yup.string().required('Alamat wajib diisi'),
-    province: Yup.string().required('Provinsi wajib diisi'),
-    city: Yup.string().required('Kota wajib diisi'),
-    district: Yup.string().required('Kecamatan wajib diisi'),
     postal_code: Yup.string().required('Kode Pos wajib diisi'),
-    notes: Yup.string(),
   });
 
-  const defaultValues = {
-    recipient_name: '',
-    phone_number: '',
-    address: '',
-    province: '',
-    city: '',
-    district: '',
-    postal_code: '',
-    notes: '',
-  };
-
-  const methods = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
     resolver: yupResolver(NewAddressSchema),
-    defaultValues,
+    defaultValues: {
+      recipient_name: '',
+      phone_number: '',
+      address: '',
+      postal_code: '',
+    },
   });
 
-  const { handleSubmit, watch, setValue } = methods;
-
-  const values = watch();
-
-  const handleProvinceChange = (option) => {
-    setProvinceId(option?.id || '');
-    setValue('province', option?.name || '');
-    setValue('city', '');
-    setValue('district', '');
-  };
-
-  const handleCityChange = (option) => {
-    setCityId(option?.id || '');
-    setValue('city', option?.name || '');
-    setValue('district', '');
-  };
-
-  const handleDistrictChange = (option) => {
-    setDistrictId(option?.id || '');
-    setValue('district', option?.name || '');
-  };
+  const mutation = useMutationCreateShippings({
+    onSuccess: () => {
+      enqueueSnackbar('Alamat berhasil disimpan!', { variant: 'success' });
+      queryClient.invalidateQueries(['shippings']);
+      onClose();
+      reset();
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.response?.data?.message || 'Gagal menyimpan alamat', {
+        variant: 'error',
+      });
+    },
+  });
 
   const onSubmit = async (data) => {
-    onCreate(data);
+    try {
+      await mutation.mutateAsync({
+        recipient_name: data.recipient_name,
+        phone_number: data.phone_number,
+        address: data.address,
+        postal_code: data.postal_code,
+        province_id: provinceId,
+        city_id: cityId,
+        district_id: districtId,
+        village_id: villageId,
+        // notes: data.notes || '', // kalau kamu mau ada catatan
+      });
+      enqueueSnackbar('Alamat berhasil ditambahkan!');
+      queryClient.invalidateQueries(['shippings']);
+      reset();
+      onClose();
+    } catch (error) {
+      enqueueSnackbar('Gagal menambahkan alamat', { variant: 'error' });
+    }
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Tambah Alamat Baru</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogTitle>Tambah Alamat Baru</DialogTitle>
 
-      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Stack spacing={2}>
-            <RHFTextField name="recipient_name" label="Nama Penerima" />
-            <RHFTextField name="phone_number" label="Nomor HP" />
-            <RHFTextField name="address" label="Alamat" multiline rows={3} />
+            <TextField
+              label="Nama Penerima"
+              {...register('recipient_name')}
+              error={!!errors.recipient_name}
+              helperText={errors.recipient_name?.message}
+            />
 
-            {/* Province */}
-            <RHFAutocomplete
-              name="province"
+            <TextField
+              label="Nomor HP"
+              {...register('phone_number')}
+              error={!!errors.phone_number}
+              helperText={errors.phone_number?.message}
+            />
+
+            <TextField
+              label="Alamat"
+              {...register('address')}
+              error={!!errors.address}
+              helperText={errors.address?.message}
+            />
+
+            <TextField
+              label="Kode Pos"
+              {...register('postal_code')}
+              error={!!errors.postal_code}
+              helperText={errors.postal_code?.message}
+            />
+
+            {/* Province Select */}
+            <TextField
+              select
               label="Provinsi"
-              options={provinces}
-              getOptionLabel={(option) => option.name || ''}
-              onChange={(e, value) => handleProvinceChange(value)}
-            />
+              value={provinceId}
+              onChange={(e) => {
+                setProvinceId(e.target.value);
+                setCityId('');
+                setDistrictId('');
+                setVillageId('');
+              }}
+            >
+              {provinces.map((province) => (
+                <MenuItem key={province.id} value={province.id}>
+                  {province.name}
+                </MenuItem>
+              ))}
+            </TextField>
 
-            {/* City */}
-            <RHFAutocomplete
-              name="city"
+            {/* City Select */}
+            <TextField
+              select
               label="Kota/Kabupaten"
-              options={cities}
-              getOptionLabel={(option) => option.name || ''}
-              onChange={(e, value) => handleCityChange(value)}
+              value={cityId}
+              onChange={(e) => {
+                setCityId(e.target.value);
+                setDistrictId('');
+                setVillageId('');
+              }}
               disabled={!provinceId}
-            />
+            >
+              {cities.map((city) => (
+                <MenuItem key={city.id} value={city.id}>
+                  {city.name}
+                </MenuItem>
+              ))}
+            </TextField>
 
-            {/* District */}
-            <RHFAutocomplete
-              name="district"
+            {/* District Select */}
+            <TextField
+              select
               label="Kecamatan"
-              options={districts}
-              getOptionLabel={(option) => option.name || ''}
-              onChange={(e, value) => handleDistrictChange(value)}
+              value={districtId}
+              onChange={(e) => {
+                setDistrictId(e.target.value);
+                setVillageId('');
+              }}
               disabled={!cityId}
-            />
+            >
+              {districts.map((district) => (
+                <MenuItem key={district.id} value={district.id}>
+                  {district.name}
+                </MenuItem>
+              ))}
+            </TextField>
 
-            {/* Village */}
-            <RHFAutocomplete
-              name="village"
+            {/* Village Select */}
+            <TextField
+              select
               label="Kelurahan/Desa"
-              options={villages}
-              getOptionLabel={(option) => option.name || ''}
+              value={villageId}
+              onChange={(e) => setVillageId(e.target.value)}
               disabled={!districtId}
-            />
-
-            <RHFTextField name="postal_code" label="Kode Pos" />
-            <RHFTextField name="notes" label="Catatan" multiline rows={2} />
+            >
+              {villages.map((village) => (
+                <MenuItem key={village.id} value={village.id}>
+                  {village.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Stack>
         </DialogContent>
 
         <DialogActions>
           <Button onClick={onClose}>Batal</Button>
-          <LoadingButton type="submit" variant="contained">
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
             Simpan
-          </LoadingButton>
+          </Button>
         </DialogActions>
-      </FormProvider>
+      </form>
     </Dialog>
   );
 }
-
-AddressNewForm.propTypes = {
-  onClose: PropTypes.func,
-  onCreate: PropTypes.func,
-  open: PropTypes.bool,
-};

@@ -43,6 +43,7 @@ export default function ProductTableRow({
     created_at,
     price,
     publish,
+    status,
     coverUrl,
     category_id,
     quantity,
@@ -51,6 +52,19 @@ export default function ProductTableRow({
     inventoryType,
     categories_id,
   } = row;
+
+  const translateInventoryType = (type) => {
+    switch (type) {
+      case 'available':
+        return 'Tersedia';
+      case 'out of stock':
+        return 'Habis';
+      case 'low stock':
+        return 'Stok Menipis';
+      default:
+        return type; // Kalau tidak ketemu, tetap pakai original
+    }
+  };
 
   const confirm = useBoolean();
 
@@ -105,9 +119,9 @@ export default function ProductTableRow({
           />
         </TableCell>
 
-        {/* <TableCell sx={{ typography: 'caption', color: 'text.secondary' }}>
+        <TableCell sx={{ typography: 'caption', color: 'text.secondary' }}>
           <LinearProgress
-            value={(available * 100) / quantity}
+            value={((stock.available ?? stock.quantity) * 100) / stock.quantity}
             variant="determinate"
             color={
               (inventoryType === 'out of stock' && 'error') ||
@@ -116,16 +130,18 @@ export default function ProductTableRow({
             }
             sx={{ mb: 1, height: 6, maxWidth: 80 }}
           />
-          {!!available && available} {inventoryType}
-        </TableCell> */}
+          {/* Tampilkan available + status dalam bahasa Indonesia */}
+          {!!(stock.available ?? stock.quantity) && (stock.available ?? stock.quantity)}{' '}
+          {translateInventoryType(stock.status)}
+        </TableCell>
 
         <TableCell>{fCurrency(price)}</TableCell>
 
-        {/* <TableCell>
+        <TableCell>
           <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>
-            {publish}
+            {status}
           </Label>
-        </TableCell> */}
+        </TableCell>
 
         <TableCell align="right">
           <IconButton color={popover.open ? 'primary' : 'default'} onClick={popover.onOpen}>

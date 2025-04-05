@@ -12,36 +12,31 @@ import Iconify from 'src/components/iconify';
 import { useCheckoutContext } from './context';
 import CheckoutSummary from './checkout-summary';
 import { AddressNewForm, AddressItem } from '../address';
-import { useMutationCreateShippings } from 'src/utils/shippings';
+import { useFetchShippings } from 'src/utils/shippings';
 
 // ----------------------------------------------------------------------
 
 export default function CheckoutBillingAddress() {
   const checkout = useCheckoutContext();
 
-  const addressForm = useBoolean();
+  const { data } = useFetchShippings();
 
-  const mutation = useMutationCreateShippings({
-    onSuccess: () => {
-      enqueueSnackbar('Alamat berhasil disimpan!', { variant: 'success' });
-      addressForm.onFalse(); // Tutup form
-      // Bisa refetch address list atau apa
-    },
-    onError: (error) => {
-      enqueueSnackbar(error?.response?.data?.message || 'Gagal menyimpan alamat', {
-        variant: 'error',
-      });
-    },
-  });
+  const addressForm = useBoolean();
 
   return (
     <>
       <Grid container spacing={3}>
         <Grid xs={12} md={8}>
-          {_addressBooks.slice(0, 4).map((address) => (
+          {data.slice(0, 4).map((address) => (
             <AddressItem
               key={address.id}
-              address={address}
+              address={{
+                recipient_name: address.recipient_name,
+                fullAddress: `${address.address}, ${address.postal_code}`, // atau bisa lebih lengkap nanti
+                addressType: 'Utama', // atau bisa 'Rumah', 'Kantor', bebas tergantung logic
+                phone_number: address.phone_number,
+                primary: true, // kalau mau kasih tanda primary address
+              }}
               action={
                 <Stack flexDirection="row" flexWrap="wrap" flexShrink={0}>
                   {!address.primary && (
@@ -83,7 +78,7 @@ export default function CheckoutBillingAddress() {
               onClick={addressForm.onTrue}
               startIcon={<Iconify icon="mingcute:add-line" />}
             >
-              New Address
+              Buat alamat baru
             </Button>
           </Stack>
         </Grid>
@@ -97,13 +92,7 @@ export default function CheckoutBillingAddress() {
         </Grid>
       </Grid>
 
-      <AddressNewForm
-        open={addressForm.value}
-        onClose={addressForm.onFalse}
-        onCreate={(data) => {
-          mutation.mutate({ ...data, users_id: users_id });
-        }}
-      />
+      <AddressNewForm open={addressForm.value} onClose={addressForm.onFalse} />
     </>
   );
 }
