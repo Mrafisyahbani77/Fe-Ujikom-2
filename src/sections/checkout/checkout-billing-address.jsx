@@ -12,6 +12,7 @@ import Iconify from 'src/components/iconify';
 import { useCheckoutContext } from './context';
 import CheckoutSummary from './checkout-summary';
 import { AddressNewForm, AddressItem } from '../address';
+import { useMutationCreateShippings } from 'src/utils/shippings';
 
 // ----------------------------------------------------------------------
 
@@ -19,6 +20,19 @@ export default function CheckoutBillingAddress() {
   const checkout = useCheckoutContext();
 
   const addressForm = useBoolean();
+
+  const mutation = useMutationCreateShippings({
+    onSuccess: () => {
+      enqueueSnackbar('Alamat berhasil disimpan!', { variant: 'success' });
+      addressForm.onFalse(); // Tutup form
+      // Bisa refetch address list atau apa
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.response?.data?.message || 'Gagal menyimpan alamat', {
+        variant: 'error',
+      });
+    },
+  });
 
   return (
     <>
@@ -86,7 +100,9 @@ export default function CheckoutBillingAddress() {
       <AddressNewForm
         open={addressForm.value}
         onClose={addressForm.onFalse}
-        onCreate={checkout.onCreateBilling}
+        onCreate={(data) => {
+          mutation.mutate({ ...data, users_id: users_id });
+        }}
       />
     </>
   );

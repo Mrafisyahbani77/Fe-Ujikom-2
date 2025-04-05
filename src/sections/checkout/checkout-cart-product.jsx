@@ -20,27 +20,34 @@ import IncrementerButton from '../product/common/incrementer-button';
 // ----------------------------------------------------------------------
 
 export default function CheckoutCartProduct({ row, onDelete, onDecrease, onIncrease }) {
-  const { product_name, size, product_price, color, product_image, quantity, stockStatus} = row;
-  console.log(color)
+  const { product_name, size, product_price, color, product_image, quantity, stockStatus } = row;
+  console.log(color);
 
   return (
     <TableRow>
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar variant="rounded" alt={product_name} src={product_image} sx={{ width: 64, height: 64, mr: 2 }} />
+        <Avatar
+          variant="rounded"
+          alt={product_name}
+          src={product_image}
+          sx={{ width: 64, height: 64, mr: 2 }}
+        />
 
         <Stack spacing={0.5}>
           <Typography noWrap variant="subtitle2" sx={{ maxWidth: 240 }}>
             {product_name}
           </Typography>
-
+          <Typography noWrap variant="caption" sx={{ maxWidth: 240 }}>
+            Variasi
+          </Typography>
           <Stack
             direction="row"
             alignItems="center"
             sx={{ typography: 'body2', color: 'text.secondary' }}
           >
-            size: <Label sx={{ ml: 0.5 }}> {size} </Label>
+            <Label sx={{ ml: 0.5 }}> {size} </Label>
             <Divider orientation="vertical" sx={{ mx: 1, height: 16 }} />
-            {/* <ColorPreview colors={color} /> */}
+            <Label sx={{ ml: 0.5 }}> {color} </Label>
           </Stack>
         </Stack>
       </TableCell>
@@ -57,9 +64,9 @@ export default function CheckoutCartProduct({ row, onDelete, onDecrease, onIncre
             disabledIncrease={quantity >= stockStatus?.available}
           />
 
-          <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mt: 1 }}>
+          {/* <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mt: 1 }}>
             available: {stockStatus?.available}
-          </Typography>
+          </Typography> */}
         </Box>
       </TableCell>
 

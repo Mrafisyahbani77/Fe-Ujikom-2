@@ -4,7 +4,12 @@ import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { PRODUCT_CHECKOUT_STEPS } from 'src/_mock/_product';
 import { CheckoutContext } from './checkout-context';
-import { useMutationCreate, useMutationDelete, useFetchCart } from 'src/utils/cart';
+import {
+  useMutationCreate,
+  useMutationDelete,
+  useFetchCart,
+  useMutationUpdate,
+} from 'src/utils/cart';
 import { useSnackbar } from 'notistack';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthContext } from 'src/auth/hooks';
@@ -38,6 +43,18 @@ export function CheckoutProvider({ children }) {
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
+  const mutationUpdateCart = useMutationUpdate({
+    onSuccess: () => {
+      enqueueSnackbar('Keranjang berhasil diperbarui', { variant: 'success' });
+      queryClient.invalidateQueries({ queryKey: ['fetch.cart'] }); // refresh cart
+    },
+    onError: (error) => {
+      const errorMessage =
+        error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat update';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
@@ -159,23 +176,57 @@ export function CheckoutProvider({ children }) {
     setActiveStep(step);
   }, []);
 
-  const onIncreaseQuantity = useCallback((itemId) => {
-    setState((prevState) => ({
-      ...prevState,
-      items: prevState.items.map((item) =>
-        item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
-      ),
-    }));
-  }, []);
+  const onIncreaseQuantity = useCallback(
+    (itemId) => {
+      setState((prevState) => {
+        const newItems = prevState.items.map((item) =>
+          item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
+        );
 
-  const onDecreaseQuantity = useCallback((itemId) => {
-    setState((prevState) => ({
-      ...prevState,
-      items: prevState.items.map((item) =>
-        item.id === itemId ? { ...item, quantity: Math.max(item.quantity - 1, 1) } : item
-      ),
-    }));
-  }, []);
+        // Cari item yang diupdate
+        const updatedItem = newItems.find((item) => item.id === itemId);
+
+        // 🔥 Call API buat update ke backend
+        if (updatedItem) {
+          mutationUpdateCart.mutate({
+            cart_id: updatedItem.id, // cart_id sesuai item
+            quantity: updatedItem.quantity, // quantity baru
+          });
+        }
+
+        return {
+          ...prevState,
+          items: newItems,
+        };
+      });
+    },
+    [mutationUpdateCart]
+  );
+
+  const onDecreaseQuantity = useCallback(
+    (itemId) => {
+      setState((prevState) => {
+        const newItems = prevState.items.map((item) =>
+          item.id === itemId ? { ...item, quantity: Math.max(item.quantity - 1, 1) } : item
+        );
+
+        const updatedItem = newItems.find((item) => item.id === itemId);
+
+        if (updatedItem) {
+          mutationUpdateCart.mutate({
+            cart_id: updatedItem.id,
+            quantity: updatedItem.quantity,
+          });
+        }
+
+        return {
+          ...prevState,
+          items: newItems,
+        };
+      });
+    },
+    [mutationUpdateCart]
+  );
 
   const onCreateBilling = useCallback(
     (address) => {

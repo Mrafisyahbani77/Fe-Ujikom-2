@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance, { endpoints } from 'src/utils/axios';
 
-export const useFetchCity = (id) =>
+export const useFetchVillage = (id) =>
   useQuery({
-    queryKey: ['city.id', id], // Tambahkan id agar cache unik untuk setiap permintaan
+    queryKey: ['village.id', id], // Tambahkan id agar cache unik untuk setiap permintaan
     queryFn: async () => {
       if (!id) return null; // Hindari fetch jika id tidak tersedia
-      const response = await axiosInstance.get(`${endpoints.shippings.city}/${id}`);
+      const response = await axiosInstance.get(`${endpoints.shippings.village}/${id}`);
       return response.data.data;
     },
     enabled: !!id,

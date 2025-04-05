@@ -22,33 +22,46 @@ import FormProvider, {
   RHFRadioGroup,
   RHFAutocomplete,
 } from 'src/components/hook-form';
+import {
+  useFetchProvinces,
+  useFetchCity,
+  useFetchDistricts,
+  useFetchVillage,
+} from 'src/utils/shippings';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
 export default function AddressNewForm({ open, onClose, onCreate }) {
+  const [provinceId, setProvinceId] = useState('');
+  const [cityId, setCityId] = useState('');
+  const [districtId, setDistrictId] = useState('');
+
+  const { data: provinces = [] } = useFetchProvinces();
+  const { data: cities = [] } = useFetchCity(provinceId);
+  const { data: districts = [] } = useFetchDistricts(cityId);
+  const { data: villages = [] } = useFetchVillage(districtId);
+
   const NewAddressSchema = Yup.object().shape({
-    name: Yup.string().required('Fullname is required'),
-    phoneNumber: Yup.string().required('Phone number is required'),
-    address: Yup.string().required('Address is required'),
-    city: Yup.string().required('City is required'),
-    state: Yup.string().required('State is required'),
-    country: Yup.string().required('Country is required'),
-    zipCode: Yup.string().required('Zip code is required'),
-    // not required
-    addressType: Yup.string(),
-    primary: Yup.boolean(),
+    recipient_name: Yup.string().required('Nama penerima wajib diisi'),
+    phone_number: Yup.string().required('Nomor HP wajib diisi'),
+    address: Yup.string().required('Alamat wajib diisi'),
+    province: Yup.string().required('Provinsi wajib diisi'),
+    city: Yup.string().required('Kota wajib diisi'),
+    district: Yup.string().required('Kecamatan wajib diisi'),
+    postal_code: Yup.string().required('Kode Pos wajib diisi'),
+    notes: Yup.string(),
   });
 
   const defaultValues = {
-    name: '',
-    city: '',
-    state: '',
+    recipient_name: '',
+    phone_number: '',
     address: '',
-    zipCode: '',
-    primary: true,
-    phoneNumber: '',
-    addressType: 'Home',
-    country: '',
+    province: '',
+    city: '',
+    district: '',
+    postal_code: '',
+    notes: '',
   };
 
   const methods = useForm({
@@ -56,113 +69,90 @@ export default function AddressNewForm({ open, onClose, onCreate }) {
     defaultValues,
   });
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
+  const { handleSubmit, watch, setValue } = methods;
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      onCreate({
-        name: data.name,
-        phoneNumber: data.phoneNumber,
-        fullAddress: `${data.address}, ${data.city}, ${data.state}, ${data.country}, ${data.zipCode}`,
-        addressType: data.addressType,
-        primary: data.primary,
-      });
-      onClose();
-    } catch (error) {
-      console.error(error);
-    }
-  });
+  const values = watch();
+
+  const handleProvinceChange = (option) => {
+    setProvinceId(option?.id || '');
+    setValue('province', option?.name || '');
+    setValue('city', '');
+    setValue('district', '');
+  };
+
+  const handleCityChange = (option) => {
+    setCityId(option?.id || '');
+    setValue('city', option?.name || '');
+    setValue('district', '');
+  };
+
+  const handleDistrictChange = (option) => {
+    setDistrictId(option?.id || '');
+    setValue('district', option?.name || '');
+  };
+
+  const onSubmit = async (data) => {
+    onCreate(data);
+  };
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
-      <FormProvider methods={methods} onSubmit={onSubmit}>
-        <DialogTitle>New address</DialogTitle>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Tambah Alamat Baru</DialogTitle>
 
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
-          <Stack spacing={3}>
-            <RHFRadioGroup
-              row
-              name="addressType"
-              options={[
-                { label: 'Home', value: 'Home' },
-                { label: 'Office', value: 'Office' },
-              ]}
-            />
+          <Stack spacing={2}>
+            <RHFTextField name="recipient_name" label="Nama Penerima" />
+            <RHFTextField name="phone_number" label="Nomor HP" />
+            <RHFTextField name="address" label="Alamat" multiline rows={3} />
 
-            <Box
-              rowGap={3}
-              columnGap={2}
-              display="grid"
-              gridTemplateColumns={{
-                xs: 'repeat(1, 1fr)',
-                sm: 'repeat(2, 1fr)',
-              }}
-            >
-              <RHFTextField name="name" label="Full Name" />
-
-              <RHFTextField name="phoneNumber" label="Phone Number" />
-            </Box>
-
-            <RHFTextField name="address" label="Address" />
-
-            <Box
-              rowGap={3}
-              columnGap={2}
-              display="grid"
-              gridTemplateColumns={{
-                xs: 'repeat(1, 1fr)',
-                sm: 'repeat(3, 1fr)',
-              }}
-            >
-              <RHFTextField name="city" label="Town / City" />
-
-              <RHFTextField name="state" label="State" />
-
-              <RHFTextField name="zipCode" label="Zip/Code" />
-            </Box>
-
+            {/* Province */}
             <RHFAutocomplete
-              name="country"
-              label="Country"
-              options={countries.map((country) => country.label)}
-              getOptionLabel={(option) => option}
-              renderOption={(props, option) => {
-                const { code, label, phone } = countries.filter(
-                  (country) => country.label === option
-                )[0];
-
-                if (!label) {
-                  return null;
-                }
-
-                return (
-                  <li {...props} key={label}>
-                    <Iconify
-                      key={label}
-                      icon={`circle-flags:${code.toLowerCase()}`}
-                      width={28}
-                      sx={{ mr: 1 }}
-                    />
-                    {label} ({code}) +{phone}
-                  </li>
-                );
-              }}
+              name="province"
+              label="Provinsi"
+              options={provinces}
+              getOptionLabel={(option) => option.name || ''}
+              onChange={(e, value) => handleProvinceChange(value)}
             />
 
-            <RHFCheckbox name="primary" label="Use this address as default." />
+            {/* City */}
+            <RHFAutocomplete
+              name="city"
+              label="Kota/Kabupaten"
+              options={cities}
+              getOptionLabel={(option) => option.name || ''}
+              onChange={(e, value) => handleCityChange(value)}
+              disabled={!provinceId}
+            />
+
+            {/* District */}
+            <RHFAutocomplete
+              name="district"
+              label="Kecamatan"
+              options={districts}
+              getOptionLabel={(option) => option.name || ''}
+              onChange={(e, value) => handleDistrictChange(value)}
+              disabled={!cityId}
+            />
+
+            {/* Village */}
+            <RHFAutocomplete
+              name="village"
+              label="Kelurahan/Desa"
+              options={villages}
+              getOptionLabel={(option) => option.name || ''}
+              disabled={!districtId}
+            />
+
+            <RHFTextField name="postal_code" label="Kode Pos" />
+            <RHFTextField name="notes" label="Catatan" multiline rows={2} />
           </Stack>
         </DialogContent>
 
         <DialogActions>
-          <Button color="inherit" variant="outlined" onClick={onClose}>
-            Cancel
-          </Button>
-
-          <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            Deliver to this Address
+          <Button onClick={onClose}>Batal</Button>
+          <LoadingButton type="submit" variant="contained">
+            Simpan
           </LoadingButton>
         </DialogActions>
       </FormProvider>

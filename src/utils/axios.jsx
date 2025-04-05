@@ -193,6 +193,7 @@ export const endpoints = {
     provinces: '/api/shippings/provinces',
     city: '/api/shippings/cities', // need id provinsi
     districts: '/api/shippings/districts', //need id city
+    village: '/api/shippings/villages', //need id districts
     update: '/api/shippings',
     delete: '/api/shippings',
     deleteAll: '/api/shippings',
