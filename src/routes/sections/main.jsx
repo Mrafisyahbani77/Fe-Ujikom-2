@@ -10,6 +10,7 @@ import { SplashScreen } from 'src/components/loading-screen';
 import Category from 'src/sections/home/category';
 import Success from 'src/sections/home/success';
 import Error from 'src/sections/home/error';
+import ShippingView from 'src/sections/checkout/shipping-view';
 
 // ----------------------------------------------------------------------
 
@@ -45,6 +46,7 @@ export const mainRoutes = [
       { path: 'category/:slug', element: <Category /> },
       { path: 'success', element: <Success /> },
       { path: 'error', element: <Error /> },
+      { path: 'shipping', element: <ShippingView /> },
       {
         path: 'product',
         children: [

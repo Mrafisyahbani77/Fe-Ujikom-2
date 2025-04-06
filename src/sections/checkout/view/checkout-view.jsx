@@ -38,6 +38,7 @@ export default function CheckoutView() {
           open={checkout.completed}
           onReset={checkout.onReset}
           onDownloadPDF={() => {}}
+          data={checkout.orderData}
         />
       ) : (
         <>

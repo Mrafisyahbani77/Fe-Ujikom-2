@@ -16,12 +16,13 @@ export default function DiscountEditView({ id }) {
       <CustomBreadcrumbs
         heading="Edit Diskon"
         links={[
-          { name: 'Dashboard', href: paths.dashboard.root },
-          { name: 'daftar diskon', href: paths.dashboard.discount.list },
+          { name: 'Daftar diskon', href: paths.dashboard.discount.list },
+          { name: 'Edit diskon' },
+
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
-      <EditForm currentProduct={data} />
+      <EditForm currentDiscount={data} />
     </Container>
   );
 }

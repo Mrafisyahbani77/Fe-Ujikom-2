@@ -146,12 +146,20 @@ export const endpoints = {
     delete: '/api/categories',
   },
   discount: {
-    list: '/api/discount',
-    getByid: 'api/discount',
-    getBySlug: 'api/discount',
-    create: '/api/discount/store',
-    update: '/api/discount',
-    delete: '/api/discount',
+    user: {
+      checkValidate: '/api/discounts/validate',
+    },
+    public: {
+      GetAllDiscount: '/api/discounts/public',
+      GetDiscountSlug: '/api/discounts/slug', //need slug
+      Available: '/api/discounts/available',
+    },
+    list: '/api/discounts',
+    getByid: 'api/discounts',
+    getBySlug: 'api/discounts',
+    create: '/api/discounts/store',
+    update: '/api/discounts',
+    delete: '/api/discounts',
   },
   product: {
     list: '/api/products/users/all',
@@ -180,7 +188,7 @@ export const endpoints = {
     details: '/api/order',
     update: '/api/order',
     delete: '/api/order',
-    create: '/api/order/store',
+    create: '/api/order/from-cart',
   },
   payment: {
     buy: '/api/payments',
@@ -209,12 +217,5 @@ export const endpoints = {
     update: '/api/reviews',
     delete: '/api/reviews',
     create: '/api/reviews/store',
-  },
-  discount: {
-    list: '/api/discounts',
-    details: '/api/discounts',
-    update: '/api/discounts',
-    delete: '/api/discounts',
-    create: '/api/discounts/store',
   },
 };

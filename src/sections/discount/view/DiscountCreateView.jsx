@@ -13,8 +13,8 @@ export default function DiscountCreateView() {
       <CustomBreadcrumbs
         heading="Buat Diskon"
         links={[
-          { name: 'Dashboard', href: paths.dashboard.root },
-          { name: 'daftar diskon', href: paths.dashboard.discount.list },
+          { name: 'Daftar diskon', href: paths.dashboard.discount.list },
+          { name: 'Buat diskon' },
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />

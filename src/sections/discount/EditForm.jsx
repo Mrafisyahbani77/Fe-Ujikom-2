@@ -3,17 +3,28 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-// @mui
-import { Button, Card, CardContent, TextField, Typography } from '@mui/material';
-// hooks
+import { Button, Card, CardContent, MenuItem, TextField, Typography } from '@mui/material';
 import { useSnackbar } from 'src/components/snackbar';
 import { useRouter } from 'src/routes/hooks';
-// utils
 import { useMutationUpdate } from 'src/utils/discount';
+import { NumericFormat } from 'react-number-format';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function EditForm({ currentDiscount }) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+
+  const formatDateTime = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d
+      .getDate()
+      .toString()
+      .padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:${d
+      .getMinutes()
+      .toString()
+      .padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+  };
 
   const validationSchema = Yup.object().shape({
     code: Yup.string().required('Kode wajib diisi'),
@@ -26,8 +37,6 @@ export default function EditForm({ currentDiscount }) {
     max_discount_amount: Yup.number()
       .required('Maksimal diskon wajib diisi')
       .min(0, 'Tidak boleh negatif'),
-    start_date: Yup.date().required('Tanggal mulai wajib diisi'),
-    end_date: Yup.date().required('Tanggal berakhir wajib diisi'),
     usage_limit: Yup.number()
       .required('Batas penggunaan wajib diisi')
       .min(0, 'Tidak boleh negatif'),
@@ -37,13 +46,15 @@ export default function EditForm({ currentDiscount }) {
     register,
     handleSubmit,
     setValue,
+    watch,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       code: '',
       description: '',
-      discount_type: '',
+      discount_type: '', // <-- ini WAJIB
       discount_value: '',
       min_order_amount: '',
       max_discount_amount: '',
@@ -53,128 +64,182 @@ export default function EditForm({ currentDiscount }) {
     },
   });
 
-  // Mengisi form dengan data yang ada
+  const discountType = watch('discount_type');
+
   useEffect(() => {
     if (currentDiscount) {
-      Object.keys(currentDiscount).forEach((key) => {
-        setValue(key, currentDiscount[key]);
+      reset({
+        code: currentDiscount.code || '',
+        description: currentDiscount.description || '',
+        discount_type: currentDiscount.discount_type || '',
+        discount_value: Number(currentDiscount.discount_value) || 0,
+        min_order_amount: Number(currentDiscount.min_order_amount) || 0,
+        max_discount_amount: Number(currentDiscount.max_discount_amount) || 0,
+        usage_limit: currentDiscount.usage_limit || 0,
+        start_date: currentDiscount.start_date ? currentDiscount.start_date.substring(0, 10) : '',
+        end_date: currentDiscount.end_date ? currentDiscount.end_date.substring(0, 10) : '',
       });
     }
-  }, [currentDiscount, setValue]);
+  }, [currentDiscount, reset]);
 
-  const mutation = useMutationUpdate({
+  const { mutate: editDiscount, isLoading } = useMutationUpdate({
     onSuccess: () => {
       enqueueSnackbar('Diskon berhasil diperbarui', { variant: 'success' });
       router.push('/dashboard/discount/list');
+      queryClient.invalidateQueries({ queryKey: ['fetch.discount'] });
     },
     onError: (error) => {
-      enqueueSnackbar(error.message || 'Terjadi kesalahan', { variant: 'error' });
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
 
   const onSubmit = (data) => {
-    if (!currentDiscount?.id) {
-      enqueueSnackbar('ID diskon tidak ditemukan!', { variant: 'error' });
-      return;
-    }
-    mutation.mutate({ id: currentDiscount.id, data });
+    const payload = {
+      ...data,
+      start_date: formatDateTime(data.start_date),
+      end_date: formatDateTime(data.end_date),
+    };
+    editDiscount({ id: currentDiscount.id, data: payload });
   };
 
   return (
-    <Card sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
+    <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Edit Diskon
         </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <TextField
+            label="Kode Diskon"
             fullWidth
-            label="Kode"
-            variant="outlined"
+            margin="normal"
             {...register('code')}
             error={!!errors.code}
             helperText={errors.code?.message}
-            sx={{ mb: 2 }}
           />
+
           <TextField
-            fullWidth
             label="Deskripsi"
-            variant="outlined"
+            fullWidth
+            margin="normal"
             {...register('description')}
             error={!!errors.description}
             helperText={errors.description?.message}
-            sx={{ mb: 2 }}
           />
+
           <TextField
-            fullWidth
             label="Tipe Diskon"
-            variant="outlined"
+            fullWidth
+            select
+            margin="normal"
             {...register('discount_type')}
             error={!!errors.discount_type}
             helperText={errors.discount_type?.message}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
+          >
+            <MenuItem value="fixed">Fixed (Rp)</MenuItem>
+            <MenuItem value="percentage">Percentage (%)</MenuItem>
+          </TextField>
+
+          <NumericFormat
+            customInput={TextField}
             label="Nilai Diskon"
-            variant="outlined"
-            type="number"
-            {...register('discount_value')}
+            fullWidth
+            margin="normal"
+            value={watch('discount_value')}
+            onValueChange={(values) => {
+              const { floatValue } = values;
+              setValue('discount_value', floatValue || 0);
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix={discountType === 'fixed' ? 'Rp ' : ''}
+            suffix={discountType === 'percentage' ? ' %' : ''}
+            allowNegative={false}
+            isNumericString
             error={!!errors.discount_value}
             helperText={errors.discount_value?.message}
-            sx={{ mb: 2 }}
           />
-          <TextField
-            fullWidth
+
+          {/* Min Order Amount */}
+          <NumericFormat
+            customInput={TextField}
             label="Minimal Pesanan"
-            variant="outlined"
-            type="number"
-            {...register('min_order_amount')}
+            fullWidth
+            margin="normal"
+            value={watch('min_order_amount')}
+            onValueChange={(values) => {
+              const { floatValue } = values;
+              setValue('min_order_amount', floatValue || 0);
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix="Rp "
+            allowNegative={false}
+            isNumericString
             error={!!errors.min_order_amount}
             helperText={errors.min_order_amount?.message}
-            sx={{ mb: 2 }}
           />
-          <TextField
-            fullWidth
+
+          {/* Max Discount Amount */}
+          <NumericFormat
+            customInput={TextField}
             label="Maksimal Diskon"
-            variant="outlined"
-            type="number"
-            {...register('max_discount_amount')}
+            fullWidth
+            margin="normal"
+            value={watch('max_discount_amount')}
+            onValueChange={(values) => {
+              const { floatValue } = values;
+              setValue('max_discount_amount', floatValue || 0);
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix="Rp "
+            allowNegative={false}
+            isNumericString
             error={!!errors.max_discount_amount}
             helperText={errors.max_discount_amount?.message}
-            sx={{ mb: 2 }}
           />
+
           <TextField
-            fullWidth
-            label="Tanggal Mulai"
+            label="Start Date"
             type="date"
-            InputLabelProps={{ shrink: true }}
+            fullWidth
+            margin="normal"
             {...register('start_date')}
             error={!!errors.start_date}
             helperText={errors.start_date?.message}
-            sx={{ mb: 2 }}
           />
+
           <TextField
-            fullWidth
-            label="Tanggal Berakhir"
+            label="End Date"
             type="date"
-            InputLabelProps={{ shrink: true }}
+            fullWidth
+            margin="normal"
             {...register('end_date')}
             error={!!errors.end_date}
             helperText={errors.end_date?.message}
-            sx={{ mb: 2 }}
           />
+
           <TextField
-            fullWidth
             label="Batas Penggunaan"
-            variant="outlined"
+            fullWidth
+            margin="normal"
             type="number"
             {...register('usage_limit')}
             error={!!errors.usage_limit}
             helperText={errors.usage_limit?.message}
-            sx={{ mb: 2 }}
           />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+            disabled={isLoading}
+          >
             Simpan
           </Button>
         </form>

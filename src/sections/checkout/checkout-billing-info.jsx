@@ -14,7 +14,7 @@ export default function CheckoutBillingInfo({ billing, onBackStep }) {
   return (
     <Card sx={{ mb: 3 }}>
       <CardHeader
-        title="Address"
+        title="Alamat"
         action={
           <Button size="small" startIcon={<Iconify icon="solar:pen-bold" />} onClick={onBackStep}>
             Edit
@@ -23,15 +23,15 @@ export default function CheckoutBillingInfo({ billing, onBackStep }) {
       />
       <Stack spacing={1} sx={{ p: 3 }}>
         <Box sx={{ typography: 'subtitle2' }}>
-          {`${billing?.name} `}
+          {`${billing?.recipient_name} `}
           <Box component="span" sx={{ color: 'text.secondary', typography: 'body2' }}>
-            ({billing?.addressType})
+            {/* ({billing?.addressType}) */}
           </Box>
         </Box>
 
-        <Box sx={{ color: 'text.secondary', typography: 'body2' }}>{billing?.fullAddress}</Box>
+        <Box sx={{ color: 'text.secondary', typography: 'body2' }}>{billing?.address}</Box>
 
-        <Box sx={{ color: 'text.secondary', typography: 'body2' }}>{billing?.phoneNumber}</Box>
+        <Box sx={{ color: 'text.secondary', typography: 'body2' }}>{billing?.phone_number}</Box>
       </Stack>
     </Card>
   );

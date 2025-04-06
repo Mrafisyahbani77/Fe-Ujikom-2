@@ -58,15 +58,15 @@ export default function AddressNewForm({ open, onClose }) {
     },
   });
 
-  const mutation = useMutationCreateShippings({
+  const { mutateAsync: createShipping } = useMutationCreateShippings({
     onSuccess: () => {
-      enqueueSnackbar('Alamat berhasil disimpan!', { variant: 'success' });
-      queryClient.invalidateQueries(['shippings']);
-      onClose();
+      enqueueSnackbar('Alamat berhasil ditambahkan!', { variant: 'success' });
+      queryClient.invalidateQueries({ queryKey: ['fetch.shippings'] });
       reset();
+      onClose();
     },
     onError: (error) => {
-      enqueueSnackbar(error?.response?.data?.message || 'Gagal menyimpan alamat', {
+      enqueueSnackbar(error?.response?.data?.message || error?.message || 'Terjadi kesalahan', {
         variant: 'error',
       });
     },
@@ -74,7 +74,7 @@ export default function AddressNewForm({ open, onClose }) {
 
   const onSubmit = async (data) => {
     try {
-      await mutation.mutateAsync({
+      await createShipping({
         recipient_name: data.recipient_name,
         phone_number: data.phone_number,
         address: data.address,
@@ -83,10 +83,9 @@ export default function AddressNewForm({ open, onClose }) {
         city_id: cityId,
         district_id: districtId,
         village_id: villageId,
-        // notes: data.notes || '', // kalau kamu mau ada catatan
+        notes: data.notes || '', // kalau kamu mau ada catatan
       });
-      enqueueSnackbar('Alamat berhasil ditambahkan!');
-      queryClient.invalidateQueries(['shippings']);
+
       reset();
       onClose();
     } catch (error) {
@@ -199,6 +198,16 @@ export default function AddressNewForm({ open, onClose }) {
                 </MenuItem>
               ))}
             </TextField>
+
+            <TextField
+              label="Catatan"
+              {...register('notes')}
+              multiline
+              rows={4}
+              error={!!errors.notes}
+              helperText={errors.notes?.message}
+              fullWidth
+            />
           </Stack>
         </DialogContent>
 

@@ -97,11 +97,11 @@ export default function CheckoutPayment() {
         <Grid xs={12} md={8}>
           <CheckoutDelivery onApplyShipping={checkout.onApplyShipping} options={DELIVERY_OPTIONS} />
 
-          <CheckoutPaymentMethods
+          {/* <CheckoutPaymentMethods
             cardOptions={CARDS_OPTIONS}
             options={PAYMENT_OPTIONS}
             sx={{ my: 3 }}
-          />
+          /> */}
 
           <Button
             size="small"
@@ -109,7 +109,7 @@ export default function CheckoutPayment() {
             onClick={checkout.onBackStep}
             startIcon={<Iconify icon="eva:arrow-ios-back-fill" />}
           >
-            Back
+            Kembali
           </Button>
         </Grid>
 
@@ -130,6 +130,7 @@ export default function CheckoutPayment() {
             type="submit"
             variant="contained"
             loading={isSubmitting}
+            onClick={checkout.onCreateOrder}
           >
             Complete Order
           </LoadingButton>

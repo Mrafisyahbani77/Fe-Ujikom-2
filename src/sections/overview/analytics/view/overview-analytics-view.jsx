@@ -45,6 +45,7 @@ export default function OverviewAnalyticsView() {
   const { data: sold, isLoading: loading, isError: Error } = useFetchChartProductSold();
   const { data: gender, isLoading: fetching, isError: not_work } = useFetchChartSaleByGender();
   const { data: year, isLoading: loadd, isError: ERror } = useFetchChartYearly();
+  console.log(year)
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>

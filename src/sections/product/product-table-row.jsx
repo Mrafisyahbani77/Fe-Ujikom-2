@@ -66,6 +66,10 @@ export default function ProductTableRow({
     }
   };
 
+  const availableStock = stock.available ?? stock.quantity;
+  const progressColor =
+    availableStock === 0 ? 'error' : inventoryType === 'low stock' ? 'warning' : 'success';
+
   const confirm = useBoolean();
 
   const popover = usePopover();
@@ -121,13 +125,9 @@ export default function ProductTableRow({
 
         <TableCell sx={{ typography: 'caption', color: 'text.secondary' }}>
           <LinearProgress
-            value={((stock.available ?? stock.quantity) * 100) / stock.quantity}
+            value={(availableStock * 100) / stock.quantity}
             variant="determinate"
-            color={
-              (inventoryType === 'out of stock' && 'error') ||
-              (inventoryType === 'low stock' && 'warning') ||
-              'success'
-            }
+            color={progressColor}
             sx={{ mb: 1, height: 6, maxWidth: 80 }}
           />
           {/* Tampilkan available + status dalam bahasa Indonesia */}

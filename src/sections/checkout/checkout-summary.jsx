@@ -14,6 +14,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { fCurrency } from 'src/utils/format-number';
 // components
 import Iconify from 'src/components/iconify';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -27,6 +28,28 @@ export default function CheckoutSummary({
   onApplyDiscount,
 }) {
   const displayShipping = shipping !== null ? 'Free' : '-';
+
+  const [discountCode, setDiscountCode] = useState('');
+
+  const renderDiscount = () => {
+    if (!discount || !discount.discount_type) {
+      return '-';
+    }
+
+    if (discount.discount_type === 'percentage') {
+      return (
+        <>
+          {discount.discount_value}% ({fCurrency(-discount.discount_amount)})
+        </>
+      );
+    }
+
+    if (discount.discount_type === 'fixed') {
+      return fCurrency(-discount.discount_amount);
+    }
+
+    return '-';
+  };
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -54,7 +77,7 @@ export default function CheckoutSummary({
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Discount
             </Typography>
-            <Typography variant="subtitle2">{discount ? fCurrency(-discount) : '-'}</Typography>
+            <Typography variant="subtitle2">{renderDiscount()}</Typography>
           </Stack>
 
           <Stack direction="row" justifyContent="space-between">
@@ -74,22 +97,27 @@ export default function CheckoutSummary({
               <Typography variant="subtitle1" sx={{ color: 'error.main' }}>
                 {fCurrency(total)}
               </Typography>
-              <Typography variant="caption" sx={{ fontStyle: 'italic' }}>
-                (VAT included if applicable)
-              </Typography>
+              {/* <Typography variant="caption" sx={{ fontStyle: 'italic' }}>
+                  (VAT included if applicable)
+                </Typography> */}
             </Box>
           </Stack>
 
           {onApplyDiscount && (
             <TextField
-              fullWidth
-              placeholder="Discount codes / Gifts"
-              value="DISCOUNT5"
+              value={discountCode}
+              placeholder="Masukkan kode diskon"
+              onChange={(e) => setDiscountCode(e.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <Button color="primary" onClick={() => onApplyDiscount(5)} sx={{ mr: -0.5 }}>
-                      Apply
+                    <Button
+                      size="small"
+                      color="primary"
+                      sx={{ mr: -0.5 }}
+                      onClick={() => onApplyDiscount({ code: discountCode })}
+                    >
+                      Terapkan
                     </Button>
                   </InputAdornment>
                 ),

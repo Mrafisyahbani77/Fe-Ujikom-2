@@ -14,10 +14,41 @@ import { OrderCompleteIllustration } from 'src/assets/illustrations';
 // components
 import Iconify from 'src/components/iconify';
 import { varFade } from 'src/components/animate';
+import { useMutationBuy } from 'src/utils/payment';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
-export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF }) {
+export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF, data }) {
+  console.log(data);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { mutate: Payment, isLoading } = useMutationBuy({
+    onSuccess: (res) => {
+      console.log('Payment success', res);
+      enqueueSnackbar('Redirecting to payment...', { variant: 'success' });
+
+      const redirectUrl = res?.redirect_url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl; // Langsung redirect ke Midtrans
+      } else {
+        enqueueSnackbar('Redirect URL tidak ditemukan!', { variant: 'error' });
+      }
+    },
+    onError: (error) => {
+      console.log('Payment error', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
+  const handlePayment = () => {
+    if (!data?.id) {
+      enqueueSnackbar('Order ID tidak ditemukan!', { variant: 'error' });
+      return;
+    }
+    Payment({ order_id: data.id }); // Kirim order_id ke API payment
+  };
   const renderContent = (
     <Stack
       spacing={5}
@@ -63,6 +94,17 @@ export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF }) 
         </Button>
 
         <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          startIcon={<Iconify icon="eva:credit-card-fill" />}
+          onClick={handlePayment}
+          disabled={isLoading} // disable saat loading
+        >
+          {isLoading ? 'Proses...' : 'Bayar Sekarang'}
+        </Button>
+
+        {/* <Button
           fullWidth
           size="large"
           variant="contained"
@@ -70,7 +112,7 @@ export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF }) 
           onClick={onDownloadPDF}
         >
           Download as PDF
-        </Button>
+        </Button> */}
       </Stack>
     </Stack>
   );

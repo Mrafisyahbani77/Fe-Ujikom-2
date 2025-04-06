@@ -5,6 +5,7 @@ import { useMutationCreate } from 'src/utils/discount';
 import { useRouter } from 'src/routes/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { paths } from 'src/routes/paths';
+import { NumericFormat } from 'react-number-format';
 
 export default function CreateDiscountForm() {
   const { enqueueSnackbar } = useSnackbar();
@@ -54,116 +55,142 @@ export default function CreateDiscountForm() {
     }));
   };
 
+  const handleDiscountValueChange = (values) => {
+    const { value } = values;
+    setForm((prev) => ({
+      ...prev,
+      discount_value: value,
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.code || !form.discount_value || !form.start_date || !form.end_date) {
-      enqueueSnackbar('Pastikan semua data yang wajib diisi sudah terisi', { variant: 'warning' });
-      return;
-    }
     mutation.mutate(form);
   };
 
   return (
-    <Card sx={{ maxWidth: 500, margin: 'auto', mt: 5, p: 2 }}>
+    <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Buat Diskon
         </Typography>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <TextField
-            fullWidth
-            label="Kode Diskon"
             name="code"
-            variant="outlined"
+            label="Kode Diskon"
             value={form.code}
             onChange={handleChange}
-            sx={{ mb: 2 }}
+            required
           />
           <TextField
-            fullWidth
-            label="Deskripsi"
             name="description"
-            variant="outlined"
+            label="Deskripsi"
             value={form.description}
             onChange={handleChange}
-            sx={{ mb: 2 }}
+            required
           />
           <TextField
-            fullWidth
-            select
-            label="Tipe Diskon"
             name="discount_type"
-            variant="outlined"
+            label="Tipe Diskon"
             value={form.discount_type}
             onChange={handleChange}
-            sx={{ mb: 2 }}
+            select
+            required
           >
-            <MenuItem value="percentage">Persentase</MenuItem>
-            <MenuItem value="fixed">Tetap</MenuItem>
+            <MenuItem value="percentage">Persentase (%)</MenuItem>
+            <MenuItem value="fixed">Tetap (Rp)</MenuItem>
           </TextField>
-          <TextField
-            fullWidth
-            label="Nilai Diskon"
-            name="discount_value"
-            type="number"
-            variant="outlined"
+
+          {/* INI Bagian Diskon Value */}
+          <NumericFormat
             value={form.discount_value}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
+            onValueChange={(values) => {
+              const { floatValue } = values;
+              setForm((prev) => ({
+                ...prev,
+                discount_value: floatValue || '',
+              }));
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix={form.discount_type === 'fixed' ? 'Rp ' : ''}
+            suffix={form.discount_type === 'percentage' ? ' %' : ''}
+            allowNegative={false}
+            isNumericString
+            customInput={TextField}
+            label="Nilai Diskon"
             fullWidth
-            label="Minimal Order (Opsional)"
-            name="min_order_amount"
-            type="number"
-            variant="outlined"
+            margin="normal"
+          />
+
+          {/* Input lainnya */}
+          <NumericFormat
             value={form.min_order_amount}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
+            onValueChange={(values) => {
+              const { floatValue } = values;
+              setForm((prev) => ({
+                ...prev,
+                min_order_amount: floatValue || '',
+              }));
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix="Rp "
+            allowNegative={false}
+            isNumericString
+            customInput={TextField}
+            name="min_order_amount"
+            label="Minimal Pembelian (Rp)"
             fullWidth
-            label="Maksimal Diskon (Opsional)"
-            name="max_discount_amount"
-            type="number"
-            variant="outlined"
+            margin="normal"
+          />
+
+          <NumericFormat
             value={form.max_discount_amount}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
+            onValueChange={(values) => {
+              const { floatValue } = values;
+              setForm((prev) => ({
+                ...prev,
+                max_discount_amount: floatValue || '',
+              }));
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix="Rp "
+            allowNegative={false}
+            isNumericString
+            customInput={TextField}
+            name="max_discount_amount"
+            label="Maksimal Diskon (Rp)"
             fullWidth
-            label="Tanggal Mulai"
+            margin="normal"
+          />
+
+          <TextField
             name="start_date"
+            label="Tanggal Mulai"
             type="date"
-            InputLabelProps={{ shrink: true }}
-            variant="outlined"
             value={form.start_date}
             onChange={handleChange}
-            sx={{ mb: 2 }}
+            InputLabelProps={{ shrink: true }}
           />
           <TextField
-            fullWidth
-            label="Tanggal Selesai"
             name="end_date"
+            label="Tanggal Selesai"
             type="date"
-            InputLabelProps={{ shrink: true }}
-            variant="outlined"
             value={form.end_date}
             onChange={handleChange}
-            sx={{ mb: 2 }}
+            InputLabelProps={{ shrink: true }}
           />
           <TextField
-            fullWidth
-            label="Batas Penggunaan (Opsional)"
             name="usage_limit"
+            label="Batas Penggunaan"
             type="number"
-            variant="outlined"
             value={form.usage_limit}
             onChange={handleChange}
-            sx={{ mb: 2 }}
           />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+
+          <Button type="submit" variant="contained" color="primary">
             Simpan
           </Button>
         </form>

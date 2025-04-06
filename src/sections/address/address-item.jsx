@@ -27,13 +27,10 @@ export default function AddressItem({ address, action, sx, ...other }) {
     >
       <Stack flexGrow={1} spacing={1}>
         <Stack direction="row" alignItems="center">
-          <Typography variant="subtitle2">
-            {recipient_name}
-            <Box component="span" sx={{ ml: 0.5, typography: 'body2', color: 'text.secondary' }}>
-              ({addressType})
-            </Box>
+          <Typography variant="subtitle2">{recipient_name}</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', ml: 0.5 }}>
+            {phone_number}
           </Typography>
-
           {primary && (
             <Label color="info" sx={{ ml: 1 }}>
               Default
@@ -45,9 +42,9 @@ export default function AddressItem({ address, action, sx, ...other }) {
           {fullAddress}
         </Typography>
 
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {phone_number}
-        </Typography>
+        <Box component="span" sx={{ ml: 0.5, typography: 'body2', color: 'text.secondary' }}>
+          ({addressType})
+        </Box>
       </Stack>
 
       {action && action}
