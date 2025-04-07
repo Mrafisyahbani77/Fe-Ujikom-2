@@ -97,7 +97,7 @@ export default function ProductItem({ product }) {
       )}
 
       {/* Gambar Produk dengan validasi stok */}
-      <Tooltip title={isOutOfStock ? 'Out of stock' : ''} placement="bottom-end">
+      <Tooltip title={isOutOfStock ? 'Stok habis' : ''} placement="bottom-end">
         <Image
           alt={name}
           src={images[0]}
