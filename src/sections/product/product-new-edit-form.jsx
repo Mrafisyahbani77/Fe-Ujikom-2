@@ -53,7 +53,7 @@ export default function ProductNewEditForm({ currentProduct }) {
   const mdUp = useResponsive('up', 'md');
   const { enqueueSnackbar } = useSnackbar();
   // const [includeTaxes, setIncludeTaxes] = useState(false);
-  const [status, setStatus] = useState('publish'); // Default ke 'publish'
+  // const [status, setStatus] = useState('publish'); // Default ke 'publish'
   const { data, productsLoading, productsEmpty } = useFetchCategory();
 
   const NewProductSchema = Yup.object().shape({
@@ -90,10 +90,11 @@ export default function ProductNewEditForm({ currentProduct }) {
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
       price: currentProduct?.price || 0,
-      stock: currentProduct?.stock || 0,
-      categories_id: currentProduct?.categories_id || '',
+      stock: currentProduct?.stock.quantity || 0,
+      categories_id: currentProduct?.categories.id || '',
       color: currentProduct?.color || [],
       size: currentProduct?.size || [],
+      status: currentProduct?.status || 'publish',
       // newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
       // saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
     }),
@@ -114,6 +115,7 @@ export default function ProductNewEditForm({ currentProduct }) {
   } = methods;
 
   const values = watch();
+  const status = watch('status');
 
   useEffect(() => {
     if (currentProduct) {
@@ -228,7 +230,7 @@ export default function ProductNewEditForm({ currentProduct }) {
   // }, []);
 
   const handleChangeStatus = useCallback((event) => {
-    setStatus(event.target.checked ? 'publish' : 'private');
+    setValue(event.target.checked ? 'publish' : 'private');
   }, []);
 
   const renderForm = (
@@ -421,7 +423,14 @@ export default function ProductNewEditForm({ currentProduct }) {
       {mdUp && <Grid md={4} />}
       <Grid xs={12} md={8} sx={{ display: 'flex', alignItems: 'center' }}>
         <FormControlLabel
-          control={<Switch checked={status === 'publish'} onChange={handleChangeStatus} />}
+          control={
+            <Switch
+              checked={status === 'publish'}
+              onChange={(event) => {
+                setValue('status', event.target.checked ? 'publish' : 'private');
+              }}
+            />
+          }
           label={status === 'publish' ? 'Publish' : 'Private'}
         />
 

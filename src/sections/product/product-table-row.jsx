@@ -21,6 +21,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { Tooltip, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -49,6 +50,7 @@ export default function ProductTableRow({
     quantity,
     createdAt,
     available,
+    categories,
     inventoryType,
     categories_id,
   } = row;
@@ -104,7 +106,7 @@ export default function ProductTableRow({
             }
             secondary={
               <Box component="div" sx={{ typography: 'body2', color: 'text.disabled' }}>
-                {categories_id}
+                {categories.name}
               </Box>
             }
           />
@@ -135,7 +137,21 @@ export default function ProductTableRow({
           {translateInventoryType(stock.status)}
         </TableCell>
 
-        <TableCell>{fCurrency(price)}</TableCell>
+        <TableCell
+          align="right"
+          sx={{
+            maxWidth: 120,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <Tooltip title={fCurrency(price)} arrow enterTouchDelay={0}>
+            <Typography variant="body2" noWrap>
+              {fCurrency(price)}
+            </Typography>
+          </Tooltip>
+        </TableCell>
 
         <TableCell>
           <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>

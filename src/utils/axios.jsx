@@ -163,6 +163,8 @@ export const endpoints = {
   },
   product: {
     list: '/api/products/users/all',
+    listAdmin: '/api/products/admin/all',
+    detailAdmin: '/api/products/admin',
     details: '/api/products/users',
     update: '/api/products',
     delete: '/api/products',
