@@ -61,7 +61,16 @@ export default function ProductNewEditForm({ currentProduct }) {
     images: Yup.array().min(1, 'Images is required'),
     tags: Yup.array().min(2, 'Must have at least 2 tags'),
     categories_id: Yup.number().required('Category is required'), // Perbaikan: ID kategori biasanya angka
-    price: Yup.number().moreThan(0, 'Price should not be $0.00'),
+    price: Yup.number()
+      .transform((value, originalValue) => {
+        if (typeof originalValue === 'string') {
+          const cleaned = originalValue.replace(/,/g, ''); // hapus koma
+          return Number(cleaned);
+        }
+        return value;
+      })
+      .typeError('Price must be a number')
+      .required('Price is required'),
     stock: Yup.number().min(0, 'Stock should not be negative'),
     description: Yup.string().required('Description is required'),
     // taxes: Yup.number().nullable(),
@@ -180,6 +189,12 @@ export default function ProductNewEditForm({ currentProduct }) {
       console.error('Error submitting form:', error);
     }
   });
+
+  function formatNumber(value) {
+    if (!value) return value;
+    const onlyNumbers = value.toString().replace(/[^\d]/g, ''); // Buang semua selain angka
+    return onlyNumbers.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // Tambahin koma setiap 3 digit
+  }
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -351,15 +366,12 @@ export default function ProductNewEditForm({ currentProduct }) {
             <RHFTextField
               name="price"
               label="Harga"
-              placeholder="Rp.0000"
-              type="number"
-              InputLabelProps={{ shrink: true }}
+              onChange={(e) => {
+                const formattedValue = formatNumber(e.target.value);
+                setValue('price', formattedValue); // setValue dari react-hook-form
+              }}
               InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Box component="span" sx={{ color: 'text.disabled' }}></Box>
-                  </InputAdornment>
-                ),
+                startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
               }}
             />
 

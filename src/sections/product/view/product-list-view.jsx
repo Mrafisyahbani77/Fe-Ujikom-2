@@ -1,5 +1,5 @@
 import isEqual from 'lodash/isEqual';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 // @mui
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -174,6 +174,16 @@ export default function ProductListView() {
     setFilters(defaultFilters);
   }, []);
 
+  const publishOptions = [
+    { value: 'publish', label: 'Publish' },
+    { value: 'private', label: 'Private' },
+  ];
+
+  const stockOptions = [
+    { value: 'available', label: 'Tersedia' },
+    { value: 'out_of_stock', label: 'Habis' },
+  ];
+
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -205,8 +215,8 @@ export default function ProductListView() {
             filters={filters}
             onFilters={handleFilters}
             //
-            stockOptions={PRODUCT_STOCK_OPTIONS}
-            publishOptions={PUBLISH_OPTIONS}
+            stockOptions={stockOptions}
+            publishOptions={publishOptions}
           />
 
           {canReset && (
@@ -337,7 +347,7 @@ export default function ProductListView() {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name, stock, publish } = filters;
+  const { name, stock = [], publish = [] } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -347,21 +357,21 @@ function applyFilter({ inputData, comparator, filters }) {
     return a[1] - b[1];
   });
 
-  inputData = stabilizedThis.map((el) => el[0]);
+  let filteredData = stabilizedThis.map((el) => el[0]);
 
   if (name) {
-    inputData = inputData.filter(
-      (product) => product.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+    filteredData = filteredData.filter((product) =>
+      product.name.toLowerCase().includes(name.toLowerCase())
     );
   }
 
-  if (stock.length) {
-    inputData = inputData.filter((product) => stock.includes(product.inventoryType));
-  }
-
   if (publish.length) {
-    inputData = inputData.filter((product) => publish.includes(product.publish));
+    filteredData = filteredData.filter((product) => publish.includes(product.status));
   }
 
-  return inputData;
+  if (stock.length) {
+    filteredData = filteredData.filter((product) => stock.includes(product.stock?.status));
+  }
+
+  return filteredData;
 }
