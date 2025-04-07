@@ -5,87 +5,121 @@ import Typography from '@mui/material/Typography';
 import { MotionContainer } from 'src/components/animate';
 import Button from '@mui/material/Button';
 import Image from 'src/components/image';
-import Carousel, { useCarousel } from 'src/components/carousel';
+import Carousel, { useCarousel, CarouselArrows } from 'src/components/carousel';
 import { useFetchBanner } from 'src/utils/banner/public/useFetchBanner';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
-const StyledRoot = styled('div')(() => ({
-  width: '100vw',
-  minHeight: '100vh',
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  overflow: 'hidden',
-}));
-
-const StyledOverlay = styled('div')(() => ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7))`,
-  zIndex: 0,
-}));
+// const StyledRoot = styled('div')(() => ({
+//   width: '100vw',
+//   minHeight: '100vh',
+//   position: 'relative',
+//   display: 'flex',
+//   alignItems: 'center',
+//   justifyContent: 'center',
+//   overflow: 'hidden',
+// }));
 
 export default function HomeHero() {
-  const { data, isLoading, isError } = useFetchBanner();
-  console.log(data);
+  const { data, isLoading } = useFetchBanner();
 
-  return (
-    <StyledRoot>
-      <BackgroundCarousel list={data} />
-
-      <StyledOverlay />
-
-      <Container
-        component={MotionContainer}
-        sx={{ zIndex: 1, textAlign: 'center', color: 'white' }}
-      >
-        <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-          Welcome to Our Store
-        </Typography>
-        <Typography variant="h6" sx={{ maxWidth: '600px', mx: 'auto', opacity: 0.8 }}>
-          Temukan produk terbaik dengan kualitas terbaik hanya di toko kami.
-        </Typography>
-        <Button variant="contained" color="primary" sx={{ mt: 3 }}>
-          Shop Now
-        </Button>
-      </Container>
-    </StyledRoot>
-  );
-}
-
-function BackgroundCarousel({ list }) {
   const carousel = useCarousel({
-    speed: 1000,
     autoplay: true,
+    speed: 1000,
     loop: true,
+    draggable: true,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    dots: true,
+    fade: true,
+    arrows: false,
   });
 
-  return (
-    <Box sx={{ position: 'absolute', width: '100vw', height: '100vh', zIndex: -1 }}>
-      <Carousel {...carousel.carouselSettings}>
-        {list.map((item) => (
-          <CarouselItem key={item.id} item={item} />
-        ))}
-      </Carousel>
-    </Box>
-  );
-}
+  if (isLoading) return null;
 
-function CarouselItem({ item }) {
   return (
-    <Box sx={{ width: '100vw', height: '100vh' }}>
-      <Image
-        alt={item.title}
-        src={item.image_url}
+    <Container
+      sx={{
+        width: '100vw',
+        // minHeight: '100vh',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      }}
+    >
+      <Box
         sx={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
+          width: { xs: '100%', md: '95%', lg: '95%' },
+          height: { xs: '30vh', md: '50vh' },
+          maxWidth: '1800px',
+          position: 'relative',
         }}
-      />
-    </Box>
+      >
+        <Carousel ref={carousel.carouselRef} {...carousel.carouselSettings}>
+          {data?.map((item) => (
+            <Card
+              key={item.id}
+              sx={{
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden',
+                position: 'relative',
+                borderRadius: 3,
+                boxShadow: 10,
+                borderRadius: 2, // Optional, biar sedikit rounded
+              }}
+            >
+              <Image
+                alt={item.title}
+                src={item.image_url}
+                sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              {/* Optional: Tambah isi Card (judul, tombol, dll) */}
+              {/* <CardContent
+                sx={{
+                  position: 'absolute',
+                  bottom: 16,
+                  left: 16,
+                  color: 'white',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  borderRadius: 2,
+                  padding: 2,
+                }}
+              >
+                <Typography variant="h5">{item.title}</Typography>
+              </CardContent> */}
+            </Card>
+          ))}
+        </Carousel>
+
+        {/* ARROWS */}
+        <CarouselArrows
+          onNext={carousel.onNext}
+          onPrev={carousel.onPrev}
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            px: 2,
+            transform: 'translateY(-50%)',
+            '& .arrow': {
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              color: 'white',
+              fontSize: 28,
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.9)',
+              },
+            },
+          }}
+        />
+      </Box>
+    </Container>
   );
 }

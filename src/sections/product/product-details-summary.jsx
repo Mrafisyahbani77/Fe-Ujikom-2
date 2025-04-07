@@ -71,7 +71,7 @@ export default function ProductDetailsSummary({
     images,
     available,
     price,
-    color: [color[0]],
+    color: color[0],
     size: size[0],
     quantity: available < 1 ? 0 : 1,
   };
@@ -122,7 +122,7 @@ export default function ProductDetailsSummary({
     try {
       onAddCart?.({
         ...values,
-        colors: [values.color],
+        colors: values.color,
         subTotal: values.price * values.quantity,
       });
     } catch (error) {
@@ -202,29 +202,20 @@ export default function ProductDetailsSummary({
           maxWidth: 120,
         }}
       >
-        {[
-          { name: 'Red', value: 'red' },
-          { name: 'Blue', value: 'blue' },
-          { name: 'Green', value: 'green' },
-          { name: 'Yellow', value: 'yellow' },
-          { name: 'Cyan', value: 'cyan' },
-          { name: 'Violet', value: 'violet' },
-          { name: 'Black', value: 'black' },
-          { name: 'White', value: 'white' },
-        ].map((color) => (
-          <MenuItem key={color.value} value={color.value}>
+        {color.map((color) => (
+          <MenuItem key={color} value={color}>
             <Box
               sx={{
                 width: 20,
                 height: 20,
-                backgroundColor: color.value,
+                backgroundColor: color,
                 display: 'inline-block',
                 marginRight: 1,
                 borderRadius: '50%',
                 border: '1px solid #ddd',
               }}
             />
-            {color.name}
+            {color}
           </MenuItem>
         ))}
       </RHFSelect>

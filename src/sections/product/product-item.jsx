@@ -18,35 +18,67 @@ import Iconify from 'src/components/iconify';
 import { ColorPreview } from 'src/components/color-utils';
 //
 import { useCheckoutContext } from '../checkout/context';
+import { Typography } from '@mui/material';
+import { useAuthContext } from 'src/auth/hooks';
+import { useSnackbar } from 'notistack';
+import { useRouter } from 'src/routes/hooks';
+import { useCallback } from 'react';
 
 // ----------------------------------------------------------------------
 
 export default function ProductItem({ product }) {
   const { onAddToCart } = useCheckoutContext();
+  const { user } = useAuthContext(); // <-- ambil user login
+  const { enqueueSnackbar } = useSnackbar(); // <-- buat notifikasi
+  const router = useRouter(); // <-- buat redirect
 
-  const { id, name, images, price, color, stock, sizes, priceSale, newLabel, saleLabel } = product;
+  const {
+    id,
+    name,
+    images,
+    price,
+    color,
+    stock,
+    sizes,
+    priceSale,
+    newLabel,
+    saleLabel,
+    total_sold,
+  } = product;
 
   console.log(product);
 
   const linkTo = paths.product.details(id);
 
-  const handleAddCart = async () => {
-    const newProduct = {
-      id,
-      name,
-      images,
-      stock,
-      price,
-      color: [color[0]],
-      size: sizes[0],
-      quantity: 1,
-    };
+  const handleAddCart = useCallback(() => {
+    if (!user) {
+      enqueueSnackbar('Anda harus login dulu', { variant: 'warning' });
+      router.push('/auth/jwt/login');
+      return;
+    }
+
+    // if (!sizes || sizes.length === 0) {
+    //   enqueueSnackbar('Produk ini belum memiliki ukuran', { variant: 'error' });
+    //   return;
+    // }
+
     try {
-      onAddToCart(newProduct);
+      onAddToCart({
+        id,
+        name,
+        image: images?.[0], // ambil gambar pertama
+        price,
+        quantity: 1,
+        color: color?.[0] || '', // ambil warna pertama kalau ada
+        size: sizes?.[0] || '', // ambil ukuran pertama kalau ada
+        subTotal: price * 1,
+      });
+      enqueueSnackbar('Berhasil tambah ke keranjang!', { variant: 'success' });
     } catch (error) {
       console.error(error);
+      enqueueSnackbar('Gagal menambahkan ke keranjang.', { variant: 'error' });
     }
-  };
+  }, [user, enqueueSnackbar, router, onAddToCart, id, name, images, price, color, sizes]);
 
   // const renderLabels = (newLabel.enabled || saleLabel.enabled) && (
   //   <Stack
@@ -73,7 +105,7 @@ export default function ProductItem({ product }) {
   const renderImg = (
     <Box sx={{ position: 'relative', p: 1 }}>
       {/* Tombol "Add to Cart" hanya muncul jika stok tersedia */}
-      {!isOutOfStock && (
+      {/* {!isOutOfStock && (
         <Fab
           color="warning"
           size="medium"
@@ -94,7 +126,7 @@ export default function ProductItem({ product }) {
         >
           <Iconify icon="solar:cart-plus-bold" width={24} />
         </Fab>
-      )}
+      )} */}
 
       {/* Gambar Produk dengan validasi stok */}
       <Tooltip title={isOutOfStock ? 'Stok habis' : ''} placement="bottom-end">
@@ -116,21 +148,37 @@ export default function ProductItem({ product }) {
 
   const renderContent = (
     <Stack spacing={2.5} sx={{ p: 3, pt: 2 }}>
-      <Link component={RouterLink} href={linkTo} color="inherit" variant="subtitle2" noWrap>
-        {name}
-      </Link>
+      {/* Nama Produk */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Link component={RouterLink} href={linkTo} color="inherit" variant="subtitle2" noWrap>
+          {name}
+        </Link>
+
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Iconify icon="mdi:star" width={18} height={18} color="#FFC107" />
+          <Typography variant="caption" color="text.secondary">
+            {product.rating || 0}
+          </Typography>
+        </Stack>
+      </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <ColorPreview colors={color} />
+        {/* Warna Produk */}
+        {/* <ColorPreview colors={color} /> */}
+        <Typography variant="subtitle1" noWrap>
+          {fCurrency(price)}
+        </Typography>
 
-        <Stack direction="row" spacing={0.5} sx={{ typography: 'subtitle1' }}>
-          {/* {priceSale && (
-            <Box component="span" sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
-              {fCurrency(priceSale)}
-            </Box>
-          )} */}
+        {/* Bagian Rating, Terjual dan Harga */}
+        <Stack spacing={0.5} alignItems="flex-end">
+          {/* Rating */}
 
-          <Box component="span">{fCurrency(price)}</Box>
+          {/* Terjual */}
+          <Typography variant="caption" color="text.secondary">
+            Terjual {total_sold || 0}
+          </Typography>
+
+          {/* Harga */}
         </Stack>
       </Stack>
     </Stack>

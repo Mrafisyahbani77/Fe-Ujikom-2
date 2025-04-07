@@ -211,18 +211,17 @@ function applyFilter({ inputData, filters, sortBy }) {
   const min = priceRange[0];
   const max = priceRange[1];
 
-  // Sorting
   if (sortBy === 'featured') {
-    filteredData = orderBy(filteredData, ['totalSold'], ['desc']);
+    filteredData = orderBy(filteredData, ['total_sold'], ['desc']);
   }
   if (sortBy === 'newest') {
-    filteredData = orderBy(filteredData, ['createdAt'], ['desc']);
+    filteredData = orderBy(filteredData, ['created_at'], ['desc']); // ini 'created_at' sesuai API
   }
   if (sortBy === 'priceDesc') {
-    filteredData = orderBy(filteredData, ['price'], ['desc']);
+    filteredData = orderBy(filteredData, [(product) => parseFloat(product.price)], ['desc']);
   }
   if (sortBy === 'priceAsc') {
-    filteredData = orderBy(filteredData, ['price'], ['asc']);
+    filteredData = orderBy(filteredData, [(product) => parseFloat(product.price)], ['asc']);
   }
 
   // Filtering

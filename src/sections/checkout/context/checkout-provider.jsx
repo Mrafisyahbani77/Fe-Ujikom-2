@@ -174,7 +174,7 @@ export function CheckoutProvider({ children }) {
       mutationAddToCart.mutate({
         users_id: user?.id,
         products_id: newItem.id,
-        color: newItem.colors.join(','),
+        color: newItem.colors || '',
         size: newItem.size || '', // Pastikan tidak undefined
         quantity: newItem.quantity,
       });
@@ -297,6 +297,9 @@ export function CheckoutProvider({ children }) {
           const maxDiscount = parseFloat(max_discount_amount);
           if (calculatedDiscount > maxDiscount) {
             calculatedDiscount = maxDiscount;
+            enqueueSnackbar(`Diskon maksimal hanya Rp${maxDiscount.toLocaleString()}`, {
+              variant: 'error',
+            });
           }
         }
 
@@ -313,7 +316,7 @@ export function CheckoutProvider({ children }) {
         enqueueSnackbar('Diskon berhasil diterapkan', { variant: 'success' });
       } catch (error) {
         console.error('Failed to apply discount:', error);
-        enqueueSnackbar('Diskon tidak ditemukan', { variant: 'error' });
+        // enqueueSnackbar('Diskon tidak ditemukan', { variant: 'error' });
       }
     },
     [ApplyDiscount, state.subTotal, enqueueSnackbar]

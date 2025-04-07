@@ -9,9 +9,7 @@ import { ProductItemSkeleton } from './product-skeleton';
 // ----------------------------------------------------------------------
 
 export default function ProductList({ products, loading, ...other }) {
-
-  
-  console.log(products)
+  // console.log(products)
 
   const renderSkeleton = (
     <>
