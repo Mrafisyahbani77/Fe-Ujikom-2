@@ -60,11 +60,33 @@ export default function EditForm({ currentProduct }) {
   }, [currentProduct, setValue]);
 
   // Menangani perubahan file gambar
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
     if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        const { width, height } = img;
+
+        // Misal kamu mau validasi minimal 1920x600
+        if (width >= 1920 && height >= 600) {
+          setImage(file);
+          setPreview(img.src);
+        } else {
+          enqueueSnackbar(
+            `Ukuran gambar terlalu kecil! Minimal 1920x600 px. (Sekarang ${width}x${height}px)`,
+            { variant: 'error' }
+          );
+          // Reset input
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+      };
+
+      img.onerror = () => {
+        enqueueSnackbar('Gagal membaca gambar', { variant: 'error' });
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
     }
   };
 

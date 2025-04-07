@@ -83,7 +83,7 @@ export default function EcommerceWidgetSummary({ title, percent, total, chart, s
         {fPercent(percent)}
 
         <Box component="span" sx={{ color: 'text.secondary', typography: 'body2' }}>
-          {' than last week'}
+          {' dari minggu lalu'}
         </Box>
       </Typography>
     </Stack>

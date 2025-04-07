@@ -40,12 +40,39 @@ import {
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const theme = useTheme();
-  const { data, isLoading, isError } = useFetchChartWeekly();
+  const { data = [], isLoading, isError } = useFetchChartWeekly();
   const { data: total_order, isLoading: load, isError: error } = useFetchChartOrder();
-  const { data: sold, isLoading: loading, isError: Error } = useFetchChartProductSold();
-  const { data: gender, isLoading: fetching, isError: not_work } = useFetchChartSaleByGender();
+  const { data: soldData = [], isLoading: loading, isError: Error } = useFetchChartProductSold();
+  // const { data: gender = [], isLoading: fetching } = useFetchChartSaleByGender();
   const { data: year, isLoading: loadd, isError: ERror } = useFetchChartYearly();
-  console.log(year)
+  console.log(year);
+
+  const {
+    data: genderData = [],
+    isLoading: fetching,
+    isError: not_work,
+  } = useFetchChartSaleByGender();
+
+  const gender = {
+    total: Array.isArray(genderData)
+      ? genderData.reduce((sum, item) => sum + (item.total || 0), 0)
+      : 0,
+    series: Array.isArray(genderData)
+      ? genderData.map((item) => ({
+          label: item.gender ? item.gender : 'Unknown',
+          value: item.total || 0,
+        }))
+      : [],
+  };
+
+  const sold = {
+    total_sold: Array.isArray(soldData) && soldData.length > 0 ? Number(soldData[0].total_sold) : 0,
+    percent_change:
+      Array.isArray(soldData) && soldData.length > 0 ? parseFloat(soldData[0].percentage) : 0,
+    chart_data: Array.isArray(soldData) ? soldData.map((item) => Number(item.total_sold)) : [],
+  };
+
+  console.log(sold);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -62,7 +89,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Weekly Sales"
-            total={data}
+            total={data[0]?.sales || 0}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
           />
         </Grid>
@@ -78,8 +105,8 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
-            title="Item Orders"
-            total={total_order}
+            title="Total produk order"
+            total={total_order.total_orders}
             color="warning"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
           />
@@ -87,11 +114,12 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} md={4}>
           <EcommerceWidgetSummary
-            title="Product Sold"
+            title="Produk"
             percent={sold?.percent_change || 0}
             total={sold?.total_sold || 0}
             chart={{
-              series: sold?.chart_data || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              series:
+                sold?.chart_data?.length > 0 ? sold.chart_data : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }}
             loading={loading}
           />
@@ -183,12 +211,15 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} md={6} lg={4}>
           <EcommerceSaleByGender
             title="Sale By Gender"
-            total={gender?.total || 0}
+            total={gender.total}
             chart={{
-              series: gender?.series || [
-                { label: 'Mens', value: 0 },
-                { label: 'Womens', value: 0 }
-              ],
+              series:
+                gender.series.length > 0
+                  ? gender.series
+                  : [
+                      { label: 'Mens', value: 0 },
+                      { label: 'Womens', value: 0 },
+                    ],
             }}
             loading={fetching}
           />

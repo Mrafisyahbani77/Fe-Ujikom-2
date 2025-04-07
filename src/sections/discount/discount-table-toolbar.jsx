@@ -26,9 +26,9 @@ export default function DiscountTableToolbar({
 }) {
   const popover = usePopover();
 
-  const handleFilterName = useCallback(
+  const handleFilterCode = useCallback(
     (event) => {
-      onFilters('name', event.target.value);
+      onFilters('code', event.target.value);
     },
     [onFilters]
   );
@@ -128,8 +128,8 @@ export default function DiscountTableToolbar({
         <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
           <TextField
             fullWidth
-            value={filters.name}
-            onChange={handleFilterName}
+            value={filters.code}
+            onChange={handleFilterCode}
             placeholder="Search..."
             InputProps={{
               startAdornment: (

@@ -51,7 +51,7 @@ const TABLE_HEAD = [
 ];
 
 const defaultFilters = {
-  name: '',
+  code: '',
   publish: [],
   stock: [],
 };
@@ -101,11 +101,11 @@ export default function DiscountView() {
   const notFound = (!dataFiltered.length && canReset) || productsEmpty;
 
   const handleFilters = useCallback(
-    (name, value) => {
+    (code, value) => {
       table.onResetPage();
       setFilters((prevState) => ({
         ...prevState,
-        [name]: value,
+        [code]: value,
       }));
     },
     [table]
@@ -328,6 +328,7 @@ export default function DiscountView() {
 
 function applyFilter({ inputData, comparator, filters }) {
   const { code, stock, publish } = filters;
+  console.log(filters)
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
