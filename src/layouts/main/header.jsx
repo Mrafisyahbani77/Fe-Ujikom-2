@@ -47,7 +47,14 @@ export default function Header() {
   const offsetTop = useOffSetTop(HEADER.H_DESKTOP);
 
   return (
-    <AppBar>
+    <AppBar
+      color="default"
+      sx={{
+        backgroundColor: '#ffffff', // Putih
+        boxShadow: '0 4px 6px -1px rgba(25, 118, 210, 0.2)', // Shadow biru
+        borderBottom: 'none', // Ga perlu border lagi kalau sudah pakai shadow
+      }}
+    >
       <Toolbar
         disableGutters
         sx={{
@@ -59,14 +66,7 @@ export default function Header() {
             easing: theme.transitions.easing.easeInOut,
             duration: theme.transitions.duration.shorter,
           }),
-          ...(offsetTop && {
-            ...bgBlur({
-              color: theme.palette.background.default,
-            }),
-            height: {
-              md: HEADER.H_DESKTOP_OFFSET,
-            },
-          }),
+          px: 2,
         }}
       >
         <Container sx={{ height: 1, display: 'flex', alignItems: 'center' }}>

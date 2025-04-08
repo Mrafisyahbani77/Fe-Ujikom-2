@@ -1,60 +1,61 @@
-import { m } from 'framer-motion';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import Image from 'src/components/image';
-import { MotionViewport, varFade } from 'src/components/animate';
-import { fetchCategory } from 'src/utils/category';
 import { Link } from 'react-router-dom';
+import { m } from 'framer-motion';
+import { varFade, MotionViewport } from 'src/components/animate';
+import { fetchCategory } from 'src/utils/category';
+import Image from 'src/components/image';
 
 export default function ShoesCategories() {
   const { data } = fetchCategory();
 
   return (
-    <Container component={MotionViewport} sx={{ py: { xs: 5, md: 5 } }}>
-      <Stack spacing={3} sx={{ mb: { xs: 5, md: 10 } }}>
-        <m.div variants={varFade().inUp}>
-          <Typography component="div" variant="h2" sx={{ color: 'text.disabled' }}>
-            Kategori
-          </Typography>
-        </m.div>
-      </Stack>
-
-      <Box
-        gap={3}
-        display="grid"
-        sx={{
-          display: 'flex',
-          overflowX: 'auto',
-          whiteSpace: 'nowrap',
-          gap: 7,
-          pb: 1,
-          '&::-webkit-scrollbar': { display: 'none' },
-        }}
-        gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' }}
-      >
-        {data?.map((category) => (
-          <m.div key={category.id} variants={varFade().inUp}>
-            <Link
-              style={{
-                textDecoration: 'none',
-                color: 'inherit',
-              }}
-              to={`/category/${category?.slug}`}
-            >
-              <Stack alignItems="center" spacing={1}>
+    <Container component={MotionViewport} sx={{ py: 5 }}>
+      <m.div variants={varFade().inUp}>
+        <Card sx={{pt:0, boxShadow: 3, overflow: 'hidden' }}>
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h4">KATEGORI</Typography>
+          </Box>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+              borderTop: '1px solid #e0e0e0', // garis atas
+              borderLeft: '1px solid #e0e0e0', // garis kiri
+            }}
+          >
+            {data?.map((category) => (
+              <Box
+                key={category.id}
+                component={Link}
+                to={`/category/${category.slug}`}
+                sx={{
+                  textAlign: 'center',
+                  p: 2,
+                  borderRight: '0.5px solid #e0e0e0', // garis kanan antar item
+                  borderBottom: '0.5px solid #e0e0e0', // garis bawah antar item
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <Image
-                  src={category.image_url}
                   alt={category.name}
-                  sx={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
+                  src={category.image_url}
+                  sx={{ width: 64, height: 64, borderRadius: '50%', mb: 1 }}
                 />
-                <Typography variant="subtitle1">{category.name}</Typography>
-              </Stack>
-            </Link>
-          </m.div>
-        ))}
-      </Box>
+                <Typography variant="body2">{category.name}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Card>
+      </m.div>
     </Container>
   );
 }

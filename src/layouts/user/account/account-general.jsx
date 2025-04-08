@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 // hooks
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+// import { useMockedUser } from 'src/hooks/use-mocked-users';
 // utils
 import { fData } from 'src/utils/format-number';
 // assets
@@ -25,13 +25,17 @@ import FormProvider, {
   RHFUploadAvatar,
   RHFAutocomplete,
 } from 'src/components/hook-form';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
 export default function AccountGeneral() {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
+  const users = user.data;
+
+  // console.log(users);
 
   const UpdateUserSchema = Yup.object().shape({
     displayName: Yup.string().required('Name is required'),
@@ -44,22 +48,24 @@ export default function AccountGeneral() {
     city: Yup.string().required('City is required'),
     zipCode: Yup.string().required('Zip code is required'),
     about: Yup.string().required('About is required'),
+    gender: Yup.string().required('Gender is required'),
     // not required
     isPublic: Yup.boolean(),
   });
 
   const defaultValues = {
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-    photoURL: user?.photoURL || null,
-    phoneNumber: user?.phoneNumber || '',
-    country: user?.country || '',
-    address: user?.address || '',
-    state: user?.state || '',
-    city: user?.city || '',
-    zipCode: user?.zipCode || '',
-    about: user?.about || '',
-    isPublic: user?.isPublic || false,
+    displayName: users?.username || '',
+    email: users?.email || '',
+    photoURL: users?.profile_photo || null,
+    phoneNumber: users?.phone_number || '',
+    country: users?.country || '',
+    address: users?.address || '',
+    state: users?.state || '',
+    city: users?.city || '',
+    gender: users?.gender || '',
+    zipCode: users?.zipCode || '',
+    about: users?.about || '',
+    isPublic: users?.isPublic || false,
   };
 
   const methods = useForm({
@@ -100,7 +106,7 @@ export default function AccountGeneral() {
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Grid container spacing={3}>
+      <Grid sx={{ mb: 5 }} container spacing={3}>
         <Grid xs={12} md={4}>
           <Card sx={{ pt: 10, pb: 5, px: 3, textAlign: 'center' }}>
             <RHFUploadAvatar
@@ -124,12 +130,12 @@ export default function AccountGeneral() {
               }
             />
 
-            <RHFSwitch
+            {/* <RHFSwitch
               name="isPublic"
               labelPlacement="start"
               label="Public Profile"
               sx={{ mt: 5 }}
-            />
+            /> */}
 
             {/* <Button variant="soft" color="error" sx={{ mt: 3 }}>
               Delete User
@@ -152,6 +158,7 @@ export default function AccountGeneral() {
               <RHFTextField name="email" label="Email Address" />
               <RHFTextField name="phoneNumber" label="Phone Number" />
               <RHFTextField name="address" label="Address" />
+              <RHFTextField name="gender" label="Jenis kelamin" />
 
               <RHFAutocomplete
                 name="country"
@@ -190,7 +197,7 @@ export default function AccountGeneral() {
               <RHFTextField name="about" multiline rows={4} label="About" />
 
               <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                Save Changes
+                Simpan perubahan
               </LoadingButton>
             </Stack>
           </Card>

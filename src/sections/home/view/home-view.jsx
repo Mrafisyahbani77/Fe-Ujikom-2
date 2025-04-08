@@ -72,17 +72,26 @@ export default function HomeView() {
   return (
     <>
       {/* <ScrollProgress scrollYProgress={scrollYProgress} /> */}
-
       <Box
         sx={{
           overflow: 'hidden',
           position: 'relative',
           bgcolor: 'background.default',
-          mt:20,
+          mt: 20,
+          mb:2,
         }}
       >
         <HomeHero />
+      </Box>
 
+      <Box
+        sx={{
+          overflow: 'hidden',
+          position: 'relative',
+          bgcolor: 'grey.50',
+          // mt: 20,
+        }}
+      >
         <HomeMinimal />
         <ProductShopView />
         {/* <HomeAdvertisement /> */}

@@ -93,7 +93,7 @@ export default function JwtLoginView() {
       }
 
       const userRole = response.user.role;
-      console.log(userRole);
+      // console.log(userRole);
 
       if (userRole === 'admin') {
         router.push('/dashboard');

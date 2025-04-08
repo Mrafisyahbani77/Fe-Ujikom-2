@@ -66,9 +66,9 @@ export function AuthProvider({ children }) {
 
       if (accessToken && refreshToken) {
         setSession(accessToken, refreshToken);
-        
+
         const response = await axiosInstance.get(endpoints.auth.me);
-        const user = response.data?.user || null;
+        const user = response.data || null;
 
         dispatch({
           type: 'INITIAL',

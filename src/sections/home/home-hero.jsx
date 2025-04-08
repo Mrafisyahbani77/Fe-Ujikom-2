@@ -25,7 +25,7 @@ export default function HomeHero() {
 
   const carousel = useCarousel({
     autoplay: true,
-    speed: 1000,
+    speed: 500,
     loop: true,
     draggable: true,
     slidesToShow: 1,
@@ -51,7 +51,7 @@ export default function HomeHero() {
     >
       <Box
         sx={{
-          width: { xs: '100%', md: '95%', lg: '95%' },
+          width: { xs: '100%', md: '100%', lg: '100%' },
           height: { xs: '30vh', md: '50vh' },
           maxWidth: '1800px',
           position: 'relative',
@@ -66,15 +66,14 @@ export default function HomeHero() {
                 height: '100%',
                 overflow: 'hidden',
                 position: 'relative',
-                borderRadius: 3,
+                borderRadius: 1, // Lebih gede, lebih bulet
                 boxShadow: 10,
-                borderRadius: 2, // Optional, biar sedikit rounded
               }}
             >
               <Image
                 alt={item.title}
                 src={item.image_url}
-                sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                sx={{ width: '100%', height: '100%', objectFit: 'cover',  borderRadius: 'inherit' }}
               />
               {/* Optional: Tambah isi Card (judul, tombol, dll) */}
               {/* <CardContent
@@ -107,7 +106,7 @@ export default function HomeHero() {
             px: 2,
             transform: 'translateY(-50%)',
             '& .arrow': {
-              backgroundColor: 'rgba(0,0,0,0.7)',
+              backgroundColor: 'rgba(161, 126, 126, 0.7)',
               width: 48,
               height: 48,
               borderRadius: '50%',

@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 // hooks
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { useMockedUser } from 'src/hooks/use-mocked-users';
 // utils
 import { fData } from 'src/utils/format-number';
 // assets
@@ -25,13 +25,16 @@ import FormProvider, {
   RHFUploadAvatar,
   RHFAutocomplete,
 } from 'src/components/hook-form';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
 export default function AccountGeneral() {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
+  const users = user.data;
+  // console.log(users)
 
   const UpdateUserSchema = Yup.object().shape({
     displayName: Yup.string().required('Name is required'),
@@ -41,6 +44,7 @@ export default function AccountGeneral() {
     country: Yup.string().required('Country is required'),
     address: Yup.string().required('Address is required'),
     state: Yup.string().required('State is required'),
+    gender: Yup.string().required('Gender is required'),
     city: Yup.string().required('City is required'),
     zipCode: Yup.string().required('Zip code is required'),
     about: Yup.string().required('About is required'),
@@ -49,17 +53,18 @@ export default function AccountGeneral() {
   });
 
   const defaultValues = {
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-    photoURL: user?.photoURL || null,
-    phoneNumber: user?.phoneNumber || '',
-    country: user?.country || '',
-    address: user?.address || '',
-    state: user?.state || '',
-    city: user?.city || '',
-    zipCode: user?.zipCode || '',
-    about: user?.about || '',
-    isPublic: user?.isPublic || false,
+    displayName: users?.username || '',
+    email: users?.email || '',
+    photoURL: users?.profile_photo || null,
+    gender: users?.gender || '',
+    phoneNumber: users?.phone_number || '',
+    country: users?.country || '',
+    address: users?.address || '',
+    state: users?.state || '',
+    city: users?.city || '',
+    zipCode: users?.zipCode || '',
+    about: users?.about || '',
+    isPublic: users?.isPublic || false,
   };
 
   const methods = useForm({
@@ -124,7 +129,7 @@ export default function AccountGeneral() {
               }
             />
 
-            <RHFSwitch
+            {/* <RHFSwitch
               name="isPublic"
               labelPlacement="start"
               label="Public Profile"
@@ -133,7 +138,7 @@ export default function AccountGeneral() {
 
             <Button variant="soft" color="error" sx={{ mt: 3 }}>
               Delete User
-            </Button>
+            </Button> */}
           </Card>
         </Grid>
 
@@ -181,7 +186,7 @@ export default function AccountGeneral() {
                 }}
               />
 
-              <RHFTextField name="state" label="State/Region" />
+              <RHFTextField name="gender" label="Jenis kelamin" />
               <RHFTextField name="city" label="City" />
               <RHFTextField name="zipCode" label="Zip/Code" />
             </Box>

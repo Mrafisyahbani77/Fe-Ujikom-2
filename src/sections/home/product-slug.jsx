@@ -32,6 +32,7 @@ import ProductSearch from '../product/product-search';
 import ProductFilters from '../product/product-filters';
 import ProductFiltersResult from '../product/product-filters-result';
 import { useSearch } from 'src/utils/product/useSearch';
+import { useSearchCategory } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -69,7 +70,7 @@ export default function ProductSlug({ slug }) {
   console.log('Produk:', product);
   // console.log('Produk kosong?', productsEmpty);
 
-  const { searchResults, searchLoading } = useSearch(debouncedQuery);
+  const { searchResults, searchLoading } = useSearchCategory(debouncedQuery, slug);
 
   const handleFilters = useCallback((name, value) => {
     setFilters((prevState) => ({

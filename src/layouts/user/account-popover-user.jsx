@@ -48,6 +48,7 @@ export default function AccountPopoverUser() {
   const { logout } = useAuthContext();
 
   const { user } = useAuthContext();
+  const users = user.data;
 
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -123,8 +124,8 @@ export default function AccountPopoverUser() {
         }}
       >
         <Avatar
-          src={user?.photo_profile}
-          alt={user?.username}
+          src={users?.photo_profile}
+          alt={users?.username}
           sx={{
             width: 36,
             height: 36,
@@ -136,11 +137,11 @@ export default function AccountPopoverUser() {
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 200, p: 0 }}>
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {user?.username}
+            {users?.username}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {user?.email}
+            {users?.email}
           </Typography>
         </Box>
 

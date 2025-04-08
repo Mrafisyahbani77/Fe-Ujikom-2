@@ -47,7 +47,20 @@ export default function NavVertical({ openNav, onCloseNav }) {
         },
       }}
     >
-      <Logo sx={{ mt: 3, ml: 4, mb: 1 }} />
+      <Box
+        component="img"
+        src="/logo/barangin 3.png" // <-- benar, tanpa /public
+        sx={{
+          height: { xs: 50, sm: 60, md: 72 }, // lebih besar
+          width: 'auto', // biar proporsional
+          display: 'block', // gambar block supaya rapih
+          mx: 'auto', // center horizontal
+          mt: 3,
+          ml: 4,
+          mb: 1,
+          cursor: 'pointer',
+        }}
+      />
 
       <NavSectionVertical
         data={navData}
@@ -57,7 +70,6 @@ export default function NavVertical({ openNav, onCloseNav }) {
       />
 
       <Box sx={{ flexGrow: 1 }} />
-
     </Scrollbar>
   );
 
