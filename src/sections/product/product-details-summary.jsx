@@ -172,7 +172,7 @@ export default function ProductDetailsSummary({
         }}
       >
         <Iconify icon="solar:heart-bold" width={16} sx={{ mr: 1 }} />
-        Favorite
+        Favorit
       </Link>
 
       <Link
@@ -184,7 +184,7 @@ export default function ProductDetailsSummary({
         }}
       >
         <Iconify icon="solar:share-bold" width={16} sx={{ mr: 1 }} />
-        Share
+        Bagikan
       </Link>
     </Stack>
   );
@@ -192,7 +192,7 @@ export default function ProductDetailsSummary({
   const renderColorOptions = (
     <Stack direction="row">
       <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-        Color
+        Warna
       </Typography>
 
       <RHFSelect
@@ -204,7 +204,7 @@ export default function ProductDetailsSummary({
       >
         {color.map((color) => (
           <MenuItem key={color} value={color}>
-            <Box
+            {/* <Box
               sx={{
                 width: 20,
                 height: 20,
@@ -214,7 +214,7 @@ export default function ProductDetailsSummary({
                 borderRadius: '50%',
                 border: '1px solid #ddd',
               }}
-            />
+            /> */}
             {color}
           </MenuItem>
         ))}
@@ -225,17 +225,17 @@ export default function ProductDetailsSummary({
   const renderSizeOptions = (
     <Stack direction="row">
       <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-        Size
+        Ukuran
       </Typography>
 
       <RHFSelect
         name="size"
         size="small"
-        helperText={
-          <Link underline="always" color="textPrimary">
-            Size Chart
-          </Link>
-        }
+        // helperText={
+        //   <Link underline="always" color="textPrimary">
+        //     Size Chart
+        //   </Link>
+        // }
         sx={{
           maxWidth: 88,
           [`& .${formHelperTextClasses.root}`]: {
@@ -257,7 +257,7 @@ export default function ProductDetailsSummary({
   const renderQuantity = (
     <Stack direction="row">
       <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-        Quantity
+        Jumlah
       </Typography>
 
       <Stack spacing={1}>

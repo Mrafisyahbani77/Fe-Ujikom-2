@@ -49,7 +49,7 @@ export default function AccountPopover() {
 
   const { user } = useAuthContext();
   const users = user.data;
-  // console.log(users)
+  console.log(user);
 
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -122,7 +122,7 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={users?.photo_profile}
+          src={users?.profile_photo}
           alt={users?.username}
           sx={{
             width: 36,

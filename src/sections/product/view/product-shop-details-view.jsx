@@ -163,13 +163,14 @@ export default function ProductShopDetailsView({ id }) {
         </Tabs>
 
         {currentTab === 'description' && (
-          <ProductDetailsDescription description={data?.description} data={data}/>
+          <ProductDetailsDescription description={data?.description} data={data} />
         )}
 
         {currentTab === 'reviews' && (
           <ProductDetailsReview
+            data={data.id}
             ratings={review.rating}
-            reviews={review.review}
+            reviews={review}
             totalRatings={data?.review?.average_rating}
             totalReviews={data?.review?.total_review}
           />

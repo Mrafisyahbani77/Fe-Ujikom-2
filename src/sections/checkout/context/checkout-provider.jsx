@@ -33,10 +33,12 @@ const initialState = {
 export function CheckoutProvider({ children }) {
   const router = useRouter();
   const { user } = useAuthContext();
+  const users = user?.data;
+  console.log(users);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
-  const { data: cartData } = useFetchCart(user?.id);
+  const { data: cartData } = useFetchCart(users?.id);
 
   const mutationAddToCart = useMutationCreate({
     onSuccess: () => {

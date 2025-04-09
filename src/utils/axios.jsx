@@ -108,6 +108,8 @@ export const fetcher = async (args) => {
 export const endpoints = {
   auth: {
     me: '/api/auth/profile',
+    updateProfile: '/api/auth/profile/update',
+    updatePassword: '/api/auth/profile/update-password',
     login: '/api/auth/login',
     register: '/api/auth/register',
     logout: '/api/auth/logout',

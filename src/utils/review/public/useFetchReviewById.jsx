@@ -3,7 +3,7 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 
 export const usefetchReviewById = (id) =>
   useQuery({
-    queryKey: ['public.category_id'],
+    queryKey: ['public.review_id'],
     queryFn: async () => {
       if (!id) return null;
       const response = await axiosInstance.get(`${endpoints.review.public.details}/${id}`);

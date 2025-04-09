@@ -15,14 +15,29 @@ import OrderDetailsInfo from '../order-details-info';
 import OrderDetailsItems from '../order-details-item';
 import OrderDetailsToolbar from '../order-details-toolbar';
 import OrderDetailsHistory from '../order-details-history';
+import { useFetchOrderById } from 'src/utils/order';
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export default function OrderDetailsView({ id }) {
   const settings = useSettingsContext();
 
-  const currentOrder = _orders.filter((order) => order.id === id)[0];
+  const { data, isLoading, error } = useFetchOrderById(id);
+  console.log(data)
 
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" marginTop={4}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error || !data) {
+    return <Typography color="error">Gagal mengambil data: {error?.response?.data?.message}</Typography>;
+  }
+  const currentOrder = data;
   const [status, setStatus] = useState(currentOrder.status);
 
   const handleChangeStatus = useCallback((newValue) => {
@@ -33,8 +48,8 @@ export default function OrderDetailsView({ id }) {
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <OrderDetailsToolbar
         backLink={paths.dashboard.order.root}
-        orderNumber={currentOrder.orderNumber}
-        createdAt={currentOrder.createdAt}
+        // orderNumber={currentOrder.orderNumber}
+        createdAt={currentOrder.created_at}
         status={status}
         onChangeStatus={handleChangeStatus}
         statusOptions={ORDER_STATUS_OPTIONS}
@@ -45,11 +60,11 @@ export default function OrderDetailsView({ id }) {
           <Stack spacing={3} direction={{ xs: 'column-reverse', md: 'column' }}>
             <OrderDetailsItems
               items={currentOrder.items}
-              taxes={currentOrder.taxes}
-              shipping={currentOrder.shipping}
-              discount={currentOrder.discount}
-              subTotal={currentOrder.subTotal}
-              totalAmount={currentOrder.totalAmount}
+              // taxes={currentOrder.taxes}
+              // shipping={currentOrder.shipping}
+              // discount={currentOrder.discount}
+              // subTotal={currentOrder.subTotal}
+              // totalAmount={currentOrder.totalAmount}
             />
 
             <OrderDetailsHistory history={currentOrder.history} />

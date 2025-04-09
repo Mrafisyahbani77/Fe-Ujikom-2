@@ -13,12 +13,14 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import Iconify from 'src/components/iconify';
 import { useSnackbar } from 'src/components/snackbar';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import { useMutationUpdatePassword } from 'src/utils/auth';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
 export default function AccountChangePassword() {
   const { enqueueSnackbar } = useSnackbar();
-
+  const queryClient = useQueryClient();
   const password = useBoolean();
 
   const ChangePassWordSchema = Yup.object().shape({
@@ -51,12 +53,29 @@ export default function AccountChangePassword() {
     formState: { isSubmitting },
   } = methods;
 
+  const { mutateAsync: updatePassword } = useMutationUpdatePassword({
+    onSuccess: () => {
+      enqueueSnackbar('Update success!', { variant: 'success' });
+      queryClient.invalidateQueries(['user']);
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      enqueueSnackbar('Update success!');
-      console.info('DATA', data);
+      const formData = new FormData();
+
+      formData.append('current_password ', data.oldPassword);
+      formData.append('new_password', data.newPassword);
+      formData.append('confirm_new_password', data.confirmNewPassword);
+
+      updatePassword({
+        user_id: data.user_id,
+        data: formData,
+      });
     } catch (error) {
       console.error(error);
     }

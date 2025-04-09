@@ -34,7 +34,7 @@ export default function AccountGeneral() {
 
   const { user } = useAuthContext();
   const users = user.data;
-  // console.log(users)
+  console.log(users)
 
   const UpdateUserSchema = Yup.object().shape({
     displayName: Yup.string().required('Name is required'),
@@ -187,12 +187,12 @@ export default function AccountGeneral() {
               />
 
               <RHFTextField name="gender" label="Jenis kelamin" />
-              <RHFTextField name="city" label="City" />
-              <RHFTextField name="zipCode" label="Zip/Code" />
+              {/* <RHFTextField name="city" label="City" />
+              <RHFTextField name="zipCode" label="Zip/Code" /> */}
             </Box>
 
             <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-              <RHFTextField name="about" multiline rows={4} label="About" />
+              {/* <RHFTextField name="about" multiline rows={4} label="About" /> */}
 
               <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
                 Save Changes

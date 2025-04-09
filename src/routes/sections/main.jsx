@@ -6,11 +6,13 @@ import SimpleLayout from 'src/layouts/simple';
 import CompactLayout from 'src/layouts/compact';
 // components
 import { SplashScreen } from 'src/components/loading-screen';
-  import AccountUser from 'src/pages/account-user';
+import AccountUser from 'src/pages/account-user';
 import Category from 'src/sections/home/category';
 import Success from 'src/sections/home/success';
 import Error from 'src/sections/home/error';
 import ShippingView from 'src/sections/checkout/shipping-view';
+import OrderDetailsPage from 'src/pages/dashboard/order/details';
+import HomeOrder from 'src/sections/home/home-order';
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +49,8 @@ export const mainRoutes = [
       { path: 'success', element: <Success /> },
       { path: 'error', element: <Error /> },
       { path: 'shipping', element: <ShippingView /> },
+      { path: 'riwayat-order/:id', element: <OrderDetailsPage /> },
+      { path: 'riwayat-order', element: <HomeOrder /> },
       {
         path: 'product',
         children: [

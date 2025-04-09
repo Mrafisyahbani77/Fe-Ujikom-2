@@ -20,7 +20,7 @@ import ProductReviewNewForm from './product-review-new-form';
 
 // ----------------------------------------------------------------------
 
-export default function ProductDetailsReview({ totalRatings, totalReviews, ratings, reviews }) {
+export default function ProductDetailsReview({data, totalRatings, totalReviews, ratings, reviews }) {
   const review = useBoolean();
 
   const total = sumBy(ratings, (star) => star.starCount);
@@ -124,7 +124,7 @@ export default function ProductDetailsReview({ totalRatings, totalReviews, ratin
 
       <ProductReviewList reviews={reviews} />
 
-      <ProductReviewNewForm  open={review.value} onClose={review.onFalse} />
+      <ProductReviewNewForm data={data}  open={review.value} onClose={review.onFalse} />
     </>
   );
 }

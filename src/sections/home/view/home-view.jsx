@@ -56,6 +56,9 @@ export default function HomeView() {
 
       // Hapus token dari URL agar lebih bersih
       navigate('/', { replace: true });
+      setTimeout(() => {
+        window.location.reload(); // Refresh halaman agar reset state
+      }, 100);
     }
   }, [navigate]);
 
@@ -78,7 +81,7 @@ export default function HomeView() {
           position: 'relative',
           bgcolor: 'background.default',
           mt: 20,
-          mb:2,
+          mb: 2,
         }}
       >
         <HomeHero />

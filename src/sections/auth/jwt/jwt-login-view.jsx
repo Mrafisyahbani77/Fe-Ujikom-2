@@ -122,6 +122,7 @@ export default function JwtLoginView() {
 
   const handleGoogleLogin = () => {
     window.location.href = `${HOST_API}/api/auth/google`;
+    
   };
 
   // // Menangkap token dari URL setelah redirect dari backend Google

@@ -26,51 +26,50 @@ import FormProvider, {
   RHFAutocomplete,
 } from 'src/components/hook-form';
 import { useAuthContext } from 'src/auth/hooks';
+import { useMutationUpdateProfile } from 'src/utils/auth';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
 export default function AccountGeneral() {
   const { enqueueSnackbar } = useSnackbar();
-
+  const queryClient = useQueryClient();
   const { user } = useAuthContext();
   const users = user.data;
 
   // console.log(users);
 
   const UpdateUserSchema = Yup.object().shape({
-    displayName: Yup.string().required('Name is required'),
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    photoURL: Yup.mixed().nullable().required('Avatar is required'),
-    phoneNumber: Yup.string().required('Phone number is required'),
-    country: Yup.string().required('Country is required'),
-    address: Yup.string().required('Address is required'),
-    state: Yup.string().required('State is required'),
-    city: Yup.string().required('City is required'),
-    zipCode: Yup.string().required('Zip code is required'),
-    about: Yup.string().required('About is required'),
-    gender: Yup.string().required('Gender is required'),
-    // not required
-    isPublic: Yup.boolean(),
+    displayName: Yup.string().required('Name harus di isi'),
+    email: Yup.string().required('Email harus di isi').email('Email harus valid'),
+    photoURL: Yup.mixed().nullable().required('Foto harus di isi'),
+    phoneNumber: Yup.string().required('Nomor telepon harus di isi'),
+    gender: Yup.string().required('Gender harus di isi'),
   });
 
   const defaultValues = {
-    displayName: users?.username || '',
+    user_id: users?.id || '', 
+    displayName: users?.username || '', 
     email: users?.email || '',
-    photoURL: users?.profile_photo || null,
     phoneNumber: users?.phone_number || '',
-    country: users?.country || '',
-    address: users?.address || '',
-    state: users?.state || '',
-    city: users?.city || '',
     gender: users?.gender || '',
-    zipCode: users?.zipCode || '',
-    about: users?.about || '',
-    isPublic: users?.isPublic || false,
+    photoURL: users?.profile_photo || null,
   };
 
   const methods = useForm({
     resolver: yupResolver(UpdateUserSchema),
     defaultValues,
+  });
+
+  const { mutateAsync: updateProfile } = useMutationUpdateProfile({
+    onSuccess: () => {
+      enqueueSnackbar('Update success!', { variant: 'success' });
+      queryClient.invalidateQueries(['user']);
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
   });
 
   const {
@@ -79,15 +78,30 @@ export default function AccountGeneral() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      enqueueSnackbar('Update success!');
-      console.info('DATA', data);
+      const formData = new FormData();
+
+      formData.append('name', data.displayName); 
+      formData.append('email', data.email);
+      formData.append('phone_number', data.phoneNumber);
+      formData.append('gender', data.gender);
+      if (data.photoURL instanceof File) {
+        formData.append('photo_profile', data.photoURL);
+      }
+
+      updateProfile({
+        user_id: data.user_id,
+        data: formData,
+      });
+
+      // enqueueSnackbar('Profile updated successfully!');
+      // queryClient.invalidateQueries(['user']); 
     } catch (error) {
       console.error(error);
+      // enqueueSnackbar('Failed to update profile', { variant: 'error' });
     }
-  });
+  };
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -105,7 +119,7 @@ export default function AccountGeneral() {
   );
 
   return (
-    <FormProvider methods={methods} onSubmit={onSubmit}>
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid sx={{ mb: 5 }} container spacing={3}>
         <Grid xs={12} md={4}>
           <Card sx={{ pt: 10, pb: 5, px: 3, textAlign: 'center' }}>
@@ -157,10 +171,10 @@ export default function AccountGeneral() {
               <RHFTextField name="displayName" label="Name" />
               <RHFTextField name="email" label="Email Address" />
               <RHFTextField name="phoneNumber" label="Phone Number" />
-              <RHFTextField name="address" label="Address" />
+              {/* <RHFTextField name="address" label="Address" /> */}
               <RHFTextField name="gender" label="Jenis kelamin" />
 
-              <RHFAutocomplete
+              {/* <RHFAutocomplete
                 name="country"
                 label="Country"
                 options={countries.map((country) => country.label)}
@@ -190,11 +204,11 @@ export default function AccountGeneral() {
 
               <RHFTextField name="state" label="State/Region" />
               <RHFTextField name="city" label="City" />
-              <RHFTextField name="zipCode" label="Zip/Code" />
+              <RHFTextField name="zipCode" label="Zip/Code" /> */}
             </Box>
 
             <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-              <RHFTextField name="about" multiline rows={4} label="About" />
+              {/* <RHFTextField name="about" multiline rows={4} label="About" /> */}
 
               <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
                 Simpan perubahan

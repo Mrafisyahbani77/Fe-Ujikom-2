@@ -16,7 +16,7 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
     <Box
       ref={ref}
       component="img"
-      src="/logo/barangin 2.png" // <-- benar, tanpa /public
+      src="/logo/barangin 3.png" // <-- benar, tanpa /public
       sx={{
         height: { xs: 50, sm: 60, md: 72 }, // lebih besar
         width: 'auto', // biar proporsional

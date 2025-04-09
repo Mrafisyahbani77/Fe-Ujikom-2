@@ -107,7 +107,7 @@ export default function HomeHero() {
             transform: 'translateY(-50%)',
             '& .arrow': {
               backgroundColor: 'rgba(161, 126, 126, 0.7)',
-              width: 48,
+              width: 70,
               height: 48,
               borderRadius: '50%',
               color: 'white',

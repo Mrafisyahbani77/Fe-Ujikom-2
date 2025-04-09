@@ -36,6 +36,10 @@ const OPTIONS = [
     label: 'Profile',
     linkTo: paths.profile,
   },
+  {
+    label: 'Riwayat order',
+    linkTo: paths.historyorder,
+  },
 ];
 
 // ----------------------------------------------------------------------
@@ -88,7 +92,7 @@ export default function AccountPopoverUser() {
       router.replace('/');
       setTimeout(() => {
         window.location.reload(); // Refresh halaman agar reset state
-      }, 500);
+      }, 100);
       enqueueSnackbar('Logout Berhasil!', { variant: 'success' });
     } catch (error) {
       enqueueSnackbar('Gagal log out!', { variant: 'error' });
@@ -124,7 +128,7 @@ export default function AccountPopoverUser() {
         }}
       >
         <Avatar
-          src={users?.photo_profile}
+          src={users?.profile_photo}
           alt={users?.username}
           sx={{
             width: 36,

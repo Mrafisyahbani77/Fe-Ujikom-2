@@ -44,6 +44,7 @@ export default function ProductItem({ product }) {
     newLabel,
     saleLabel,
     total_sold,
+    review,
   } = product;
 
   console.log(product);
@@ -157,7 +158,7 @@ export default function ProductItem({ product }) {
         <Stack direction="row" alignItems="center" spacing={0.5}>
           <Iconify icon="mdi:star" width={18} height={18} color="#FFC107" />
           <Typography variant="caption" color="text.secondary">
-            {product.rating || 0}
+            {review.average_rating || 0}
           </Typography>
         </Stack>
       </Stack>

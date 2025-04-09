@@ -14,7 +14,8 @@ import Iconify from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export default function ProductReviewItem({ review }) {
-  const { name, rating, comment, postedAt, avatarUrl, attachments, isPurchased } = review;
+  const { name, rating, comment, postedAt, avatarUrl, attachments, isPurchased, images, created_at, user_name  } = review;
+  console.log(review)
 
   const renderInfo = (
     <Stack
@@ -38,8 +39,8 @@ export default function ProductReviewItem({ review }) {
       />
 
       <ListItemText
-        primary={name}
-        secondary={fDate(postedAt)}
+        primary={user_name}
+        secondary={fDate(created_at)}
         primaryTypographyProps={{
           noWrap: true,
           typography: 'subtitle2',
@@ -72,11 +73,11 @@ export default function ProductReviewItem({ review }) {
         </Stack>
       )}
 
-      <Typography variant="body2">{comment}</Typography>
+      <Typography variant="body2">{review.review}</Typography>
 
-      {!!attachments?.length && (
+      {!!images?.length && (
         <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ pt: 1 }}>
-          {attachments.map((attachment) => (
+          {images.map((attachment) => (
             <Box
               component="img"
               key={attachment}
