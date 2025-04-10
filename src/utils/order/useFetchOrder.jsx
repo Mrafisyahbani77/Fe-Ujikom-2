@@ -3,7 +3,7 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 
 export const useFetchOrder = () =>
   useQuery({
-    queryKey: ['fetch.order'],
+    queryKey: ['all.order'],
     queryFn: async () => {
       const response = await axiosInstance.get(endpoints.order.list);
       console.log(response.data);

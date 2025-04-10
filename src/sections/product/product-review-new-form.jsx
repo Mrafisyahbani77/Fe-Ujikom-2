@@ -19,11 +19,18 @@ import { useMutationCreateReview } from 'src/utils/review';
 import { useSnackbar } from 'notistack';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
-export default function ProductReviewNewForm({ data, onClose, ...other }) {
+export default function ProductReviewNewForm({ userId, data, onClose, ...other }) {
   const [images, setImages] = useState([]);
+  const { user } = useAuthContext();
+  const users = user.data.id;
+
+  console.log(users)
+  console.log(data);
+  console.log(userId);
 
   const ReviewSchema = Yup.object().shape({
     rating: Yup.number()
@@ -68,7 +75,8 @@ export default function ProductReviewNewForm({ data, onClose, ...other }) {
 
   const onSubmit = async (values) => {
     const formData = new FormData();
-    formData.append('products_id', data); // ← ambil product id dari props
+    formData.append('products_id', data);
+    // formData.append('users_id', users);
     formData.append('rating', values.rating);
     formData.append('review', values.review);
 

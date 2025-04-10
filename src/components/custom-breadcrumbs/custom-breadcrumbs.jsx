@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 //
 import LinkItem from './link-item';
+import Iconify from '../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +35,15 @@ export default function CustomBreadcrumbs({
 
           {/* BREADCRUMBS */}
           {!!links.length && (
-            <Breadcrumbs separator=">" {...other}>
+            <Breadcrumbs
+              separator={<Iconify icon="ic:round-chevron-right" width={20} height={20} />}
+              sx={{
+                '& .MuiBreadcrumbs-separator': {
+                  mx: 0.5,
+                },
+              }}
+              {...other}
+            >
               {links.map((link) => (
                 <LinkItem
                   key={link.name || ''}

@@ -41,6 +41,7 @@ import {
 import OrderTableRow from '../order-table-row';
 import OrderTableToolbar from '../order-table-toolbar';
 import OrderTableFiltersResult from '../order-table-filters-result';
+import { useFetchOrder } from 'src/utils/order';
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +75,10 @@ export default function OrderListView() {
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const { data } = useFetchOrder();
+
+  const [tableData, setTableData] = useState(data);
+  // console.log(data);
 
   const [filters, setFilters] = useState(defaultFilters);
 
@@ -166,7 +170,7 @@ export default function OrderListView() {
               name: 'Order',
               href: paths.dashboard.order.root,
             },
-            { name: 'List' },
+            { name: 'Daftar' },
           ]}
           sx={{
             mb: { xs: 3, md: 5 },
@@ -202,14 +206,14 @@ export default function OrderListView() {
                   >
                     {tab.value === 'all' && _orders.length}
                     {tab.value === 'completed' &&
-                      _orders.filter((order) => order.status === 'completed').length}
+                      data.filter((order) => order.status === 'completed').length}
 
                     {tab.value === 'pending' &&
-                      _orders.filter((order) => order.status === 'pending').length}
+                      data.filter((order) => order.status === 'pending').length}
                     {tab.value === 'cancelled' &&
-                      _orders.filter((order) => order.status === 'cancelled').length}
+                      data.filter((order) => order.status === 'cancelled').length}
                     {tab.value === 'refunded' &&
-                      _orders.filter((order) => order.status === 'refunded').length}
+                      data.filter((order) => order.status === 'refunded').length}
                   </Label>
                 }
               />

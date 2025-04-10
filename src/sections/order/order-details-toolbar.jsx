@@ -69,7 +69,7 @@ export default function OrderDetailsToolbar({
           alignItems="center"
           justifyContent="flex-end"
         >
-          <Button
+          {/* <Button
             color="inherit"
             variant="outlined"
             endIcon={<Iconify icon="eva:arrow-ios-downward-fill" />}
@@ -77,7 +77,7 @@ export default function OrderDetailsToolbar({
             sx={{ textTransform: 'capitalize' }}
           >
             {status}
-          </Button>
+          </Button> */}
 
           <Button
             color="inherit"
@@ -87,13 +87,13 @@ export default function OrderDetailsToolbar({
             Print
           </Button>
 
-          <Button color="inherit" variant="contained" startIcon={<Iconify icon="solar:pen-bold" />}>
+          {/* <Button color="inherit" variant="contained" startIcon={<Iconify icon="solar:pen-bold" />}>
             Edit
-          </Button>
+          </Button> */}
         </Stack>
       </Stack>
 
-      <CustomPopover
+      {/* <CustomPopover
         open={popover.open}
         onClose={popover.onClose}
         arrow="top-right"
@@ -111,7 +111,7 @@ export default function OrderDetailsToolbar({
             {option.label}
           </MenuItem>
         ))}
-      </CustomPopover>
+      </CustomPopover> */}
     </>
   );
 }

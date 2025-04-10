@@ -20,21 +20,27 @@ import ProductReviewNewForm from './product-review-new-form';
 
 // ----------------------------------------------------------------------
 
-export default function ProductDetailsReview({data, totalRatings, totalReviews, ratings, reviews }) {
+export default function ProductDetailsReview({
+  data,
+  totalRatings,
+  totalReviews,
+  ratings,
+  reviews,
+}) {
   const review = useBoolean();
 
   const total = sumBy(ratings, (star) => star.starCount);
 
   const renderSummary = (
     <Stack spacing={1} alignItems="center" justifyContent="center">
-      <Typography variant="subtitle2">Average rating</Typography>
+      <Typography variant="subtitle2">Penilaian produk</Typography>
 
       <Typography variant="h2">{totalRatings}/5</Typography>
 
       <Rating readOnly value={totalRatings} precision={0.1} />
 
       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-        ({fShortenNumber(totalReviews)} reviews)
+        ({fShortenNumber(totalReviews)} review)
       </Typography>
     </Stack>
   );
@@ -96,7 +102,7 @@ export default function ProductDetailsReview({data, totalRatings, totalReviews, 
         onClick={review.onTrue}
         startIcon={<Iconify icon="solar:pen-bold" />}
       >
-        Write your review
+        Berikan Penilaian
       </Button>
     </Stack>
   );
@@ -110,21 +116,21 @@ export default function ProductDetailsReview({data, totalRatings, totalReviews, 
           md: 'repeat(3, 1fr)',
         }}
         sx={{
-          py: { xs: 5, md: 0 },
+          py: { xs: 5, md: 5 },
         }}
       >
         {renderSummary}
 
         {renderProgress}
 
-        {renderReviewButton}
+        {/* {renderReviewButton} */}
       </Box>
 
       <Divider sx={{ borderStyle: 'dashed' }} />
 
       <ProductReviewList reviews={reviews} />
 
-      <ProductReviewNewForm data={data}  open={review.value} onClose={review.onFalse} />
+      <ProductReviewNewForm data={data} open={review.value} onClose={review.onFalse} />
     </>
   );
 }

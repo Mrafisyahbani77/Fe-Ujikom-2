@@ -138,7 +138,7 @@ export function useNavData() {
           icon: ICONS.order,
           children: [
             { title: 'list', path: paths.dashboard.order.root },
-            { title: 'details', path: paths.dashboard.order.demo.details },
+            // { title: 'details', path: paths.dashboard.order.demo.details },
           ],
         },
 

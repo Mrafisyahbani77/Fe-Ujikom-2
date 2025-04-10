@@ -63,7 +63,7 @@ export default function AccountGeneral() {
 
   const { mutateAsync: updateProfile } = useMutationUpdateProfile({
     onSuccess: () => {
-      enqueueSnackbar('Update success!', { variant: 'success' });
+      enqueueSnackbar('Update berhasil!', { variant: 'success' });
       queryClient.invalidateQueries(['user']);
     },
     onError: (error) => {

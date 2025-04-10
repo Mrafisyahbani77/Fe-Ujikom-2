@@ -89,7 +89,7 @@ export function CheckoutProvider({ children }) {
     onSuccess: () => {
       // enqueueSnackbar('Order berhasil dibuat', { variant: 'success' });
       queryClient.invalidateQueries({ queryKey: ['fetch.cart'] });
-      queryClient.invalidateQueries({ queryKey: ['fetch.order'] });
+      queryClient.invalidateQueries({ queryKey: ['all.order'] });
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';

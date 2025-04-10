@@ -9,13 +9,20 @@ import {
   Box,
   Divider,
   Container,
+  Avatar,
+  Stack,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useFetchOrder } from 'src/utils/order';
+import ProductReviewNewForm from '../product/product-review-new-form';
+import { useBoolean } from 'src/hooks/use-boolean';
+import { HOST_API } from 'src/config-global';
 
 export default function HomeOrder() {
   const { data, isLoading, error } = useFetchOrder();
+  const review = useBoolean();
+  console.log(data);
 
   if (isLoading) {
     return (
@@ -30,84 +37,98 @@ export default function HomeOrder() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ my: 10 }} padding={2}>
+    <Container maxWidth="md" sx={{ my: 10 }}>
       <CustomBreadcrumbs
-        heading="Riwayat order"
-        links={[
-          {
-            name: 'Beranda',
-            href: '/',
-          },
-          { name: 'Riwayat order' },
-        ]}
+        heading="Riwayat Order"
+        links={[{ name: 'Beranda', href: '/' }, { name: 'Riwayat Order' }]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
+
       {data?.map((order) => {
-        const items = JSON.parse(order.items); // items masih JSON string
-        const formattedDate = new Date(order.created_at).toLocaleString();
+        const items = order.items || [];
+        const formattedDate = new Date(order.created_at).toLocaleDateString('id-ID');
 
         return (
           <Card key={order.id} sx={{ mb: 3 }}>
             <CardContent>
-              {/* Header: Status */}
+              {/* Header */}
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="body2" color="text.secondary">
-                  {formattedDate}
+                <Typography variant="subtitle1" fontWeight="bold">
+                  {/* {order.store_name || 'Nama Toko'} */}
                 </Typography>
-                <Chip label={order.status.toUpperCase()} color="warning" size="small" />
+                <Box display="flex" alignItems="center">
+                  <Chip
+                    label={order.status === 'completed' ? 'SELESAI' : order.status.toUpperCase()}
+                    color={order.status === 'completed' ? 'success' : 'warning'}
+                    size="small"
+                  />
+                </Box>
               </Box>
 
               <Divider sx={{ mb: 2 }} />
 
-              {/* Produk */}
-              {items.map((item, idx) => (
-                <Box key={idx} display="flex" alignItems="center" mb={2}>
-                  {/* Thumbnail produk dummy */}
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: 1,
-                      mr: 2,
-                    }}
-                  />
-
-                  <Box flexGrow={1}>
-                    <Typography variant="body1" noWrap>
-                      {item.product_name}
+              {/* Product List */}
+              {items.map((item) => (
+                <Grid container spacing={2} alignItems="center" key={item.id} sx={{ mb: 2 }}>
+                  <Grid item>
+                    <Avatar
+                      variant="square"
+                      src={
+                        item.product.images?.[0]?.image
+                          ? `${HOST_API}${item.product.images[0].image}`
+                          : ''
+                      }
+                      sx={{ width: 64, height: 64 }}
+                    />
+                  </Grid>
+                  <Grid item xs>
+                    <Typography variant="subtitle2" noWrap>
+                      {item.product.name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {item.quantity} x Rp {item.price.toLocaleString('id-ID')}
+                      {/* {item.description || 'Deskripsi produk'} */}
                     </Typography>
-                  </Box>
-                </Box>
+                    <Typography variant="body2" mt={1}>
+                      x{item.quantity}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="body2" fontWeight="bold">
+                      Rp {parseInt(item.product.price).toLocaleString('id-ID')}
+                    </Typography>
+                  </Grid>
+                  <ProductReviewNewForm
+                    userId={order.users_id}
+                    data={item.products_id}
+                    open={review.value}
+                    onClose={review.onFalse}
+                  />
+                </Grid>
               ))}
 
               <Divider sx={{ my: 2 }} />
 
-              {/* Total & Aksi */}
+              {/* Footer */}
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2" color="text.secondary">
-                  Total Harga:
-                </Typography>
-                <Typography variant="h6" color="primary">
-                  Rp {parseInt(order.total_price).toLocaleString('id-ID')}
+                <Typography variant="subtitle1">
+                  Total Pesanan:
+                  <Box component="span" fontWeight="bold" ml={1}>
+                    Rp {parseInt(order.total_price).toLocaleString('id-ID')}
+                  </Box>
                 </Typography>
               </Box>
 
-              <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
-                <Link to={`/riwayat-order/${order.id}`}>
-                  <Button variant="outlined" size="small">
-                    Lihat Detail
-                  </Button>
-                </Link>
-                {order.status === 'pending' && (
-                  <Button variant="contained" size="small" color="primary">
-                    Bayar Sekarang
-                  </Button>
-                )}
-              </Box>
+              <Stack direction="row" spacing={2} justifyContent="flex-end" mt={2}>
+                <Button component={Link} to={`/riwayat-order/${order.id}`} variant="outlined">
+                  Lihat detail
+                </Button>
+                <Button variant="outlined" size="small" onClick={review.onTrue} color="error">
+                  Nilai
+                </Button>
+                <Button variant="outlined" size="small">
+                  Beli Lagi
+                </Button>
+              </Stack>
             </CardContent>
           </Card>
         );

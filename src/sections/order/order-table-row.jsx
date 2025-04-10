@@ -22,17 +22,62 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { useMutationUpdateOrderStatus } from 'src/utils/order';
+import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
 export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteRow }) {
-  const { items, status, orderNumber, createdAt, customer, totalQuantity, subTotal } = row;
+  const {
+    items,
+    status,
+    orderNumber,
+    createdAt,
+    created_at,
+    customer,
+    totalQuantity,
+    subTotal,
+    total_price,
+    id,
+    users_id,
+  } = row;
 
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const confirm = useBoolean();
 
   const collapse = useBoolean();
 
-  const popover = usePopover();
+  const popover = usePopover(); // buat popover lain
+  const statusPopover = usePopover(); // khusus popover Status
+
+  const { mutateAsync: updateStatus } = useMutationUpdateOrderStatus({
+    onSuccess: () => {
+      enqueueSnackbar('Status berhasil diubah!');
+      queryClient.invalidateQueries({ queryKey: ['all.order'], refetchType: 'active' });
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.message || 'Gagal mengubah status', { variant: 'error' });
+    },
+  });
+
+  const handleChangeStatus = async (newStatus) => {
+    statusPopover.onClose();
+    try {
+      await updateStatus({
+        id: id, // id dari order
+        status: newStatus,
+        users_id: users_id,
+      });
+
+      // setelah berhasil
+      // enqueueSnackbar('Status berhasil diubah!');
+      queryClient.invalidateQueries({ queryKey: ['all.order'], refetchType: 'active' });
+    } catch (error) {
+      // enqueueSnackbar(error?.message || 'Gagal mengubah status', { variant: 'error' });
+    }
+  };
 
   const renderPrimary = (
     <TableRow hover selected={selected}>
@@ -50,16 +95,16 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
             },
           }}
         >
-          {orderNumber}
+          {/* {orderNumber} */}
         </Box>
       </TableCell>
 
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar alt={customer.name} src={customer.avatarUrl} sx={{ mr: 2 }} />
-
+        <Avatar sx={{ mr: 2 }} />
+        {/* alt={customer.name} src={customer.avatarUrl} */}
         <ListItemText
-          primary={customer.name}
-          secondary={customer.email}
+          // primary={customer.name}
+          // secondary={customer.email}
           primaryTypographyProps={{ typography: 'body2' }}
           secondaryTypographyProps={{
             component: 'span',
@@ -70,8 +115,8 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
 
       <TableCell>
         <ListItemText
-          primary={format(new Date(createdAt), 'dd MMM yyyy')}
-          secondary={format(new Date(createdAt), 'p')}
+          primary={format(new Date(created_at), 'dd MMM yyyy')}
+          secondary={format(new Date(created_at), 'p')}
           primaryTypographyProps={{ typography: 'body2', noWrap: true }}
           secondaryTypographyProps={{
             mt: 0.5,
@@ -81,19 +126,45 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
         />
       </TableCell>
 
-      <TableCell align="center"> {totalQuantity} </TableCell>
+      <TableCell align="center"> {items.quantity} </TableCell>
 
-      <TableCell> {fCurrency(subTotal)} </TableCell>
+      <TableCell> {fCurrency(total_price)} </TableCell>
 
       <TableCell>
+        {/* Ini Popover untuk Status */}
+        <CustomPopover
+          open={statusPopover.open}
+          onClose={statusPopover.onClose}
+          // anchorEl={statusPopover.anchorRef.current}
+          sx={{ width: 160 }}
+        >
+          {['pending', 'paid', 'shipped', 'delivered', 'canceled'].map((option) => (
+            <MenuItem
+              key={option}
+              onClick={() => handleChangeStatus(option)}
+              selected={option === status}
+              sx={{ typography: 'body2', textTransform: 'capitalize' }}
+            >
+              {option}
+            </MenuItem>
+          ))}
+        </CustomPopover>
+
         <Label
           variant="soft"
           color={
-            (status === 'completed' && 'success') ||
             (status === 'pending' && 'warning') ||
-            (status === 'cancelled' && 'error') ||
+            (status === 'paid' && 'info') ||
+            (status === 'shipped' && 'primary') ||
+            (status === 'delivered' && 'success') ||
+            (status === 'canceled' && 'error') ||
             'default'
           }
+          onClick={statusPopover.onOpen} // <= ini beda
+          sx={{
+            textTransform: 'capitalize',
+            cursor: 'pointer',
+          }}
         >
           {status}
         </Label>
@@ -142,13 +213,13 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
                 }}
               >
                 <Avatar
-                  src={item.coverUrl}
+                  // src={item.coverUrl}
                   variant="rounded"
                   sx={{ width: 48, height: 48, mr: 2 }}
                 />
 
                 <ListItemText
-                  primary={item.name}
+                  primary={item.product_name}
                   secondary={item.sku}
                   primaryTypographyProps={{
                     typography: 'body2',
@@ -162,7 +233,7 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
 
                 <Box>x{item.quantity}</Box>
 
-                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.price)}</Box>
+                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.product_price)}</Box>
               </Stack>
             ))}
           </Stack>

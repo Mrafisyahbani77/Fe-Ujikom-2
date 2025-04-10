@@ -45,9 +45,9 @@ export default function OrderDetailsView({ id }) {
   }, []);
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{my:5}} maxWidth={settings.themeStretch ? false : 'lg'}>
       <OrderDetailsToolbar
-        backLink={paths.dashboard.order.root}
+        // backLink={paths.dashboard.order.root}
         // orderNumber={currentOrder.orderNumber}
         createdAt={currentOrder.created_at}
         status={status}
@@ -67,16 +67,16 @@ export default function OrderDetailsView({ id }) {
               // totalAmount={currentOrder.totalAmount}
             />
 
-            <OrderDetailsHistory history={currentOrder.history} />
+            {/* <OrderDetailsHistory history={currentOrder.history} /> */}
           </Stack>
         </Grid>
 
         <Grid xs={12} md={4}>
           <OrderDetailsInfo
-            customer={currentOrder.customer}
-            delivery={currentOrder.delivery}
-            payment={currentOrder.payment}
-            shippingAddress={currentOrder.shippingAddress}
+            // customer={currentOrder.customer}
+            // delivery={currentOrder.delivery}
+            // payment={currentOrder.payment}
+            // shippingAddress={currentOrder.shippingAddress}
           />
         </Grid>
       </Grid>

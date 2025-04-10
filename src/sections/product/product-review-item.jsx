@@ -14,32 +14,45 @@ import Iconify from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export default function ProductReviewItem({ review }) {
-  const { name, rating, comment, postedAt, avatarUrl, attachments, isPurchased, images, created_at, user_name  } = review;
-  console.log(review)
+  const {
+    name,
+    rating,
+    comment,
+    postedAt,
+    avatarUrl,
+    attachments,
+    isPurchased,
+    images,
+    created_at,
+    user_name,
+    user
+  } = review;
+  console.log(review);
 
   const renderInfo = (
-    <Stack
-      spacing={2}
-      alignItems="center"
-      direction={{
-        xs: 'row',
-        md: 'column',
-      }}
+    <Box
       sx={{
-        width: { md: 240 },
-        textAlign: { md: 'center' },
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 2, // jarak avatar dan content
+        mb: 3, // margin bawah antar review
+        pl: { xs: 2, md: 3 }, // ⬅️ tambah padding left (pl = paddingLeft)
       }}
     >
       <Avatar
-        src={avatarUrl}
+        src={user.photo_profile}
         sx={{
-          width: { xs: 48, md: 64 },
-          height: { xs: 48, md: 64 },
+          width: { xs: 42, md: 45 },
+          height: { xs: 42, md:45 },
         }}
       />
+    </Box>
+  );
 
+  const renderContent = (
+    <Stack spacing={1} flexGrow={1}>
       <ListItemText
-        primary={user_name}
+        primary={user.name}
         secondary={fDate(created_at)}
         primaryTypographyProps={{
           noWrap: true,
@@ -52,11 +65,6 @@ export default function ProductReviewItem({ review }) {
           component: 'span',
         }}
       />
-    </Stack>
-  );
-
-  const renderContent = (
-    <Stack spacing={1} flexGrow={1}>
       <Rating size="small" value={rating} precision={0.1} readOnly />
 
       {isPurchased && (
@@ -104,18 +112,17 @@ export default function ProductReviewItem({ review }) {
   );
 
   return (
-    <Stack
-      spacing={2}
-      direction={{
-        xs: 'column',
-        md: 'row',
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'flex-start', // supaya rata atas
+        gap: 2, // kecilin jarak, bisa 1.5 atau 2
+        mt:5,
       }}
-      sx={{ mt: 5, px: { xs: 2.5, md: 0 } }}
     >
       {renderInfo}
-
       {renderContent}
-    </Stack>
+    </Box>
   );
 }
 
