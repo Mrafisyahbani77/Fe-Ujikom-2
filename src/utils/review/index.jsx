@@ -1,4 +1,6 @@
-export * from './public/useFetchReviewById'
+export * from './public/useFetchReviewPublicById'
 export * from './useMutationCreate'
 export * from './useMutationDelete'
 export * from './useMutationUpdate'
+export * from './useFetchReviewById'
+export * from './useFetchReview'

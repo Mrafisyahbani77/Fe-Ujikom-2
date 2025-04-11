@@ -34,6 +34,7 @@ export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF, da
       } else {
         enqueueSnackbar('Redirect URL tidak ditemukan!', { variant: 'error' });
       }
+      onReset();
     },
     onError: (error) => {
       console.log('Payment error', error);

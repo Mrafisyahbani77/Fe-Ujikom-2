@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   useMutationCreateShippings,
@@ -20,6 +20,7 @@ import {
   Typography,
   Card,
   CardContent,
+  Autocomplete,
 } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
@@ -50,6 +51,7 @@ export default function ShippingView() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     reset,
   } = useForm({
@@ -94,7 +96,7 @@ export default function ShippingView() {
       reset();
       onClose();
     } catch (error) {
-      enqueueSnackbar('Gagal menambahkan alamat', { variant: 'error' });
+      // enqueueSnackbar('Gagal menambahkan alamat', { variant: 'error' });
     }
   };
 
@@ -133,65 +135,76 @@ export default function ShippingView() {
                 fullWidth
               />
 
-              <TextField
-                select
-                label="Provinsi"
-                value={provinceId}
-                onChange={(e) => setProvinceId(e.target.value)}
-                fullWidth
-              >
-                {provinces.map((prov) => (
-                  <MenuItem key={prov.id} value={prov.id}>
-                    {prov.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <Controller
+                name="province"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    {...field}
+                    options={provinces}
+                    getOptionLabel={(option) => option.name || ''}
+                    onChange={(event, newValue) => {
+                      field.onChange(newValue);
+                      setProvinceId(newValue?.id || '');
+                      setCityId('');
+                      setDistrictId('');
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Provinsi" />}
+                  />
+                )}
+              />
 
-              <TextField
-                select
-                label="Kota/Kabupaten"
-                value={cityId}
-                onChange={(e) => setCityId(e.target.value)}
-                fullWidth
-                disabled={!provinceId}
-              >
-                {cities.map((city) => (
-                  <MenuItem key={city.id} value={city.id}>
-                    {city.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              {/* Kota */}
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    {...field}
+                    options={cities}
+                    getOptionLabel={(option) => option.name || ''}
+                    onChange={(event, newValue) => {
+                      field.onChange(newValue);
+                      setCityId(newValue?.id || '');
+                      setDistrictId('');
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Kota" />}
+                  />
+                )}
+              />
 
-              <TextField
-                select
-                label="Kecamatan"
-                value={districtId}
-                onChange={(e) => setDistrictId(e.target.value)}
-                fullWidth
-                disabled={!cityId}
-              >
-                {districts.map((district) => (
-                  <MenuItem key={district.id} value={district.id}>
-                    {district.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              {/* Kecamatan */}
+              <Controller
+                name="district"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    {...field}
+                    options={districts}
+                    getOptionLabel={(option) => option.name || ''}
+                    onChange={(event, newValue) => {
+                      field.onChange(newValue);
+                      setDistrictId(newValue?.id || '');
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Kecamatan" />}
+                  />
+                )}
+              />
 
-              <TextField
-                select
-                label="Kelurahan"
-                value={villageId}
-                onChange={(e) => setVillageId(e.target.value)}
-                fullWidth
-                disabled={!districtId}
-              >
-                {villages.map((village) => (
-                  <MenuItem key={village.id} value={village.id}>
-                    {village.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-
+              {/* Kelurahan */}
+              <Controller
+                name="village"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    {...field}
+                    options={villages}
+                    getOptionLabel={(option) => option.name || ''}
+                    onChange={(event, newValue) => field.onChange(newValue)}
+                    renderInput={(params) => <TextField {...params} label="Kelurahan" />}
+                  />
+                )}
+              />
               <TextField
                 label="Alamat"
                 {...register('address')}

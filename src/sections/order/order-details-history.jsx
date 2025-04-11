@@ -62,7 +62,7 @@ export default function OrderDetailsHistory({ history }) {
         },
       }}
     >
-      {history.timeline.map((item, index) => {
+      {/* {history.timeline.map((item, index) => {
         const firstTimeline = index === 0;
 
         const lastTimeline = index === history.timeline.length - 1;
@@ -83,7 +83,7 @@ export default function OrderDetailsHistory({ history }) {
             </TimelineContent>
           </TimelineItem>
         );
-      })}
+      })} */}
     </Timeline>
   );
 

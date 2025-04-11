@@ -29,7 +29,7 @@ import ProductDetailsToolbar from '../product-details-toolbar';
 import ProductDetailsCarousel from '../product-details-carousel';
 import ProductDetailsDescription from '../product-details-description';
 import { useFetchProductById } from 'src/utils/product';
-import { usefetchReviewById } from 'src/utils/review';
+import { useFetchReviewById } from 'src/utils/review';
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ export default function ProductDetailsView({ id }) {
     isLoading: productLoading,
     isError: productError,
   } = useFetchProductById(id);
-  const { data: review, isLoading: reviewLoading, isError: reviewError } = usefetchReviewById(id);
+  const { data: review, isLoading: reviewLoading, isError: reviewError } = useFetchReviewById(id);
 
   const settings = useSettingsContext();
 

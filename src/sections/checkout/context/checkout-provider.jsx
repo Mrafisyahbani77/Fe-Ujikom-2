@@ -328,9 +328,25 @@ export function CheckoutProvider({ children }) {
 
   const onCreateOrder = useCallback(async () => {
     try {
-      const discount = state.discount; // dari state kamu yang udah apply diskon
-      let payload = {};
+      // Validasi dulu
+      if (!state.billing) {
+        enqueueSnackbar('Please complete your billing address first.', { variant: 'warning' });
+        return;
+      }
 
+      const discount = state.discount; // dari state kamu yang udah apply diskon
+
+      // Buat payload yang benar
+      const payload = {
+        items: state.items,
+        billing: state.billing,
+        total: state.total,
+        discount_id: state.discount,
+        shipping: state.shipping,
+        shipping_id: state.billing?.id, // <-- Ini betul
+      };
+
+      // Kalau ada diskon, tambahkan discount_id atau discount_code
       if (discount) {
         if (discount.id) {
           payload.discount_id = discount.id;
@@ -339,22 +355,20 @@ export function CheckoutProvider({ children }) {
         }
       }
 
+      // Kirim order
       const response = await Order(payload);
       setOrderData(response.order);
 
       // Setelah sukses
       enqueueSnackbar('Order berhasil dibuat', { variant: 'success' });
 
-      // Kalau mau redirect atau reset state cart di sini juga bisa
-      // navigate('/orders'); atau
-      // resetStateCart();
-      // checkout.completed();
+      // Next step
       onNextStep();
     } catch (error) {
       console.error('Gagal membuat order:', error);
-      // Error sudah otomatis ditangani di onError useMutation
+      enqueueSnackbar('Gagal membuat order', { variant: 'error' });
     }
-  }, [Order, state.discount, enqueueSnackbar]);
+  }, [Order, state, enqueueSnackbar, onNextStep]);
 
   const onApplyShipping = useCallback((shipping) => {
     setState((prevState) => ({ ...prevState, shipping }));

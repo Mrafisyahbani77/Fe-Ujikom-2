@@ -28,7 +28,7 @@ import ProductDetailsCarousel from '../product-details-carousel';
 import ProductDetailsDescription from '../product-details-description';
 import { useCheckoutContext } from '../../checkout/context';
 import { useFetchProduct, useFetchProductById } from 'src/utils/product';
-import { usefetchReviewById } from 'src/utils/review';
+import { usefetchReviewPublicById } from 'src/utils/review';
 
 // ----------------------------------------------------------------------
 
@@ -60,7 +60,11 @@ export default function ProductShopDetailsView({ id }) {
   const [currentTab, setCurrentTab] = useState('description');
 
   const { data, isLoading: productLoading, isError: productError } = useFetchProductById(id);
-  const { data: review, isLoading: reviewLoading, isError: reviewError } = usefetchReviewById(id);
+  const {
+    data: review,
+    isLoading: reviewLoading,
+    isError: reviewError,
+  } = usefetchReviewPublicById(id);
   console.log(review);
 
   const handleChangeTab = useCallback((event, newValue) => {

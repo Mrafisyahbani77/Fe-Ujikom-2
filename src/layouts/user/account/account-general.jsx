@@ -24,10 +24,12 @@ import FormProvider, {
   RHFTextField,
   RHFUploadAvatar,
   RHFAutocomplete,
+  RHFSelect,
 } from 'src/components/hook-form';
 import { useAuthContext } from 'src/auth/hooks';
 import { useMutationUpdateProfile } from 'src/utils/auth';
 import { useQueryClient } from '@tanstack/react-query';
+import { MenuItem } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -48,8 +50,8 @@ export default function AccountGeneral() {
   });
 
   const defaultValues = {
-    user_id: users?.id || '', 
-    displayName: users?.username || '', 
+    user_id: users?.id || '',
+    displayName: users?.username || '',
     email: users?.email || '',
     phoneNumber: users?.phone_number || '',
     gender: users?.gender || '',
@@ -82,12 +84,12 @@ export default function AccountGeneral() {
     try {
       const formData = new FormData();
 
-      formData.append('name', data.displayName); 
+      formData.append('name', data.displayName);
       formData.append('email', data.email);
       formData.append('phone_number', data.phoneNumber);
       formData.append('gender', data.gender);
       if (data.photoURL instanceof File) {
-        formData.append('photo_profile', data.photoURL);
+        formData.append('profile_photo', data.photoURL);
       }
 
       updateProfile({
@@ -96,7 +98,7 @@ export default function AccountGeneral() {
       });
 
       // enqueueSnackbar('Profile updated successfully!');
-      // queryClient.invalidateQueries(['user']); 
+      // queryClient.invalidateQueries(['user']);
     } catch (error) {
       console.error(error);
       // enqueueSnackbar('Failed to update profile', { variant: 'error' });
@@ -172,7 +174,10 @@ export default function AccountGeneral() {
               <RHFTextField name="email" label="Email Address" />
               <RHFTextField name="phoneNumber" label="Phone Number" />
               {/* <RHFTextField name="address" label="Address" /> */}
-              <RHFTextField name="gender" label="Jenis kelamin" />
+              <RHFSelect name="gender" label="Jenis Kelamin">
+                <MenuItem value="pria">Pria</MenuItem>
+                <MenuItem value="wanita">Wanita</MenuItem>
+              </RHFSelect>
 
               {/* <RHFAutocomplete
                 name="country"

@@ -20,7 +20,9 @@ export default function OrderDetailsItems({
   taxes,
   subTotal,
   totalAmount,
-}) {
+}) 
+{
+  console.log(items)
   const renderTotal = (
     <Stack
       spacing={2}
@@ -56,10 +58,10 @@ export default function OrderDetailsItems({
         </Box>
       </Stack>
 
-      <Stack direction="row">
+      {/* <Stack direction="row">
         <Box sx={{ color: 'text.secondary' }}>Taxes</Box>
         <Box sx={{ width: 160 }}>{taxes ? fCurrency(taxes) : '-'}</Box>
-      </Stack>
+      </Stack> */}
 
       <Stack direction="row" sx={{ typography: 'subtitle1' }}>
         <Box>Total</Box>
@@ -89,11 +91,15 @@ export default function OrderDetailsItems({
                 borderBottom: (theme) => `dashed 2px ${theme.palette.background.neutral}`,
               }}
             >
-              <Avatar src={item.coverUrl} variant="rounded" sx={{ width: 48, height: 48, mr: 2 }} />
+              <Avatar
+                src={item?.product?.images?.[0].image_url}
+                variant="rounded"
+                sx={{ width: 48, height: 48, mr: 2 }}
+              />
 
               <ListItemText
-                primary={item.name}
-                secondary={item.sku}
+                primary={item.product.name}
+                secondary={item.product.sku}
                 primaryTypographyProps={{
                   typography: 'body2',
                 }}
@@ -107,7 +113,7 @@ export default function OrderDetailsItems({
               <Box sx={{ typography: 'body2' }}>x{item.quantity}</Box>
 
               <Box sx={{ width: 110, textAlign: 'right', typography: 'subtitle2' }}>
-                {fCurrency(item.price)}
+                {fCurrency(item.product.price)}
               </Box>
             </Stack>
           ))}

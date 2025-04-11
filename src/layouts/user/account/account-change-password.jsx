@@ -24,7 +24,7 @@ export default function AccountChangePassword() {
   const password = useBoolean();
 
   const ChangePassWordSchema = Yup.object().shape({
-    oldPassword: Yup.string().required('Old Password is required'),
+    oldPassword: Yup.string().nullable('Old Password is required'),
     newPassword: Yup.string()
       .required('New Password is required')
       .min(6, 'Password must be at least 6 characters')

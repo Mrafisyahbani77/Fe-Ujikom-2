@@ -19,10 +19,9 @@ import CheckoutCartProductList from './checkout-cart-product-list';
 
 export default function CheckoutCart() {
   const checkout = useCheckoutContext();
-  console.log(checkout)
+  console.log(checkout);
 
   const empty = !checkout.items.length;
-  
 
   return (
     <Grid container spacing={3}>
@@ -31,7 +30,7 @@ export default function CheckoutCart() {
           <CardHeader
             title={
               <Typography variant="h6">
-                Cart
+                Keranjang
                 <Typography component="span" sx={{ color: 'text.secondary' }}>
                   &nbsp;({checkout.totalItems} item)
                 </Typography>

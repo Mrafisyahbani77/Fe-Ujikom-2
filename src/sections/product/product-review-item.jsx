@@ -25,7 +25,7 @@ export default function ProductReviewItem({ review }) {
     images,
     created_at,
     user_name,
-    user
+    user,
   } = review;
   console.log(review);
 
@@ -43,7 +43,7 @@ export default function ProductReviewItem({ review }) {
         src={user.photo_profile}
         sx={{
           width: { xs: 42, md: 45 },
-          height: { xs: 42, md:45 },
+          height: { xs: 42, md: 45 },
         }}
       />
     </Box>
@@ -117,7 +117,7 @@ export default function ProductReviewItem({ review }) {
         display: 'flex',
         alignItems: 'flex-start', // supaya rata atas
         gap: 2, // kecilin jarak, bisa 1.5 atau 2
-        mt:5,
+        mt: 5,
       }}
     >
       {renderInfo}

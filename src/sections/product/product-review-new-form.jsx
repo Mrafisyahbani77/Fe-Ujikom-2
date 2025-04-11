@@ -25,12 +25,12 @@ import { useAuthContext } from 'src/auth/hooks';
 
 export default function ProductReviewNewForm({ userId, data, onClose, ...other }) {
   const [images, setImages] = useState([]);
-  const { user } = useAuthContext();
-  const users = user.data.id;
+  // const { user } = useAuthContext();
+  // const users = user.id;
 
-  console.log(users)
-  console.log(data);
-  console.log(userId);
+  // console.log('user', users);
+  console.log('data id ProductReviewNewForm', data);
+  console.log('userid', userId);
 
   const ReviewSchema = Yup.object().shape({
     rating: Yup.number()

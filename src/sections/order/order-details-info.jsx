@@ -28,24 +28,22 @@ export default function OrderDetailsInfo({ customer, delivery, payment, shipping
       />
       <Stack direction="row" sx={{ p: 3 }}>
         <Avatar
-          // alt={customer.name}
-          // src={customer.avatarUrl}
+          alt={customer.name}
+          src={customer.photo_profile}
           sx={{ width: 48, height: 48, mr: 2 }}
         />
 
         <Stack spacing={0.5} alignItems="flex-start" sx={{ typography: 'body2' }}>
-          <Typography variant="subtitle2"></Typography>
-          {/* {customer.name} */}
+          <Typography variant="subtitle2">{customer.name}</Typography>
 
-          <Box sx={{ color: 'text.secondary' }}></Box>
-          {/* {customer.email} */}
+          <Box sx={{ color: 'text.secondary' }}>{customer.email}</Box>
 
-          <Box>
+          {/* <Box>
             IP Address:
             <Box component="span" sx={{ color: 'text.secondary', ml: 0.25 }}>
-              {/* {customer.ipAddress} */}
+              {customer.ipAddress}
             </Box>
-          </Box>
+          </Box> */}
 
           {/* <Button
             size="small"
@@ -110,13 +108,19 @@ export default function OrderDetailsInfo({ customer, delivery, payment, shipping
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
             Address
           </Box>
-          {/* {shippingAddress.fullAddress} */}
+          {shippingAddress.address}
         </Stack>
         <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
             Phone number
           </Box>
-          {/* {shippingAddress.phoneNumber} */}
+          {shippingAddress.phone_number}
+        </Stack>
+        <Stack direction="row" alignItems="center">
+          <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
+            Catatan
+          </Box>
+          {shippingAddress.notes}
         </Stack>
       </Stack>
     </>
@@ -149,7 +153,7 @@ export default function OrderDetailsInfo({ customer, delivery, payment, shipping
 
       <Divider sx={{ borderStyle: 'dashed' }} />
 
-      {renderDelivery}
+      {/* {renderDelivery} */}
 
       <Divider sx={{ borderStyle: 'dashed' }} />
 
@@ -157,7 +161,7 @@ export default function OrderDetailsInfo({ customer, delivery, payment, shipping
 
       <Divider sx={{ borderStyle: 'dashed' }} />
 
-      {renderPayment}
+      {/* {renderPayment} */}
     </Card>
   );
 }

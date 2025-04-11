@@ -24,7 +24,7 @@ export default function OrderDetailsView({ id }) {
   const settings = useSettingsContext();
 
   const { data, isLoading, error } = useFetchOrderById(id);
-  console.log(data)
+  console.log(data);
 
   if (isLoading) {
     return (
@@ -35,7 +35,9 @@ export default function OrderDetailsView({ id }) {
   }
 
   if (error || !data) {
-    return <Typography color="error">Gagal mengambil data: {error?.response?.data?.message}</Typography>;
+    return (
+      <Typography color="error">Gagal mengambil data: {error?.response?.data?.message}</Typography>
+    );
   }
   const currentOrder = data;
   const [status, setStatus] = useState(currentOrder.status);
@@ -45,10 +47,10 @@ export default function OrderDetailsView({ id }) {
   }, []);
 
   return (
-    <Container sx={{my:5}} maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ my: 5 }} maxWidth={settings.themeStretch ? false : 'lg'}>
       <OrderDetailsToolbar
         // backLink={paths.dashboard.order.root}
-        // orderNumber={currentOrder.orderNumber}
+        orderNumber={currentOrder.id}
         createdAt={currentOrder.created_at}
         status={status}
         onChangeStatus={handleChangeStatus}
@@ -61,22 +63,22 @@ export default function OrderDetailsView({ id }) {
             <OrderDetailsItems
               items={currentOrder.items}
               // taxes={currentOrder.taxes}
-              // shipping={currentOrder.shipping}
-              // discount={currentOrder.discount}
-              // subTotal={currentOrder.subTotal}
-              // totalAmount={currentOrder.totalAmount}
+              shipping={currentOrder.shipping}
+              discount={currentOrder.discount_amount}
+              subTotal={currentOrder.original_price}
+              totalAmount={currentOrder.total_price}
             />
 
-            {/* <OrderDetailsHistory history={currentOrder.history} /> */}
+            {/* <OrderDetailsHistory history={currentOrder} /> */}
           </Stack>
         </Grid>
 
         <Grid xs={12} md={4}>
           <OrderDetailsInfo
-            // customer={currentOrder.customer}
-            // delivery={currentOrder.delivery}
-            // payment={currentOrder.payment}
-            // shippingAddress={currentOrder.shippingAddress}
+          customer={currentOrder.user}
+          // delivery={currentOrder.delivery}
+          // payment={currentOrder.payment}
+          shippingAddress={currentOrder.shipping}
           />
         </Grid>
       </Grid>
