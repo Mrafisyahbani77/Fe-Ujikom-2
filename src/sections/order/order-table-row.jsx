@@ -38,6 +38,7 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
     customer,
     totalQuantity,
     subTotal,
+    user,
     total_price,
     id,
     users_id,
@@ -66,7 +67,7 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
     statusPopover.onClose();
     try {
       await updateStatus({
-        id: id, // id dari order
+        id: row.id, // id dari order
         status: newStatus,
         users_id: users_id,
       });
@@ -95,16 +96,16 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
             },
           }}
         >
-          {/* {orderNumber} */}
+          {id}
         </Box>
       </TableCell>
 
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar sx={{ mr: 2 }} />
-        {/* alt={customer.name} src={customer.avatarUrl} */}
+        <Avatar sx={{ mr: 2 }} alt={user.name} src={user.photo_profile} />
+
         <ListItemText
-          // primary={customer.name}
-          // secondary={customer.email}
+          primary={user.name}
+          secondary={user.email}
           primaryTypographyProps={{ typography: 'body2' }}
           secondaryTypographyProps={{
             component: 'span',
@@ -213,13 +214,13 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
                 }}
               >
                 <Avatar
-                  // src={item.coverUrl}
+                  src={item?.product?.images?.[0]?.image_url}
                   variant="rounded"
                   sx={{ width: 48, height: 48, mr: 2 }}
                 />
 
                 <ListItemText
-                  primary={item.product_name}
+                  primary={item.product.name}
                   secondary={item.sku}
                   primaryTypographyProps={{
                     typography: 'body2',
@@ -233,7 +234,7 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
 
                 <Box>x{item.quantity}</Box>
 
-                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.product_price)}</Box>
+                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.product.price)}</Box>
               </Stack>
             ))}
           </Stack>

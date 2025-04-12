@@ -45,6 +45,7 @@ export default function OverviewAnalyticsView() {
   const { data: soldData = [], isLoading: loading, isError: Error } = useFetchChartProductSold();
   // const { data: gender = [], isLoading: fetching } = useFetchChartSaleByGender();
   const { data: year, isLoading: loadd, isError: ERror } = useFetchChartYearly();
+  
   console.log(year);
 
   const {

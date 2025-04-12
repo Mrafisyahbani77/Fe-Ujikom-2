@@ -49,10 +49,10 @@ const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS]
 
 const TABLE_HEAD = [
   { id: 'orderNumber', label: 'Order', width: 116 },
-  { id: 'name', label: 'Customer' },
-  { id: 'createdAt', label: 'Date', width: 140 },
-  { id: 'totalQuantity', label: 'Items', width: 120, align: 'center' },
-  { id: 'totalAmount', label: 'Price', width: 140 },
+  { id: 'name', label: 'Kostumer' },
+  { id: 'createdAt', label: 'Tanggal', width: 140 },
+  { id: 'totalQuantity', label: 'Item', width: 120, align: 'center' },
+  { id: 'totalAmount', label: 'Harga', width: 140 },
   { id: 'status', label: 'Status', width: 110 },
   { id: '', width: 88 },
 ];
@@ -156,6 +156,15 @@ export default function OrderListView() {
     [handleFilters]
   );
 
+  const STATUS_OPTIONS = [
+    { value: 'all', label: 'All' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'processing', label: 'Proses' },
+    { value: 'shipped', label: 'Shipped' },
+    { value: 'delivered', label: 'Delivered' },
+    { value: 'cancelled', label: 'Dibatalkan' },
+  ];
+
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -186,38 +195,38 @@ export default function OrderListView() {
               boxShadow: (theme) => `inset 0 -2px 0 0 ${alpha(theme.palette.grey[500], 0.08)}`,
             }}
           >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab
-                key={tab.value}
-                iconPosition="end"
-                value={tab.value}
-                label={tab.label}
-                icon={
-                  <Label
-                    variant={
-                      ((tab.value === 'all' || tab.value === filters.status) && 'filled') || 'soft'
-                    }
-                    color={
-                      (tab.value === 'completed' && 'success') ||
-                      (tab.value === 'pending' && 'warning') ||
-                      (tab.value === 'cancelled' && 'error') ||
-                      'default'
-                    }
-                  >
-                    {tab.value === 'all' && _orders.length}
-                    {tab.value === 'completed' &&
-                      data.filter((order) => order.status === 'completed').length}
+            {STATUS_OPTIONS.map((tab) => {
+              const count =
+                tab.value === 'all'
+                  ? _orders.length
+                  : data.filter((order) => order.status === tab.value).length;
 
-                    {tab.value === 'pending' &&
-                      data.filter((order) => order.status === 'pending').length}
-                    {tab.value === 'cancelled' &&
-                      data.filter((order) => order.status === 'cancelled').length}
-                    {tab.value === 'refunded' &&
-                      data.filter((order) => order.status === 'refunded').length}
-                  </Label>
-                }
-              />
-            ))}
+              return (
+                <Tab
+                  key={tab.value}
+                  iconPosition="end"
+                  value={tab.value}
+                  label={tab.label}
+                  icon={
+                    <Label
+                      variant={
+                        tab.value === 'all' || tab.value === filters.status ? 'filled' : 'soft'
+                      }
+                      color={
+                        (tab.value === 'delivered' && 'success') ||
+                        (tab.value === 'pending' && 'warning') ||
+                        (tab.value === 'cancelled' && 'error') ||
+                        (tab.value === 'shipped' && 'info') ||
+                        (tab.value === 'processing' && 'default') ||
+                        'default'
+                      }
+                    >
+                      {count}
+                    </Label>
+                  }
+                />
+              );
+            })}
           </Tabs>
 
           <OrderTableToolbar
@@ -362,9 +371,9 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
   if (name) {
     inputData = inputData.filter(
       (order) =>
-        order.orderNumber.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
+        order.id.toString().toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
+        order.user.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
+        order.user.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 
@@ -376,8 +385,8 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
     if (startDate && endDate) {
       inputData = inputData.filter(
         (order) =>
-          fTimestamp(order.createdAt) >= fTimestamp(startDate) &&
-          fTimestamp(order.createdAt) <= fTimestamp(endDate)
+          fTimestamp(order.created_at) >= fTimestamp(startDate) &&
+          fTimestamp(order.created_at) <= fTimestamp(endDate)
       );
     }
   }

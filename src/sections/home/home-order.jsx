@@ -22,18 +22,51 @@ import ProductReviewNewForm from '../product/product-review-new-form';
 import { useBoolean } from 'src/hooks/use-boolean';
 import { fDateTime } from 'src/utils/format-time';
 import { fCurrency } from 'src/utils/format-number';
+import { useMutationBuy } from 'src/utils/payment';
+import Iconify from 'src/components/iconify';
+import { useSnackbar } from 'notistack';
 
 // Define order status options for tabs
 const STATUS_OPTIONS = ['all', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
 export default function HomeOrder() {
   const { data, isLoading, error } = useFetchOrder();
+  const { enqueueSnackbar } = useSnackbar();
   const review = useBoolean();
   const [selectedReview, setSelectedReview] = useState(null);
   const [currentTab, setCurrentTab] = useState('all');
 
   const handleChangeTab = (event, newValue) => {
     setCurrentTab(newValue);
+  };
+
+  const { mutate: Payment, isLoading: Load } = useMutationBuy({
+    onSuccess: (res) => {
+      // console.log('Payment success', res);
+      enqueueSnackbar('Redirecting to payment...', { variant: 'success' });
+
+      const redirectUrl = res?.redirect_url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        enqueueSnackbar('Redirect URL tidak ditemukan!', { variant: 'error' });
+      }
+    },
+    onError: (error) => {
+      // console.log('Payment error', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
+  const handlePayment = (orderId) => {
+    if (!orderId) {
+      enqueueSnackbar('Order ID tidak ditemukan!', { variant: 'error' });
+      return;
+    }
+    console.log(orderId);
+
+    Payment({ order_id: orderId });
   };
 
   if (isLoading) {
@@ -215,9 +248,31 @@ export default function HomeOrder() {
                               </Button>
                             )}
 
-                            <Button variant="outlined" color="secondary" fullWidth>
-                              Beli Lagi
-                            </Button>
+                            {order.status === 'pending' ? (
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                startIcon={<Iconify icon="eva:credit-card-fill" />}
+                                onClick={() => handlePayment(order.id)}
+                                disabled={isLoading} // disable saat loading
+                              >
+                                {isLoading ? 'Proses...' : 'Bayar Sekarang'}
+                              </Button>
+                            ) : order.status === 'delivered' ? (
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                component={Link}
+                                to={`/product/${order.productId}`}
+                              >
+                                Beli Lagi
+                              </Button>
+                            ) : (
+                              <Button variant="contained" disabled>
+                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                              </Button>
+                            )}
                           </Box>
                         </Grid>
                       </Grid>

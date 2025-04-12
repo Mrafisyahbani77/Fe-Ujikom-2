@@ -87,7 +87,7 @@ export default function OrderTableToolbar({
             fullWidth
             value={filters.name}
             onChange={handleFilterName}
-            placeholder="Search customer or order number..."
+            placeholder="Cari customer atau nomor order..."
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
