@@ -122,7 +122,6 @@ export default function JwtLoginView() {
 
   const handleGoogleLogin = () => {
     window.location.href = `${HOST_API}/api/auth/google`;
-    
   };
 
   // // Menangkap token dari URL setelah redirect dari backend Google
@@ -151,14 +150,14 @@ export default function JwtLoginView() {
       <Stack spacing={2} sx={{ mb: 5 }}>
         <Typography variant="h4">Sign in to Barangin</Typography>
         <Stack direction="row" spacing={0.5}>
-          <Typography variant="body2">New user?</Typography>
+          <Typography variant="body2">Pengguna baru?</Typography>
           <Link component={RouterLink} href={paths.auth.jwt.register} variant="subtitle2">
-            Create an account
+            Buat akun
           </Link>
         </Stack>
       </Stack>
 
-      {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+      {/* {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>} */}
 
       <Stack spacing={2.5}>
         <RHFTextField

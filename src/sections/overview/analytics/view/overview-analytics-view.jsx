@@ -45,7 +45,7 @@ export default function OverviewAnalyticsView() {
   const { data: soldData = [], isLoading: loading, isError: Error } = useFetchChartProductSold();
   // const { data: gender = [], isLoading: fetching } = useFetchChartSaleByGender();
   const { data: year, isLoading: loadd, isError: ERror } = useFetchChartYearly();
-  
+
   console.log(year);
 
   const {
@@ -77,14 +77,14 @@ export default function OverviewAnalyticsView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography
+      {/* <Typography
         variant="h4"
         sx={{
           mb: { xs: 3, md: 5 },
         }}
       >
         Hi, Welcome back 👋
-      </Typography>
+      </Typography> */}
 
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
@@ -104,7 +104,7 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={6}>
           <AnalyticsWidgetSummary
             title="Total produk order"
             total={total_order?.total_orders || 0}
@@ -113,20 +113,7 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={4}>
-          <EcommerceWidgetSummary
-            title="Produk"
-            percent={sold?.percent_change || 0}
-            total={sold?.total_sold || 0}
-            chart={{
-              series:
-                sold?.chart_data?.length > 0 ? sold.chart_data : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            }}
-            loading={loading}
-          />
-        </Grid>
-
-        <Grid xs={12} md={4}>
+        {/* <Grid xs={12} md={4}>
           <EcommerceWidgetSummary
             title="Total Balance"
             percent={-0.1}
@@ -148,7 +135,7 @@ export default function OverviewAnalyticsView() {
               series: [40, 70, 75, 70, 50, 28, 7, 64, 38, 27],
             }}
           />
-        </Grid>
+        </Grid> */}
 
         {/* <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
@@ -159,74 +146,7 @@ export default function OverviewAnalyticsView() {
           />
         </Grid> */}
 
-        <Grid xs={12} md={6} lg={8}>
-          <AnalyticsWebsiteVisits
-            title="Website Visits"
-            subheader="(+43%) than last year"
-            chart={{
-              labels: [
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ],
-              series: [
-                {
-                  name: 'Team A',
-                  type: 'column',
-                  fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-                {
-                  name: 'Team B',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-                },
-                {
-                  name: 'Team C',
-                  type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-                },
-              ],
-            }}
-          />
-        </Grid>
-
-        {/* <Grid xs={12} md={6} lg={4}>
-          <AnalyticsOrderTimeline title="Order Timeline" list={_analyticOrderTimeline} />
-        </Grid> */}
-
-        <Grid xs={12} md={6} lg={4}>
-          <EcommerceLatestProducts title="Latest Products" list={_ecommerceLatestProducts} />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <EcommerceSaleByGender
-            title="Sale By Gender"
-            total={gender.total}
-            chart={{
-              series:
-                gender.series.length > 0
-                  ? gender.series
-                  : [
-                      { label: 'Mens', value: 0 },
-                      { label: 'Womens', value: 0 },
-                    ],
-            }}
-            loading={fetching}
-          />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={8}>
+        <Grid xs={12} md={6} lg={6}>
           <EcommerceYearlySales
             title="Yearly Sales"
             subheader="(+43%) than last year"
@@ -276,6 +196,86 @@ export default function OverviewAnalyticsView() {
             }}
           />
         </Grid>
+
+        <Grid xs={12} md={6} lg={6}>
+          <AnalyticsWebsiteVisits
+            title="Website Visits"
+            subheader="(+43%) than last year"
+            chart={{
+              labels: [
+                '01/01/2003',
+                '02/01/2003',
+                '03/01/2003',
+                '04/01/2003',
+                '05/01/2003',
+                '06/01/2003',
+                '07/01/2003',
+                '08/01/2003',
+                '09/01/2003',
+                '10/01/2003',
+                '11/01/2003',
+              ],
+              series: [
+                {
+                  name: 'Team A',
+                  type: 'column',
+                  fill: 'solid',
+                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
+                },
+                {
+                  name: 'Team B',
+                  type: 'area',
+                  fill: 'gradient',
+                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
+                },
+                {
+                  name: 'Team C',
+                  type: 'line',
+                  fill: 'solid',
+                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
+                },
+              ],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} md={6} lg={4}>
+          <EcommerceSaleByGender
+            title="Sale By Gender"
+            total={gender.total}
+            chart={{
+              series:
+                gender.series.length > 0
+                  ? gender.series
+                  : [
+                      { label: 'Mens', value: 0 },
+                      { label: 'Womens', value: 0 },
+                    ],
+            }}
+            loading={fetching}
+          />
+        </Grid>
+
+        <Grid xs={12} md={6} lg={4}>
+          <EcommerceLatestProducts title="Latest Products" list={_ecommerceLatestProducts} />
+        </Grid>
+
+        <Grid xs={12} md={4}>
+          <EcommerceWidgetSummary
+            title="Produk"
+            percent={sold?.percent_change || 0}
+            total={sold?.total_sold || 0}
+            chart={{
+              series:
+                sold?.chart_data?.length > 0 ? sold.chart_data : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            }}
+            loading={loading}
+          />
+        </Grid>
+
+        {/* <Grid xs={12} md={6} lg={4}>
+          <AnalyticsOrderTimeline title="Order Timeline" list={_analyticOrderTimeline} />
+        </Grid> */}
       </Grid>
     </Container>
   );

@@ -55,7 +55,7 @@ export default function AuthClassicLayout({ children, image, title }) {
             theme.palette.background.default,
             theme.palette.mode === 'light' ? 0.88 : 0.94
           ),
-          imgUrl: '/assets/background/overlay_2.jpg',
+          imgUrl: '/public/logo/icon-login.png',
         }),
       }}
     >
@@ -66,7 +66,7 @@ export default function AuthClassicLayout({ children, image, title }) {
       <Box
         component="img"
         alt="auth"
-        src={image || '/assets/illustrations/illustration_dashboard.png'}
+        src={image || '/public/logo/icon-login2.png'}
         sx={{ maxWidth: 720 }}
       />
 

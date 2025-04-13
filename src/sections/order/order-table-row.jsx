@@ -28,7 +28,14 @@ import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
-export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteRow }) {
+export default function OrderTableRow({
+  updateStatus,
+  row,
+  selected,
+  onViewRow,
+  onSelectRow,
+  onDeleteRow,
+}) {
   const {
     items,
     status,
@@ -53,16 +60,6 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
   const popover = usePopover(); // buat popover lain
   const statusPopover = usePopover(); // khusus popover Status
 
-  const { mutateAsync: updateStatus } = useMutationUpdateOrderStatus({
-    onSuccess: () => {
-      enqueueSnackbar('Status berhasil diubah!');
-      queryClient.invalidateQueries({ queryKey: ['all.order'], refetchType: 'active' });
-    },
-    onError: (error) => {
-      enqueueSnackbar(error?.message || 'Gagal mengubah status', { variant: 'error' });
-    },
-  });
-
   const handleChangeStatus = async (newStatus) => {
     statusPopover.onClose();
     try {
@@ -74,7 +71,8 @@ export default function OrderTableRow({ row, selected, onViewRow, onSelectRow, o
 
       // setelah berhasil
       // enqueueSnackbar('Status berhasil diubah!');
-      queryClient.invalidateQueries({ queryKey: ['all.order'], refetchType: 'active' });
+      // queryClient.invalidateQueries({ queryKey: ['order'] });
+      // queryClient.invalidateQueries({ queryKey: ['fetch.cart'] });
     } catch (error) {
       // enqueueSnackbar(error?.message || 'Gagal mengubah status', { variant: 'error' });
     }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
@@ -41,7 +41,9 @@ import {
 import OrderTableRow from '../order-table-row';
 import OrderTableToolbar from '../order-table-toolbar';
 import OrderTableFiltersResult from '../order-table-filters-result';
-import { useFetchOrder } from 'src/utils/order';
+import { useFetchOrder, useMutationUpdateOrderStatus } from 'src/utils/order';
+import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
@@ -67,6 +69,8 @@ const defaultFilters = {
 // ----------------------------------------------------------------------
 
 export default function OrderListView() {
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
   const settings = useSettingsContext();
@@ -75,9 +79,13 @@ export default function OrderListView() {
 
   const confirm = useBoolean();
 
-  const { data } = useFetchOrder();
+  const { data = [] } = useFetchOrder();
+  const [tableData, setTableData] = useState([]);
 
-  const [tableData, setTableData] = useState(data);
+  useEffect(() => {
+    setTableData(data);
+  }, [data]); 
+
   // console.log(data);
 
   const [filters, setFilters] = useState(defaultFilters);
@@ -156,10 +164,21 @@ export default function OrderListView() {
     [handleFilters]
   );
 
+  const { mutateAsync: updateStatus } = useMutationUpdateOrderStatus({
+    onSuccess: () => {
+      enqueueSnackbar('Status berhasil diubah!');
+      queryClient.invalidateQueries({ queryKey: ['order'] });
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.message || 'Gagal mengubah status', { variant: 'error' });
+    },
+  });
+
   const STATUS_OPTIONS = [
     { value: 'all', label: 'All' },
     { value: 'pending', label: 'Pending' },
-    { value: 'processing', label: 'Proses' },
+    { value: 'paid', label: 'Proses' },
+    // { value: 'processing', label: 'Proses' },
     { value: 'shipped', label: 'Shipped' },
     { value: 'delivered', label: 'Delivered' },
     { value: 'cancelled', label: 'Dibatalkan' },
@@ -294,6 +313,7 @@ export default function OrderListView() {
                     )
                     .map((row) => (
                       <OrderTableRow
+                        updateStatus={updateStatus}
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}

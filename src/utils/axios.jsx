@@ -175,9 +175,9 @@ export const endpoints = {
   },
   whishlist: {
     list: '/api/wishlist',
-    details: '/api/wishlist',
-    update: '/api/wishlist',
-    delete: '/api/wishlist',
+    details: '/api/wishlist', //need id
+    update: '/api/wishlist', //need id
+    delete: '/api/wishlist', //need id
     create: '/api/wishlist/store',
   },
   cart: {

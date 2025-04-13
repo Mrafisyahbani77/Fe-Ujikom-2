@@ -88,40 +88,45 @@ export function AuthProvider({ children }) {
     initialize();
   }, [initialize]);
 
-  const login = useCallback(async (email, password) => {
-    try {
-      const response = await axiosInstance.post(endpoints.auth.login, { email, password });
-      const { accessToken, refreshToken, user } = response.data;
+  const login = useCallback(
+    async (email, password) => {
+      try {
+        const response = await axiosInstance.post(endpoints.auth.login, { email, password });
+        const { accessToken, refreshToken, user } = response.data;
 
-      console.log('Before saving:', { accessToken, refreshToken });
+        console.log('Before saving:', { accessToken, refreshToken });
 
-      if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        console.log('RefreshToken saved:', refreshToken);
-      } else {
-        console.error('Missing refreshToken!');
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          console.log('RefreshToken saved:', refreshToken);
+        } else {
+          console.error('Missing refreshToken!');
+        }
+
+        setSession(accessToken, refreshToken);
+
+        dispatch({
+          type: 'LOGIN',
+          payload: {
+            user,
+            roles: user?.role ? [user.role] : [],
+            admin: user?.role === 'admin',
+            accessToken,
+            refreshToken,
+          },
+        });
+        
+        await initialize();
+
+        return response.data;
+      } catch (error) {
+        console.error('Login Error:', error);
+        throw error;
       }
-
-      setSession(accessToken, refreshToken);
-
-      dispatch({
-        type: 'LOGIN',
-        payload: {
-          user,
-          roles: user?.role ? [user.role] : [],
-          admin: user?.role === 'admin',
-          accessToken,
-          refreshToken,
-        },
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Login Error:', error);
-      throw error;
-    }
-  }, []);
+    },
+    [initialize]
+  );
 
   const register = useCallback(async (email, password, firstName, lastName) => {
     const data = { email, password, firstName, lastName };

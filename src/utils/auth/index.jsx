@@ -6,3 +6,4 @@ export * from './useMutationLogin';
 export * from './useMutationLogout';
 export * from './useMutationUpdateProfile';
 export * from './useMutationUpdatePassword';
+export * from './useFetchProfile';
