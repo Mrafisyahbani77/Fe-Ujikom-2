@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 // @mui
 import Box from '@mui/material/Box';
@@ -25,6 +25,11 @@ import FormProvider, { RHFSelect } from 'src/components/hook-form';
 import IncrementerButton from './common/incrementer-button';
 import { useAuthContext } from 'src/auth/hooks';
 import { useSnackbar } from 'notistack';
+import {
+  useFetchWhislist,
+  useMutationCreateWhislist,
+  useMutationDeleteWhislist,
+} from 'src/utils/whishlist';
 
 // ----------------------------------------------------------------------
 
@@ -81,6 +86,25 @@ export default function ProductDetailsSummary({
   });
 
   const { reset, watch, control, setValue, handleSubmit } = methods;
+  const [wishlist, setWishlist] = useState([]);
+  const { data: wishlistData = [] } = useFetchWhislist();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    // Periksa jika wishlistData sudah ada
+    if (Array.isArray(wishlistData)) {
+      setWishlist(wishlistData);
+    } else {
+      setWishlist([]); // Atur wishlist menjadi array kosong jika tidak valid
+    }
+  }, [wishlistData]);
+
+  useEffect(() => {
+    if (wishlist.length > 0 && product?.id) {
+      const isProductWishlisted = wishlist.some((item) => item.product.id === product.id);
+      setIsWishlisted(isProductWishlisted);
+    }
+  }, [wishlist, product?.id]);
 
   const values = watch();
 
@@ -88,7 +112,6 @@ export default function ProductDetailsSummary({
     if (product) {
       reset(defaultValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
   const onSubmit = handleSubmit(async (data) => {
@@ -130,6 +153,50 @@ export default function ProductDetailsSummary({
     }
   }, [onAddCart, values]);
 
+  const { mutateAsync: AddWishlist } = useMutationCreateWhislist({
+    onSuccess: () => {
+      enqueueSnackbar('Berhasil menambahkan ke wishlist', {
+        variant: 'success',
+      });
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.response?.data?.message, {
+        variant: 'error',
+      });
+    },
+  });
+
+  const { mutateAsync: RemoveWishlist } = useMutationDeleteWhislist({
+    onSuccess: () => {
+      enqueueSnackbar('Berhasil hapus produk dari wishlist', {
+        variant: 'success',
+      });
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.response?.data?.message, {
+        variant: 'error',
+      });
+    },
+  });
+
+  const handleWishlist = async (productId) => {
+    const isWishlisted = wishlist.some((id) => id === productId);
+
+    try {
+      if (isWishlisted) {
+        await RemoveWishlist({ products_id: productId });
+        setWishlist((prev) => prev.filter((id) => id !== productId));
+      } else {
+        await AddWishlist({ products_id: productId });
+        setWishlist((prev) => [...prev, productId]);
+      }
+    } catch (error) {
+      console.error('Error with wishlist operation:', error);
+    }
+  };
+
+  // const isWishlisted = wishlist.some((item) => item.product.id === product?.id);
+
   const renderPrice = (
     <Box sx={{ typography: 'h5' }}>
       {priceSale && (
@@ -165,14 +232,20 @@ export default function ProductDetailsSummary({
 
       <Link
         variant="subtitle2"
+        onClick={() => handleWishlist(product?.id)} // Call the handleWishlist function with the product id
         sx={{
-          color: 'text.secondary',
+          cursor: 'pointer',
+          color: isWishlisted ? 'primary.main' : 'text.secondary', // Change color based on wishlist status
           display: 'inline-flex',
           alignItems: 'center',
         }}
       >
-        <Iconify icon="solar:heart-bold" width={16} sx={{ mr: 1 }} />
-        Favorit
+        <Iconify
+          icon={isWishlisted ? 'solar:bookmark-bold' : 'solar:bookmark-outline'}
+          width={16}
+          sx={{ mr: 1 }}
+        />
+        {isWishlisted ? 'Disimpan' : 'Simpan'} {/* Change text based on wishlist status */}
       </Link>
 
       <Link
@@ -294,7 +367,22 @@ export default function ProductDetailsSummary({
         </Typography>
       </Button>
 
-      <Button fullWidth size="large" type="submit" variant="contained" disabled={disabledActions}>
+      <Button
+        fullWidth
+        size="large"
+        type="submit"
+        variant="contained"
+        disabled={disabledActions}
+        onClick={(e) => {
+          if (!user) {
+            e.preventDefault(); // supaya submit form-nya nggak jalan
+            enqueueSnackbar('Anda harus login dulu', { variant: 'warning' });
+            router.push('/auth/login');
+            return;
+          }
+          // kalau sudah login, lanjut submit
+        }}
+      >
         Beli sekarang
       </Button>
     </Stack>

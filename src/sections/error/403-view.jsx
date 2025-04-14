@@ -33,7 +33,7 @@ export default function View403() {
         </m.div>
 
         <Button component={RouterLink} href="/" size="large" variant="contained">
-          Go to Home
+          Kembali ke beranda
         </Button>
       </MotionContainer>
     </CompactLayout>
