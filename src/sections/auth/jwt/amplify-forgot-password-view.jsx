@@ -27,8 +27,8 @@ export default function AmplifyForgotPasswordView() {
   const { enqueueSnackbar } = useSnackbar();
   const { mutateAsync: forgotPassword } = useMutationForgotPassword({
     onSuccess: () => {
-      console.log('success');
-      enqueueSnackbar('Check your email for the verification code', {
+      // console.log('success');
+      enqueueSnackbar('Periksa email Anda untuk lihat kode otp', {
         variant: 'success',
       });
     },
@@ -84,7 +84,7 @@ export default function AmplifyForgotPasswordView() {
         variant="contained"
         loading={isSubmitting}
       >
-        Send Request
+        Kirim
       </LoadingButton>
 
       <Link
@@ -98,7 +98,7 @@ export default function AmplifyForgotPasswordView() {
         }}
       >
         <Iconify icon="eva:arrow-ios-back-fill" width={16} />
-        Return to sign in
+        Kembali ke login
       </Link>
     </Stack>
   );
@@ -111,8 +111,8 @@ export default function AmplifyForgotPasswordView() {
         <Typography variant="h3">Forgot your password?</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Please enter the email address associated with your account and We will email you a link
-          to reset your password.
+          Silakan masukkan alamat email yang terkait dengan akun Anda dan kami akan mengirimkan
+          tautan untuk mengatur ulang kata sandi Anda.
         </Typography>
       </Stack>
     </>

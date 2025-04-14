@@ -66,8 +66,8 @@ export default function AmplifyVerifyView() {
         <EmailInboxIcon sx={{ height: 96 }} />
         <Typography variant="h3">Please check your email!</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          We have emailed a 6-digit confirmation code. Please enter the code below to verify your
-          email address.
+          Kami telah mengirim kode konfirmasi 6 digit melalui email. Harap masukkan kode di bawah
+          ini untuk memverifikasi alamat email Anda.
         </Typography>
       </Stack>
 

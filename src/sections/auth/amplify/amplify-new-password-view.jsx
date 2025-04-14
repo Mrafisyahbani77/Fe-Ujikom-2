@@ -10,12 +10,16 @@ import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import { useMutationResetPassword } from 'src/utils/auth';
 import { paths } from 'src/routes/paths';
 import { useParams } from 'react-router-dom'; // <-- pastikan menggunakan useParams dari react-router-dom
+import { useBoolean } from 'src/hooks/use-boolean';
+import { IconButton, InputAdornment } from '@mui/material';
+import Iconify from 'src/components/iconify';
 
 export default function ResetPasswordView() {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
+  const password = useBoolean();
   const { resetToken } = useParams(); // Ambil token dari URL path
-  console.log(resetToken)
+  console.log(resetToken);
 
   const { mutateAsync: resetPassword, isLoading } = useMutationResetPassword({
     onSuccess: () => {
@@ -66,8 +70,34 @@ export default function ResetPasswordView() {
 
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={3}>
-          <RHFTextField name="newPassword" label="Password Baru" type="password" />
-          <RHFTextField name="confirmPassword" label="Konfirmasi Password" type="password" />
+          <RHFTextField
+            name="newPassword"
+            label="Password Baru"
+            type={password.value ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={password.onToggle} edge="end">
+                    <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <RHFTextField
+            name="confirmPassword"
+            label="Konfirmasi Password"
+            type={password.value ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={password.onToggle} edge="end">
+                    <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
           <LoadingButton type="submit" variant="contained" loading={isLoading}>
             Reset Password
           </LoadingButton>

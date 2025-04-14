@@ -41,6 +41,11 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (error.response?.status === 403) {
+      window.location.href = '/403'; // Ganti dengan URL halaman 403
+      return Promise.reject(error);
+    }
+
     // Jika error 401 dan request belum dicoba ulang
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
