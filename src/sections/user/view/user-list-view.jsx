@@ -1,5 +1,5 @@
 import isEqual from 'lodash/isEqual';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
@@ -17,7 +17,7 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 // _mock
-import { _userList, _roles, USER_STATUS_OPTIONS } from 'src/_mock';
+// import { _userList } from 'src/_mock';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
@@ -41,15 +41,24 @@ import {
 import UserTableRow from '../user-table-row';
 import UserTableToolbar from '../user-table-toolbar';
 import UserTableFiltersResult from '../user-table-filters-result';
+import { useFetchAllUser } from 'src/utils/users';
 
 // ----------------------------------------------------------------------
+const USER_STATUS_OPTIONS = [
+  { value: 'active', label: 'Active' },
+  // { value: 'pending', label: 'Pending' },
+  { value: 'banned', label: 'Banned' },
+  // { value: 'rejected', label: 'Rejected' },
+];
+
+const _roles = ['pembeli', 'admin'];
 
 const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...USER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name' },
   { id: 'phoneNumber', label: 'Phone Number', width: 180 },
-  { id: 'company', label: 'Company', width: 220 },
+  // { id: 'company', label: 'Company', width: 220 },
   { id: 'role', label: 'Role', width: 180 },
   { id: 'status', label: 'Status', width: 100 },
   { id: '', width: 88 },
@@ -72,9 +81,16 @@ export default function UserListView() {
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_userList);
+  const { data } = useFetchAllUser();
+  console.log(data);
+
+  const [tableData, setTableData] = useState(data);
 
   const [filters, setFilters] = useState(defaultFilters);
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -150,19 +166,19 @@ export default function UserListView() {
           heading="List"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'User', href: paths.dashboard.user.root },
+            // { name: 'User', href: paths.dashboard.user.root },
             { name: 'List' },
           ]}
-          action={
-            <Button
-              component={RouterLink}
-              href={paths.dashboard.user.new}
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-            >
-              New User
-            </Button>
-          }
+          // action={
+          //   <Button
+          //     component={RouterLink}
+          //     href={paths.dashboard.user.new}
+          //     variant="contained"
+          //     startIcon={<Iconify icon="mingcute:add-line" />}
+          //   >
+          //     New User
+          //   </Button>
+          // }
           sx={{
             mb: { xs: 3, md: 5 },
           }}
@@ -195,16 +211,12 @@ export default function UserListView() {
                       'default'
                     }
                   >
-                    {tab.value === 'all' && _userList.length}
+                    {tab.value === 'all' && data?.users?.length}
                     {tab.value === 'active' &&
-                      _userList.filter((user) => user.status === 'active').length}
-
+                      data?.users?.filter((user) => user.is_active && !user.is_banned).length}
                     {tab.value === 'pending' &&
-                      _userList.filter((user) => user.status === 'pending').length}
-                    {tab.value === 'banned' &&
-                      _userList.filter((user) => user.status === 'banned').length}
-                    {tab.value === 'rejected' &&
-                      _userList.filter((user) => user.status === 'rejected').length}
+                      data?.users?.filter((user) => !user.is_active && !user.is_banned).length}
+                    {tab.value === 'banned' && data?.users?.filter((user) => user.is_banned).length}
                   </Label>
                 }
               />
@@ -337,9 +349,18 @@ export default function UserListView() {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
+  // Pastikan inputData.users itu array
+  const users = Array.isArray(inputData?.users) ? inputData.users : [];
+
   const { name, status, role } = filters;
 
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
+  const stabilizedThis = users.map((el, index) => [el, index]);
+
+  const getUserStatus = (user) => {
+    if (user.is_banned) return 'banned';
+    if (user.is_active) return 'active';
+    return 'inactive';
+  };
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -347,21 +368,21 @@ function applyFilter({ inputData, comparator, filters }) {
     return a[1] - b[1];
   });
 
-  inputData = stabilizedThis.map((el) => el[0]);
+  let filteredUsers = stabilizedThis.map((el) => el[0]);
 
   if (name) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+    filteredUsers = filteredUsers.filter(
+      (user) => user.username.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
-
+  // Filter by status (is_active / is_banned)
   if (status !== 'all') {
-    inputData = inputData.filter((user) => user.status === status);
+    filteredUsers = filteredUsers.filter((user) => getUserStatus(user) === status);
   }
 
-  if (role.length) {
-    inputData = inputData.filter((user) => role.includes(user.role));
+  if (role?.length) {
+    filteredUsers = filteredUsers.filter((user) => role.includes(user.role));
   }
 
-  return inputData;
+  return filteredUsers;
 }

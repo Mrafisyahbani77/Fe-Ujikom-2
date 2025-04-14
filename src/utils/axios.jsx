@@ -228,5 +228,6 @@ export const endpoints = {
     getAllUser: '/api/users',
     getById: '/api/users',
     banUser: '/api/users',
+    unbanUser: '/api/users',
   },
 };

@@ -170,7 +170,8 @@ export default function OrderListView() {
       queryClient.invalidateQueries({ queryKey: ['order'] });
     },
     onError: (error) => {
-      enqueueSnackbar(error?.message || 'Gagal mengubah status', { variant: 'error' });
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
 

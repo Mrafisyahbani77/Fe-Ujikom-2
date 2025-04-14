@@ -18,17 +18,79 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 //
 import UserQuickEditForm from './user-quick-edit-form';
+import { useMutationBanned, useMutationUnban } from 'src/utils/users';
+import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
-  const { name, avatarUrl, company, role, status, email, phoneNumber } = row;
+  const {
+    username,
+    avatarUrl,
+    company,
+    role,
+    status,
+    email,
+    phoneNumber,
+    phone_number,
+    profile_photo,
+    gender,
+    is_active,
+    is_banned,
+  } = row;
+
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
 
   const confirm = useBoolean();
 
   const quickEdit = useBoolean();
 
   const popover = usePopover();
+
+  const statusPopover = usePopover();
+
+  // Mapping label untuk status
+  const statusLabel = {
+    banned: 'Banned',
+    active: 'Active',
+  };
+
+  const { mutate: banned } = useMutationBanned({
+    onSuccess: () => {
+      enqueueSnackbar('User berhasil di ban', {
+        variant: 'success',
+      });
+      queryClient.invalidateQueries(['fetch.alluser']);
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
+  const { mutate: unban } = useMutationUnban({
+    onSuccess: () => {
+      enqueueSnackbar('User berhasil di unban', {
+        variant: 'success',
+      });
+      queryClient.invalidateQueries(['fetch.alluser']);
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
+
+  const handleChangeBanStatus = (action) => {
+    if (action === 'ban') {
+      banned({ id: row.id });
+    } else if (action === 'unban') {
+      unban({ id: row.id });
+    }
+    statusPopover.onClose();
+  };
 
   return (
     <>
@@ -38,10 +100,10 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         </TableCell>
 
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar alt={name} src={avatarUrl} sx={{ mr: 2 }} />
+          <Avatar alt={username} src={profile_photo} sx={{ mr: 2 }} />
 
           <ListItemText
-            primary={name}
+            primary={username}
             secondary={email}
             primaryTypographyProps={{ typography: 'body2' }}
             secondaryTypographyProps={{
@@ -51,23 +113,52 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
           />
         </TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{phoneNumber}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{phone_number}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{company}</TableCell>
+        {/* <TableCell sx={{ whiteSpace: 'nowrap' }}>{company}</TableCell> */}
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{role}</TableCell>
 
+        {/* <TableCell>
+          <Label color={is_banned ? 'error' : is_active ? 'success' : 'default'}>
+            {is_banned ? 'Banned' : is_active ? 'Active' : 'Inactive'}
+          </Label>
+        </TableCell> */}
         <TableCell>
+          {/* Ini Popover untuk Ban/Unban */}
+          <CustomPopover
+            open={statusPopover.open}
+            onClose={statusPopover.onClose}
+            sx={{ width: 160 }}
+          >
+            {is_banned ? (
+              <MenuItem
+                onClick={() => handleChangeBanStatus('unban')}
+                sx={{ typography: 'body2', textTransform: 'capitalize' }}
+              >
+                Unban User
+              </MenuItem>
+            ) : (
+              <MenuItem
+                onClick={() => handleChangeBanStatus('ban')}
+                sx={{ typography: 'body2', textTransform: 'capitalize' }}
+              >
+                Ban User
+              </MenuItem>
+            )}
+          </CustomPopover>
+
+          {/* Label Status */}
           <Label
             variant="soft"
-            color={
-              (status === 'active' && 'success') ||
-              (status === 'pending' && 'warning') ||
-              (status === 'banned' && 'error') ||
-              'default'
-            }
+            color={is_banned ? 'error' : is_active ? 'success' : 'default'}
+            onClick={statusPopover.onOpen}
+            sx={{
+              textTransform: 'capitalize',
+              cursor: 'pointer',
+            }}
           >
-            {status}
+            {is_banned ? statusLabel['banned'] : statusLabel['active']}
           </Label>
         </TableCell>
 

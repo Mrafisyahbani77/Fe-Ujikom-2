@@ -6,7 +6,7 @@ export const useFetchAllUser = () =>
     queryKey: ['fetch.alluser'],
     queryFn: async () => {
       const response = await axiosInstance.get(endpoints.user.getAllUser);
-      console.log(response.data.data);
-      return response.data.data;
+      console.log(response.data);
+      return response.data;
     },
   });

@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import axiosInstance, { endpoints } from 'src/utils/axios';
 
-export const useMutationBanned = ({ onSuccess, onError }) => {
+export const useMutationUnban = ({ onSuccess, onError }) => {
   return useMutation({
-    mutationKey: ['banned'],
+    mutationKey: ['unban'],
     mutationFn: async ({ id }) => {
-      const response = await axiosInstance.post(`${endpoints.user.banUser}/${id}/ban`);
+      const response = await axiosInstance.put(`${endpoints.user.unbanUser}/${id}/unban`);
       return response.data;
     },
     onSuccess,
