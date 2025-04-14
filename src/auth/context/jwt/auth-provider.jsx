@@ -116,7 +116,7 @@ export function AuthProvider({ children }) {
             refreshToken,
           },
         });
-        
+
         await initialize();
 
         return response.data;
@@ -128,8 +128,8 @@ export function AuthProvider({ children }) {
     [initialize]
   );
 
-  const register = useCallback(async (email, password, firstName, lastName) => {
-    const data = { email, password, firstName, lastName };
+  const register = useCallback(async (email, password) => {
+    const data = { email, password };
 
     try {
       const response = await axiosInstance.post(endpoints.auth.register, data);

@@ -27,7 +27,7 @@ import { useMutationLogin } from 'src/utils/auth';
 import { useSnackbar } from 'notistack';
 import { HOST_API } from 'src/config-global';
 
-export default function JwtLoginView() {
+export default function   JwtLoginView() {
   const { enqueueSnackbar } = useSnackbar();
   const { login } = useAuthContext();
   const router = useRouter();

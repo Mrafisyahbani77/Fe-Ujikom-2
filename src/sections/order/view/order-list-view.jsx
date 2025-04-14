@@ -84,7 +84,7 @@ export default function OrderListView() {
 
   useEffect(() => {
     setTableData(data);
-  }, [data]); 
+  }, [data]);
 
   // console.log(data);
 
@@ -176,11 +176,11 @@ export default function OrderListView() {
 
   const STATUS_OPTIONS = [
     { value: 'all', label: 'All' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'paid', label: 'Proses' },
+    { value: 'pending', label: 'Belum Bayar' },
+    { value: 'paid', label: 'Dikemas' },
     // { value: 'processing', label: 'Proses' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
+    { value: 'shipped', label: 'Dikirim' },
+    { value: 'delivered', label: 'Selesai' },
     { value: 'cancelled', label: 'Dibatalkan' },
   ];
 
@@ -297,12 +297,12 @@ export default function OrderListView() {
                   rowCount={tableData.length}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
-                  onSelectAllRows={(checked) =>
-                    table.onSelectAllRows(
-                      checked,
-                      tableData.map((row) => row.id)
-                    )
-                  }
+                  // onSelectAllRows={(checked) =>
+                  //   table.onSelectAllRows(
+                  //     checked,
+                  //     tableData.map((row) => row.id)
+                  //   )
+                  // }
                 />
 
                 <TableBody>

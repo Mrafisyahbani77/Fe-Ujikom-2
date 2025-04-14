@@ -60,12 +60,12 @@ export default function JwtRegisterView() {
   const { mutate: mutationRegister } = useMutationRegister({
     onSuccess: (response) => {
       enqueueSnackbar('Registrasi berhasil', { variant: 'success' });
-  
+
       if (response.isGoogle) {
         // Jika pengguna daftar via Google, langsung login dengan menyimpan token
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
-  
+
         if (response.role === 'admin') {
           router.push(paths.dashboard.root);
         } else {
@@ -78,13 +78,14 @@ export default function JwtRegisterView() {
     },
     onError: (error) => {
       let errorMessage = 'Registrasi gagal';
-  
+
       if (error?.response) {
         const { status, data } = error.response;
-  
+
         if (status === 400) {
           if (data?.message?.includes('Username, email, atau nomor telepon sudah terdaftar')) {
-            errorMessage = 'Username, email, atau nomor telepon sudah terdaftar! Silakan gunakan data lain.';
+            errorMessage =
+              'Username, email, atau nomor telepon sudah terdaftar! Silakan gunakan data lain.';
           } else {
             errorMessage = data?.message || 'Input tidak valid. Periksa kembali data Anda.';
           }
@@ -94,12 +95,11 @@ export default function JwtRegisterView() {
       } else if (error?.message) {
         errorMessage = error.message;
       }
-  
+
       setErrorMsg(errorMessage);
       enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
-  
 
   const onSubmit = (data) => {
     try {
@@ -140,9 +140,9 @@ export default function JwtRegisterView() {
   return (
     <>
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
-        <Typography variant="h4">Get started absolutely free</Typography>
+        <Typography variant="h4">Register</Typography>
         <Stack direction="row" spacing={0.5}>
-          <Typography variant="body2">Already have an account?</Typography>
+          <Typography variant="body2">Sudah punya akun?</Typography>
           <Link href={paths.auth.jwt.login} component={RouterLink} variant="subtitle2">
             Sign in
           </Link>

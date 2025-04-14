@@ -14,7 +14,6 @@ import Logo from 'src/components/logo';
 // ----------------------------------------------------------------------
 
 export default function AuthClassicLayout({ children, image, title }) {
-
   const theme = useTheme();
 
   const upMd = useResponsive('up', 'md');
@@ -53,9 +52,9 @@ export default function AuthClassicLayout({ children, image, title }) {
         ...bgGradient({
           color: alpha(
             theme.palette.background.default,
-            theme.palette.mode === 'light' ? 0.88 : 0.94
+            theme.palette.mode === 'light' ? 0.97 : 0.98
           ),
-          imgUrl: '/public/logo/icon-login.png',
+          imgUrl: '/public/logo/icon-login3.png',
         }),
       }}
     >
@@ -66,10 +65,9 @@ export default function AuthClassicLayout({ children, image, title }) {
       <Box
         component="img"
         alt="auth"
-        src={image || '/public/logo/icon-login2.png'}
+        src={image || '/public/logo/icon-login3.png'}
         sx={{ maxWidth: 720 }}
       />
-
     </Stack>
   );
 

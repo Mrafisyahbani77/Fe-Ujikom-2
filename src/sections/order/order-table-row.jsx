@@ -51,14 +51,14 @@ export default function OrderTableRow({
     users_id,
   } = row;
 
-  const { enqueueSnackbar } = useSnackbar();
-  const queryClient = useQueryClient();
+  // const { enqueueSnackbar } = useSnackbar();
+  // const queryClient = useQueryClient();
   const confirm = useBoolean();
 
   const collapse = useBoolean();
 
-  const popover = usePopover(); // buat popover lain
-  const statusPopover = usePopover(); // khusus popover Status
+  const popover = usePopover();
+  const statusPopover = usePopover();
 
   const handleChangeStatus = async (newStatus) => {
     statusPopover.onClose();
@@ -69,7 +69,6 @@ export default function OrderTableRow({
         users_id: users_id,
       });
 
-      // setelah berhasil
       // enqueueSnackbar('Status berhasil diubah!');
       // queryClient.invalidateQueries({ queryKey: ['order'] });
       // queryClient.invalidateQueries({ queryKey: ['fetch.cart'] });
@@ -78,16 +77,25 @@ export default function OrderTableRow({
     }
   };
 
+  const statusLabel = {
+    pending: 'Belum Bayar',
+    paid: 'Dikemas',
+    shipped: 'Dikirim',
+    delivered: 'Selesai',
+    canceled: 'Dibatalkan',
+  };
+
   const renderPrimary = (
     <TableRow hover selected={selected}>
-      <TableCell padding="checkbox">
+      {/* <TableCell padding="checkbox">
         <Checkbox checked={selected} onClick={onSelectRow} />
-      </TableCell>
+      </TableCell> */}
 
       <TableCell>
         <Box
           onClick={onViewRow}
           sx={{
+            alignItems: 'center',
             cursor: 'pointer',
             '&:hover': {
               textDecoration: 'underline',
@@ -134,7 +142,6 @@ export default function OrderTableRow({
         <CustomPopover
           open={statusPopover.open}
           onClose={statusPopover.onClose}
-          // anchorEl={statusPopover.anchorRef.current}
           sx={{ width: 160 }}
         >
           {['pending', 'paid', 'shipped', 'delivered', 'canceled'].map((option) => (
@@ -144,7 +151,7 @@ export default function OrderTableRow({
               selected={option === status}
               sx={{ typography: 'body2', textTransform: 'capitalize' }}
             >
-              {option}
+              {statusLabel[option] || option}
             </MenuItem>
           ))}
         </CustomPopover>
@@ -159,13 +166,13 @@ export default function OrderTableRow({
             (status === 'canceled' && 'error') ||
             'default'
           }
-          onClick={statusPopover.onOpen} // <= ini beda
+          onClick={statusPopover.onOpen}
           sx={{
             textTransform: 'capitalize',
             cursor: 'pointer',
           }}
         >
-          {status}
+          {statusLabel[status] || status}
         </Label>
       </TableCell>
 
@@ -253,7 +260,7 @@ export default function OrderTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             confirm.onTrue();
             popover.onClose();
@@ -262,7 +269,7 @@ export default function OrderTableRow({
         >
           <Iconify icon="solar:trash-bin-trash-bold" />
           Delete
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => {
@@ -271,11 +278,11 @@ export default function OrderTableRow({
           }}
         >
           <Iconify icon="solar:eye-bold" />
-          View
+          Lihat
         </MenuItem>
       </CustomPopover>
 
-      <ConfirmDialog
+      {/* <ConfirmDialog
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
@@ -285,7 +292,7 @@ export default function OrderTableRow({
             Delete
           </Button>
         }
-      />
+      /> */}
     </>
   );
 }
