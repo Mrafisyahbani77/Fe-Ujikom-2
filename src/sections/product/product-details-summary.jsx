@@ -110,7 +110,7 @@ export default function ProductDetailsSummary({
   const handleAddCart = useCallback(() => {
     if (!user) {
       enqueueSnackbar('Anda harus login dulu', { variant: 'warning' });
-      router.push('/auth/jwt/login');
+      router.push('/auth/login');
       return;
     }
 

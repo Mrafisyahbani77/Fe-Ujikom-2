@@ -140,7 +140,7 @@ export default function JwtRegisterView() {
   return (
     <>
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
-        <Typography variant="h4">Register</Typography>
+        <Typography variant="h4">Register </Typography>
         <Stack direction="row" spacing={0.5}>
           <Typography variant="body2">Sudah punya akun?</Typography>
           <Link href={paths.auth.jwt.login} component={RouterLink} variant="subtitle2">

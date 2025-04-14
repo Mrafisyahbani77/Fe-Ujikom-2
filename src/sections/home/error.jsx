@@ -18,7 +18,7 @@ export default function Error() {
     }
 
     // Redirect ke halaman login setelah beberapa detik
-    setTimeout(() => navigate("/auth/jwt/login"), 1000);
+    setTimeout(() => navigate("/auth/jw/login"), 1000);
   }, [navigate]);
 
   return <div>{errorMessage} Mengalihkan ke login...</div>;

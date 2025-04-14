@@ -82,7 +82,7 @@ axiosInstance.interceptors.response.use(
 
         // Hapus sesi jika refresh token gagal
         localStorage.removeItem('accessToken');
-        window.location.href = '/auth/jwt/login'; // Redirect ke halaman login
+        window.location.href = '/auth/login'; // Redirect ke halaman login
 
         return Promise.reject(err);
       } finally {
@@ -127,6 +127,8 @@ export const endpoints = {
     products_sold: 'api/chart/products-sold',
     sales_by_gender: 'api/chart/sales-by-gender',
     sales_yearly: 'api/chart/sales-yearly',
+    total_user: 'api/chart/total-users',
+    total_produk: 'api/chart/total-products',
   },
   banner: {
     public: {

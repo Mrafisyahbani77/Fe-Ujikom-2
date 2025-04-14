@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 // @mui
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
@@ -18,7 +18,7 @@ export default function EcommerceYearlySales({ title, subheader, chart, ...other
 
   const popover = usePopover();
 
-  const [seriesData, setSeriesData] = useState('2019');
+  const [seriesData, setSeriesData] = useState(series[0]?.year || '2019'); // Default ke tahun pertama
 
   const chartOptions = useChart({
     colors,
@@ -94,7 +94,12 @@ export default function EcommerceYearlySales({ title, subheader, chart, ...other
 }
 
 EcommerceYearlySales.propTypes = {
-  chart: PropTypes.object,
+  chart: PropTypes.shape({
+    categories: PropTypes.array.isRequired,
+    series: PropTypes.array.isRequired,
+    options: PropTypes.object,
+    colors: PropTypes.array,
+  }).isRequired,
   subheader: PropTypes.string,
   title: PropTypes.string,
 };

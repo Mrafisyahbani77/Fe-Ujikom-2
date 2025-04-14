@@ -22,7 +22,7 @@ const JwtRegisterPage = lazy(() => import('src/pages/auth/jwt/register'));
 // ----------------------------------------------------------------------
 
 const authJwt = {
-  path: 'jwt',
+  path: '',
   element: (
     <GuestGuard>
       <Suspense fallback={<SplashScreen />}>

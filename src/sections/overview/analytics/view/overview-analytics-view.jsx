@@ -33,7 +33,10 @@ import {
   useFetchChartProductSold,
   useFetchChartSaleByGender,
   useFetchChartYearly,
+  useFetchTotalUser,
+  useFetchTotalProducts,
 } from 'src/utils/chart';
+import { useMemo } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -43,16 +46,55 @@ export default function OverviewAnalyticsView() {
   const { data = [], isLoading, isError } = useFetchChartWeekly();
   const { data: total_order, isLoading: load, isError: error } = useFetchChartOrder();
   const { data: soldData = [], isLoading: loading, isError: Error } = useFetchChartProductSold();
-  // const { data: gender = [], isLoading: fetching } = useFetchChartSaleByGender();
-  const { data: year, isLoading: loadd, isError: ERror } = useFetchChartYearly();
-
-  console.log(year);
-
   const {
     data: genderData = [],
     isLoading: fetching,
     isError: not_work,
   } = useFetchChartSaleByGender();
+  const { data: year, isLoading: isloading, isError: iserror } = useFetchChartYearly();
+  const { data: user } = useFetchTotalUser();
+  const { data: total_product } = useFetchTotalProducts();
+
+  const chartData = {
+    categories: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ],
+    series: (year?.data || []).map((yearItem) => ({
+      year: yearItem.year.toString(), // format string untuk tahun
+      data: [
+        {
+          name: 'Total Pendapatan',
+          data: yearItem.months.map(
+            (month) =>
+              month.totals.find((item) => item.total_income !== undefined)?.total_income || 0
+          ),
+        },
+        {
+          name: 'Total Penjualan',
+          data: yearItem.months.map(
+            (month) => month.totals.find((item) => item.sales !== undefined)?.sales || 0
+          ),
+        },
+        {
+          name: 'Total Produk',
+          data: yearItem.months.map(
+            (month) => month.totals.find((item) => item.total_items !== undefined)?.total_items || 0
+          ),
+        },
+      ],
+    })),
+  };
 
   const gender = {
     total: Array.isArray(genderData)
@@ -73,8 +115,6 @@ export default function OverviewAnalyticsView() {
     chart_data: Array.isArray(soldData) ? soldData.map((item) => Number(item.total_sold)) : [],
   };
 
-  console.log(sold);
-
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
       {/* <Typography
@@ -89,7 +129,7 @@ export default function OverviewAnalyticsView() {
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
-            title="Weekly Sales"
+            title="Penjualan Perminggu"
             total={data[0]?.sales || 0}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
           />
@@ -97,19 +137,28 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
-            title="New Users"
-            total={1352831}
-            color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={6}>
-          <AnalyticsWidgetSummary
             title="Total produk order"
             total={total_order?.total_orders || 0}
             color="warning"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={3}>
+          <AnalyticsWidgetSummary
+            title="Total Produk"
+            total={total_product.total_products || 0}
+            color="error"
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={3}>
+          <AnalyticsWidgetSummary
+            title="Total Pengguna"
+            total={user.total_users || 0}
+            color="info"
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
         </Grid>
 
@@ -137,63 +186,11 @@ export default function OverviewAnalyticsView() {
           />
         </Grid> */}
 
-        {/* <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="Bug Reports"
-            total={234}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
-          />
-        </Grid> */}
-
         <Grid xs={12} md={6} lg={6}>
           <EcommerceYearlySales
-            title="Yearly Sales"
-            subheader="(+43%) than last year"
-            chart={{
-              categories: [
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              series: [
-                {
-                  year: '2019',
-                  data: [
-                    {
-                      name: 'Total Income',
-                      data: [10, 41, 35, 51, 49, 62, 69, 91, 148, 35, 51, 49],
-                    },
-                    {
-                      name: 'Total Expenses',
-                      data: [10, 34, 13, 56, 77, 88, 99, 77, 45, 13, 56, 77],
-                    },
-                  ],
-                },
-                {
-                  year: '2020',
-                  data: [
-                    {
-                      name: 'Total Income',
-                      data: [51, 35, 41, 10, 91, 69, 62, 148, 91, 69, 62, 49],
-                    },
-                    {
-                      name: 'Total Expenses',
-                      data: [56, 13, 34, 10, 77, 99, 88, 45, 77, 99, 88, 77],
-                    },
-                  ],
-                },
-              ],
-            }}
+            title="Penjualan pertahun"
+            // subheader="(+43%) than last year"
+            chart={chartData} // pass chartData yang sudah dipersiapkan
           />
         </Grid>
 
@@ -260,7 +257,7 @@ export default function OverviewAnalyticsView() {
           <EcommerceLatestProducts title="Latest Products" list={_ecommerceLatestProducts} />
         </Grid>
 
-        <Grid xs={12} md={4}>
+        {/* <Grid xs={12} md={4}>
           <EcommerceWidgetSummary
             title="Produk"
             percent={sold?.percent_change || 0}
@@ -271,7 +268,7 @@ export default function OverviewAnalyticsView() {
             }}
             loading={loading}
           />
-        </Grid>
+        </Grid> */}
 
         {/* <Grid xs={12} md={6} lg={4}>
           <AnalyticsOrderTimeline title="Order Timeline" list={_analyticOrderTimeline} />
