@@ -224,4 +224,9 @@ export const endpoints = {
     delete: '/api/reviews',
     create: '/api/reviews/store',
   },
+  user: {
+    getAllUser: '/api/users',
+    getById: '/api/users',
+    banUser: '/api/users',
+  },
 };
