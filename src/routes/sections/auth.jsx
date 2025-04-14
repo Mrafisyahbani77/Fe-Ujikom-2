@@ -55,7 +55,7 @@ const authJwt = {
       ),
       children: [
         { path: 'verify', element: <AmplifyVerifyPage /> },
-        { path: 'new-password', element: <AmplifyNewPasswordPage /> },
+        { path: 'new-password/:resetToken', element: <AmplifyNewPasswordPage /> },
         { path: 'forgot-password', element: <AmplifyForgotPasswordPage /> },
       ],
     },

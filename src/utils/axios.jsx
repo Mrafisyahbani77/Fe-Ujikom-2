@@ -116,6 +116,9 @@ export const endpoints = {
     refreshToken: '/api/auth/refresh-token',
     google: '/api/auth/google',
     googleCallback: 'api/auth/google/callback',
+    forgotpassword: 'api/auth/forgot-password',
+    verifyotp: 'api/auth/verify-otp',
+    resetpassword: 'api/auth/reset-password',
   },
   public: {
     fetchAllCategory: '/api/categories',

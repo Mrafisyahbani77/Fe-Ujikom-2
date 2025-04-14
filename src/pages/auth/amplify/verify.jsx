@@ -8,7 +8,7 @@ export default function VerifyPage() {
   return (
     <>
       <Helmet>
-        <title> Amplify: Verify</title>
+        <title> Verify</title>
       </Helmet>
 
       <AmplifyVerifyView />

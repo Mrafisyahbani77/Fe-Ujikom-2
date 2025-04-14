@@ -17,11 +17,26 @@ import { PasswordIcon } from 'src/assets/icons';
 // components
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import { useMutationForgotPassword } from 'src/utils/auth/useMutationForgotPassword';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
 export default function AmplifyForgotPasswordView() {
-  const { forgotPassword } = useAuthContext();
+  // const { forgotPassword } = useAuthContext();
+  const { enqueueSnackbar } = useSnackbar();
+  const { mutateAsync: forgotPassword } = useMutationForgotPassword({
+    onSuccess: () => {
+      console.log('success');
+      enqueueSnackbar('Check your email for the verification code', {
+        variant: 'success',
+      });
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
 
   const router = useRouter();
 
@@ -45,14 +60,14 @@ export default function AmplifyForgotPasswordView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await forgotPassword?.(data.email);
+      await forgotPassword({ email: data.email });
 
       const searchParams = new URLSearchParams({
         email: data.email,
       }).toString();
 
-      const href = `${paths.auth.amplify.newPassword}?${searchParams}`;
-      router.push(href);
+      // const href = `${paths.auth.amplify.verify}?${searchParams}`
+      router.push(paths.auth.jwt.verify);
     } catch (error) {
       console.error(error);
     }

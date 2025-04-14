@@ -7,3 +7,6 @@ export * from './useMutationLogout';
 export * from './useMutationUpdateProfile';
 export * from './useMutationUpdatePassword';
 export * from './useFetchProfile';
+export * from './useMutationVerifyOtp';
+export * from './useMutationResetPassword';
+export * from './useMutationForgotPassword';
