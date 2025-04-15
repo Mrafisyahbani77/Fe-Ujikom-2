@@ -13,6 +13,9 @@ import { fDateTime } from 'src/utils/format-time';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { useDownloadInvoice, useMutationCreateInvoice } from 'src/utils/order';
+import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +28,38 @@ export default function OrderDetailsToolbar({
   onChangeStatus,
 }) {
   const popover = usePopover();
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+
+  const { mutate: generateInvoice } = useMutationCreateInvoice({
+    onSuccess: async () => {
+      enqueueSnackbar('Invoice berhasil di generate', { variant: 'success' });
+      queryClient.invalidateQueries(['order']);
+
+      try {
+        const fileData = await useDownloadInvoice(orderNumber);
+        const blob = new Blob([fileData], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice_${orderNumber}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error(error);
+        enqueueSnackbar('Failed to download invoice', { variant: 'error' });
+      }
+    },
+    onError: (error) => {
+      enqueueSnackbar(error?.response?.data?.message || 'Failed to generate invoice', {
+        variant: 'error',
+      });
+    },
+  });
+
+  const handleGenerate = () => {
+    generateInvoice({ order_id: orderNumber });
+  };
 
   return (
     <>
@@ -81,7 +116,9 @@ export default function OrderDetailsToolbar({
 
           <Button
             color="inherit"
+            type="submit"
             variant="outlined"
+            onClick={handleGenerate}
             startIcon={<Iconify icon="solar:printer-minimalistic-bold" />}
           >
             Print

@@ -203,6 +203,8 @@ export const endpoints = {
     update: '/api/order',
     delete: '/api/order',
     create: '/api/order/from-cart',
+    exportInvoice: '/api/order',
+    downloadInvoice: '/api/order',
   },
   payment: {
     buy: '/api/payments',
