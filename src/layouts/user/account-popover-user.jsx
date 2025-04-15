@@ -40,6 +40,10 @@ const OPTIONS = [
     label: 'Riwayat order',
     linkTo: paths.historyorder,
   },
+  {
+    label: 'Wishlist',
+    linkTo: paths.wishlist,
+  },
 ];
 
 // ----------------------------------------------------------------------

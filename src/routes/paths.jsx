@@ -20,6 +20,7 @@ export const paths = {
   payment: '/payment',
   about: '/about-us',
   success: '/success',
+  wishlist: '/wishlist',
   shipping: '/shipping',
   historyorder: '/riwayat-order',
   historyorderId: '/riwayat-order/:id',

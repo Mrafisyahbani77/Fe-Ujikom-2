@@ -13,6 +13,7 @@ import Error from 'src/sections/home/error';
 import ShippingView from 'src/sections/checkout/shipping-view';
 import OrderDetailsPage from 'src/pages/dashboard/order/details';
 import HomeOrder from 'src/sections/home/home-order';
+import HomeWishlist from 'src/sections/home/home-wishlist';
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ export const mainRoutes = [
       { path: 'shipping', element: <ShippingView /> },
       { path: 'riwayat-order/:id', element: <OrderDetailsPage /> },
       { path: 'riwayat-order', element: <HomeOrder /> },
+      { path: 'wishlist', element: <HomeWishlist /> },
       {
         path: 'product',
         children: [
