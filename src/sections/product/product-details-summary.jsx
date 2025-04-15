@@ -86,25 +86,16 @@ export default function ProductDetailsSummary({
   });
 
   const { reset, watch, control, setValue, handleSubmit } = methods;
+  const { data: wishlistData } = useFetchWhislist();
   const [wishlist, setWishlist] = useState([]);
-  const { data: wishlistData = [] } = useFetchWhislist();
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
-    // Periksa jika wishlistData sudah ada
-    if (Array.isArray(wishlistData)) {
-      setWishlist(wishlistData);
+    if (Array.isArray(wishlistData?.data)) {
+      setWishlist(wishlistData.data);
     } else {
-      setWishlist([]); // Atur wishlist menjadi array kosong jika tidak valid
+      setWishlist([]);
     }
   }, [wishlistData]);
-
-  useEffect(() => {
-    if (wishlist.length > 0 && product?.id) {
-      const isProductWishlisted = wishlist.some((item) => item.product.id === product.id);
-      setIsWishlisted(isProductWishlisted);
-    }
-  }, [wishlist, product?.id]);
 
   const values = watch();
 
@@ -180,22 +171,24 @@ export default function ProductDetailsSummary({
   });
 
   const handleWishlist = async (productId) => {
-    const isWishlisted = wishlist.some((id) => id === productId);
+    const isProductWishlisted = wishlist.some((item) => item.product.id === productId);
 
     try {
-      if (isWishlisted) {
+      if (isProductWishlisted) {
         await RemoveWishlist({ products_id: productId });
-        setWishlist((prev) => prev.filter((id) => id !== productId));
+        setWishlist((prev) => prev.filter((item) => item.product.id !== productId));
       } else {
         await AddWishlist({ products_id: productId });
-        setWishlist((prev) => [...prev, productId]);
+
+        const newItem = { product: { id: productId }, is_wishlist: true };
+        setWishlist((prev) => [...prev, newItem]);
       }
     } catch (error) {
       console.error('Error with wishlist operation:', error);
     }
   };
 
-  // const isWishlisted = wishlist.some((item) => item.product.id === product?.id);
+  const isWishlisted = wishlist.some((item) => item.product.id === product?.id);
 
   const renderPrice = (
     <Box sx={{ typography: 'h5' }}>
@@ -245,7 +238,7 @@ export default function ProductDetailsSummary({
           width={16}
           sx={{ mr: 1 }}
         />
-        {isWishlisted ? 'Disimpan' : 'Simpan'} {/* Change text based on wishlist status */}
+        {isWishlisted ? 'Disimpan' : 'Simpan'}
       </Link>
 
       <Link

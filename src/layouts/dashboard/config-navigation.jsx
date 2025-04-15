@@ -41,6 +41,9 @@ const ICONS = {
   ecommerce: icon('ic_ecommerce'),
   analytics: icon('ic_analytics'),
   dashboard: icon('ic_dashboard'),
+  category: <Iconify icon="mdi:tag" />, // Updated icon for category
+  discount: <Iconify icon="mdi:percent" />, // Updated icon for discount
+  banner: <Iconify icon="mdi:flag" />,
 };
 
 // ----------------------------------------------------------------------
@@ -85,7 +88,7 @@ export function useNavData() {
         {
           title: 'category',
           path: paths.dashboard.category.root,
-          icon: ICONS.user,
+          icon: ICONS.category,
           children: [
             { title: 'list', path: paths.dashboard.category.list },
             { title: 'create', path: paths.dashboard.category.new },
@@ -96,7 +99,7 @@ export function useNavData() {
         {
           title: 'discount',
           path: paths.dashboard.discount.root,
-          icon: ICONS.user,
+          icon: ICONS.discount,
           children: [
             { title: 'list', path: paths.dashboard.discount.list },
             { title: 'create', path: paths.dashboard.discount.new },
@@ -107,7 +110,7 @@ export function useNavData() {
         {
           title: 'banner',
           path: paths.dashboard.banner.root,
-          icon: ICONS.user,
+          icon: ICONS.banner,
           children: [
             { title: 'list', path: paths.dashboard.banner.list },
             { title: 'create', path: paths.dashboard.banner.new },
