@@ -14,6 +14,11 @@ import {
   Tabs,
   Tab,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -25,20 +30,50 @@ import { fCurrency } from 'src/utils/format-number';
 import { useMutationBuy } from 'src/utils/payment';
 import Iconify from 'src/components/iconify';
 import { useSnackbar } from 'notistack';
+import Label from 'src/components/label';
+import { useMutationCancel } from 'src/utils/order/useMutationCancel';
+import { useQueryClient } from '@tanstack/react-query';
+
+const STATUS_OPTIONS = [
+  { value: 'all', label: 'Semua', color: 'default' },
+  { value: 'pending', label: 'Belum Bayar', color: 'warning' },
+  { value: 'paid', label: 'Dikemas', color: 'warning' },
+  { value: 'shipped', label: 'Dikirim', color: 'info' },
+  { value: 'delivered', label: 'Selesai', color: 'success' },
+  { value: 'cancellation_requested', label: 'Dibatalkan', color: 'error' },
+];
 
 // Define order status options for tabs
-const STATUS_OPTIONS = ['all', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-
 export default function HomeOrder() {
   const { data, isLoading, error } = useFetchOrder();
+  const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const review = useBoolean();
   const [selectedReview, setSelectedReview] = useState(null);
   const [currentTab, setCurrentTab] = useState('all');
+  const confirmCancel = useBoolean();
+  const [cancelOrderId, setCancelOrderId] = useState(null);
+  const [cancelReason, setCancelReason] = useState('');
 
   const handleChangeTab = (event, newValue) => {
     setCurrentTab(newValue);
   };
+
+  const handleClickCancel = (orderId) => {
+    setCancelOrderId(orderId);
+    confirmCancel.onTrue();
+  };
+
+  const { mutate: Cancel } = useMutationCancel({
+    onSuccess: () => {
+      enqueueSnackbar('Order berhasil dibatalkan', { variant: 'success' });
+      queryClient.invalidateQueries(['order']);
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    },
+  });
 
   const { mutate: Payment, isLoading: Load } = useMutationBuy({
     onSuccess: (res) => {
@@ -69,6 +104,15 @@ export default function HomeOrder() {
     Payment({ order_id: orderId });
   };
 
+  const handleCancel = (orderId, reason) => {
+    if (!orderId) {
+      enqueueSnackbar('Order ID tidak ditemukan!', { variant: 'error' });
+      return;
+    }
+
+    Cancel({ id: orderId, reason });
+  };
+
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" marginTop={4}>
@@ -81,8 +125,18 @@ export default function HomeOrder() {
     return <Typography color="error">Gagal mengambil data: {error.message}</Typography>;
   }
 
+  const STATUS_MAP = STATUS_OPTIONS.reduce((acc, item) => {
+    acc[item.value] = { label: item.label, color: item.color };
+    return acc;
+  }, {});
+
+  const validStatuses = STATUS_OPTIONS.map((s) => s.value);
   const filteredOrders =
-    currentTab === 'all' ? data : data?.filter((order) => order.status === currentTab);
+    currentTab === 'all'
+      ? data
+      : data?.filter(
+          (order) => validStatuses.includes(order.status) && order.status === currentTab
+        );
 
   return (
     <Container maxWidth="lg" sx={{ my: 10 }}>
@@ -100,14 +154,31 @@ export default function HomeOrder() {
         scrollButtons="auto"
         variant="scrollable"
       >
-        {STATUS_OPTIONS.map((tab) => (
-          <Tab
-            key={tab}
-            value={tab}
-            label={tab === 'all' ? 'Semua' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-            sx={{ textTransform: 'capitalize' }}
-          />
-        ))}
+        {STATUS_OPTIONS.map((tab) => {
+          const count =
+            tab.value === 'all'
+              ? data.length
+              : data.filter((order) => order.status === tab.value).length;
+
+          const isActive = tab.value === currentTab;
+
+          return (
+            <Tab
+              key={tab.value}
+              iconPosition="end"
+              value={tab.value}
+              label={tab.label}
+              icon={
+                <Label
+                  variant={isActive ? 'filled' : 'soft'}
+                  color={STATUS_MAP[tab.value]?.color || 'default'}
+                >
+                  {count}
+                </Label>
+              }
+            />
+          );
+        })}
       </Tabs>
 
       <Grid container spacing={3}>
@@ -140,19 +211,12 @@ export default function HomeOrder() {
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
                       <Chip
-                        label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        color={
-                          order.status === 'delivered'
-                            ? 'success'
-                            : order.status === 'cancelled'
-                            ? 'error'
-                            : order.status === 'shipped'
-                            ? 'info'
-                            : 'warning'
-                        }
+                        label={STATUS_MAP[order.status]?.label || order.status}
+                        color={STATUS_MAP[order.status]?.color || 'default'}
                         size="small"
                         sx={{ mb: 1 }}
                       />
+
                       <Typography variant="subtitle2">
                         Total: {fCurrency(order.total_price)}
                       </Typography>
@@ -225,6 +289,16 @@ export default function HomeOrder() {
                               fullWidth
                             >
                               Lihat Detail
+                            </Button>
+
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="large"
+                              startIcon={<Iconify icon="eva:close-circle-fill" />}
+                              onClick={() => handleClickCancel(order.id)}
+                            >
+                              Batalkan Pesanan
                             </Button>
 
                             {order.status === 'delivered' ? (
@@ -300,6 +374,40 @@ export default function HomeOrder() {
           ))
         )}
       </Grid>
+
+      <Dialog open={confirmCancel.value} onClose={confirmCancel.onFalse} fullWidth maxWidth="sm">
+        <DialogTitle>Alasan Pembatalan</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Masukkan alasan pembatalan"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            multiline
+            rows={3}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={confirmCancel.onFalse} color="inherit">
+            Batal
+          </Button>
+          <Button
+            onClick={() => {
+              if (!cancelReason.trim()) {
+                enqueueSnackbar('Alasan pembatalan harus diisi', { variant: 'warning' });
+                return;
+              }
+              handleCancel(cancelOrderId, cancelReason);
+              confirmCancel.onFalse();
+              setCancelReason('');
+            }}
+            color="error"
+            variant="contained"
+          >
+            Konfirmasi
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Pop up Form Review */}
       {selectedReview && (

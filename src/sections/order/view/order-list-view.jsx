@@ -182,7 +182,7 @@ export default function OrderListView() {
     // { value: 'processing', label: 'Proses' },
     { value: 'shipped', label: 'Dikirim' },
     { value: 'delivered', label: 'Selesai' },
-    { value: 'cancelled', label: 'Dibatalkan' },
+    { value: 'cancellation_requested', label: 'Dibatalkan' },
   ];
 
   return (
