@@ -32,6 +32,7 @@ const initialState = {
 
 export function CheckoutProvider({ children }) {
   const router = useRouter();
+  // const [checkout, setCheckout] = useState(null);
   const { user } = useAuthContext();
   const users = user?.data;
   console.log(users);
@@ -351,7 +352,7 @@ export function CheckoutProvider({ children }) {
         if (discount.id) {
           payload.discount_id = discount.id;
         } else if (discount.code) {
-          payload.discount_code = discount.code;
+          payload.discount.code = discount.code;
         }
       }
 
@@ -385,6 +386,12 @@ export function CheckoutProvider({ children }) {
     }
   }, [completed, router]);
 
+  const resetCheckout = useCallback(() => {
+    setState(initialState);
+    setActiveStep(0);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
+
   const memoizedValue = useMemo(
     () => ({
       ...state,
@@ -403,8 +410,9 @@ export function CheckoutProvider({ children }) {
       onGotoStep,
       onReset,
       orderData,
+      resetCheckout,
     }),
-    [state, activeStep, completed]
+    [state, activeStep, completed, resetCheckout]
   );
 
   return <CheckoutContext.Provider value={memoizedValue}>{children}</CheckoutContext.Provider>;

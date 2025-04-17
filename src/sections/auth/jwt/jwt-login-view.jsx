@@ -26,6 +26,7 @@ import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import { useMutationLogin } from 'src/utils/auth';
 import { useSnackbar } from 'notistack';
 import { HOST_API } from 'src/config-global';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function JwtLoginView() {
   const { enqueueSnackbar } = useSnackbar();
@@ -33,6 +34,7 @@ export default function JwtLoginView() {
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState('');
   const password = useBoolean();
+  const queryClient = useQueryClient();
 
   // const { mutate: mutationLogin } = useMutationLogin({
   //   onSuccess: (response) => {
@@ -105,6 +107,7 @@ export default function JwtLoginView() {
       }
 
       enqueueSnackbar('Login berhasil!', { variant: 'success' });
+      queryClient.invalidateQueries({ queryKey: ['fetch.cart'] }); // refresh cart
     } catch (error) {
       const errorMessage = error?.response?.data?.error || 'Terjadi kesalahan';
 

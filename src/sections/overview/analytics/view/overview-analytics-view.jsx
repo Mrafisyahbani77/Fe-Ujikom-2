@@ -23,10 +23,7 @@ import AnalyticsWidgetSummary from '../analytics-widget-summary';
 import AnalyticsTrafficBySite from '../analytics-traffic-by-site';
 import AnalyticsCurrentSubject from '../analytics-current-subject';
 import AnalyticsConversionRates from '../analytics-conversion-rates';
-import EcommerceLatestProducts from '../../e-commerce/ecommerce-latest-products';
-import EcommerceWidgetSummary from '../../e-commerce/ecommerce-widget-summary';
-import EcommerceSaleByGender from '../../e-commerce/ecommerce-sale-by-gender';
-import EcommerceYearlySales from '../../e-commerce/ecommerce-yearly-sales';
+
 import {
   useFetchChartWeekly,
   useFetchChartOrder,
@@ -37,11 +34,22 @@ import {
   useFetchTotalProducts,
 } from 'src/utils/chart';
 import { useMemo } from 'react';
+import { SeoIllustration } from 'src/assets/illustrations';
+import { Button } from '@mui/material';
+import { useAuthContext } from 'src/auth/hooks';
+import EcommerceSaleByGender from '../ecommerce-sale-by-gender';
+import EcommerceLatestProducts from '../ecommerce-latest-products';
+import EcommerceYearlySales from '../ecommerce-yearly-sales';
+import EcommerceWidgetSummary from '../ecommerce-widget-summary';
+import AppWelcome from '../app-welcome';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
+  const { user } = useAuthContext();
+  const users = user.data;
+  // console.log(users)
   const theme = useTheme();
   const { data = [], isLoading, isError } = useFetchChartWeekly();
   const { data: total_order, isLoading: load, isError: error } = useFetchChartOrder();
@@ -52,7 +60,7 @@ export default function OverviewAnalyticsView() {
     isError: not_work,
   } = useFetchChartSaleByGender();
   const { data: year, isLoading: isloading, isError: iserror } = useFetchChartYearly();
-  const { data: user } = useFetchTotalUser();
+  const { data: User } = useFetchTotalUser();
   const { data: total_product } = useFetchTotalProducts();
 
   const chartData = {
@@ -117,15 +125,13 @@ export default function OverviewAnalyticsView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      {/* <Typography
-        variant="h4"
-        sx={{
-          mb: { xs: 3, md: 5 },
-        }}
-      >
-        Hi, Welcome back 👋
-      </Typography> */}
-
+      <Grid xs={12} md={8} sx={{ mb: 5 }}>
+        <AppWelcome
+          title={`Welcome back 👋 \n ${users?.username}`}
+          // description="If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything."
+          img={<SeoIllustration />}
+        />
+      </Grid>
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
@@ -156,7 +162,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Pengguna"
-            total={user.total_users || 0}
+            total={User.total_users || 0}
             color="info"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />

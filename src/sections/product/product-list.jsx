@@ -43,9 +43,9 @@ export default function ProductList({ products, loading, ...other }) {
         {loading ? renderSkeleton : renderList}
       </Box>
 
-      {products?.length > 8 && (
+      {products?.length > 0 && (
         <Pagination
-          count={8}
+          // count={8}
           sx={{
             mt: 8,
             [`& .${paginationClasses.ul}`]: {

@@ -34,13 +34,13 @@ import { useEffect, useState } from 'react';
 export default function Header() {
   const theme = useTheme();
   const data = navConfig();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { authenticated } = useAuthContext();
 
-  useEffect(() => {
-    // Cek apakah token tersimpan di localStorage
-    const token = localStorage.getItem('accessToken');
-    setIsAuthenticated(!!token); // Jika token ada, berarti sudah login
-  }, []);
+  // useEffect(() => {
+  //   // Cek apakah token tersimpan di localStorage
+  //   const token = localStorage.getItem('accessToken');
+  //   setIsAuthenticated(!!token); // Jika token ada, berarti sudah login
+  // }, []);
 
   const mdUp = useResponsive('up', 'md');
 
@@ -86,7 +86,7 @@ export default function Header() {
           {mdUp && <NavDesktop offsetTop={offsetTop} data={data} />}
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
-            {isAuthenticated ? (
+            {authenticated ? (
               <AccountPopoverUser />
             ) : (
               <Button

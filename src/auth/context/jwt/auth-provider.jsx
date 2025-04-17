@@ -4,6 +4,8 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 import { AuthContext } from './auth-context';
 import { setSession } from './utils';
 import { useRouter } from 'src/routes/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCheckoutContext } from 'src/sections/checkout/context';
 
 // ----------------------------------------------------------------------
 const initialState = {
@@ -54,6 +56,7 @@ const STORAGE_KEY = 'accessToken';
 
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  // const { resetCheckout } = useCheckoutContext();
   const router = useRouter();
 
   const initialize = useCallback(async () => {
@@ -145,6 +148,8 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const queryClient = useQueryClient();
+
   const logout = useCallback(async () => {
     const refreshToken = localStorage.getItem('refreshToken');
 
@@ -154,7 +159,9 @@ export function AuthProvider({ children }) {
       console.error('Logout Error:', error);
     } finally {
       setSession(null, null);
+      queryClient.invalidateQueries({ queryKey: ['fetch.cart'] }); // refresh cart
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('checkout_activeStep');
       localStorage.removeItem(STORAGE_KEY);
       dispatch({ type: 'LOGOUT' });
       router.push('/login');

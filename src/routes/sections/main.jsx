@@ -42,9 +42,9 @@ export const mainRoutes = [
       </MainLayout>
     ),
     children: [
-      { path: 'about-us', element: <AboutPage /> },
-      { path: 'contact-us', element: <ContactPage /> },
-      { path: 'faqs', element: <FaqsPage /> },
+      // { path: 'about-us', element: <AboutPage /> },
+      // { path: 'contact-us', element: <ContactPage /> },
+      // { path: 'faqs', element: <FaqsPage /> },
       { path: 'profile', element: <AccountUser /> },
       { path: 'category/:slug', element: <Category /> },
       { path: 'success', element: <Success /> },

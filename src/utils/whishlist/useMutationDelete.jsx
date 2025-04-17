@@ -4,8 +4,8 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 export const useMutationDeleteWhislist = ({ onError, onSuccess }) => {
   return useMutation({
     mutationKey: ['delete.whistlist'],
-    mutationFn: async (id) => {
-      const response = await axiosInstance.delete(`${endpoints.whishlist.delete}/${id}`);
+    mutationFn: async (wishlistId) => {
+      const response = await axiosInstance.delete(`${endpoints.whishlist.delete}/${wishlistId}`);
       return response;
     },
     onError,

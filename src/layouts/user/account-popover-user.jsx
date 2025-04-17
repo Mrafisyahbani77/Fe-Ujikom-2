@@ -24,6 +24,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { useCheckoutContext } from 'src/sections/checkout/context';
 
 // ----------------------------------------------------------------------
 
@@ -50,6 +51,8 @@ const OPTIONS = [
 
 export default function AccountPopoverUser() {
   const router = useRouter();
+
+  const { resetCheckout } = useCheckoutContext();
 
   // const { user } = useMockedUser();
 
@@ -94,9 +97,7 @@ export default function AccountPopoverUser() {
       await logout();
       setOpenDialog(false);
       router.replace('/');
-      setTimeout(() => {
-        window.location.reload(); // Refresh halaman agar reset state
-      }, 100);
+      resetCheckout();
       enqueueSnackbar('Logout Berhasil!', { variant: 'success' });
     } catch (error) {
       enqueueSnackbar('Gagal log out!', { variant: 'error' });

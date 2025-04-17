@@ -30,6 +30,7 @@ import {
   useMutationCreateWhislist,
   useMutationDeleteWhislist,
 } from 'src/utils/whishlist';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,7 @@ export default function ProductDetailsSummary({
   const router = useRouter();
   const { user } = useAuthContext(); // Cek user login
   const { enqueueSnackbar } = useSnackbar(); // Buat notif
+  const queryClient = useQueryClient();
 
   const {
     id,
@@ -149,6 +151,7 @@ export default function ProductDetailsSummary({
       enqueueSnackbar('Berhasil menambahkan ke wishlist', {
         variant: 'success',
       });
+      queryClient.invalidateQueries(['fetch.whishlist']);
     },
     onError: (error) => {
       enqueueSnackbar(error?.response?.data?.message, {
@@ -162,6 +165,7 @@ export default function ProductDetailsSummary({
       enqueueSnackbar('Berhasil hapus produk dari wishlist', {
         variant: 'success',
       });
+      queryClient.invalidateQueries(['fetch.whishlist']);
     },
     onError: (error) => {
       enqueueSnackbar(error?.response?.data?.message, {
@@ -171,16 +175,19 @@ export default function ProductDetailsSummary({
   });
 
   const handleWishlist = async (productId) => {
-    const isProductWishlisted = wishlist.some((item) => item.product.id === productId);
+    const existingItem = wishlist.find((item) => item.product.id === productId);
 
     try {
-      if (isProductWishlisted) {
-        await RemoveWishlist({ products_id: productId });
+      if (existingItem) {
+        const wishlistId = existingItem.wishlist_id; // ambil wishlist_id yang sebenarnya
+        await RemoveWishlist(wishlistId);
+
         setWishlist((prev) => prev.filter((item) => item.product.id !== productId));
       } else {
         await AddWishlist({ products_id: productId });
 
-        const newItem = { product: { id: productId }, is_wishlist: true };
+        // biasanya respons create akan return data baru, tapi kalau tidak ada:
+        const newItem = { id: new Date().getTime(), product: { id: productId }, is_wishlist: true }; // id sementara
         setWishlist((prev) => [...prev, newItem]);
       }
     } catch (error) {

@@ -21,17 +21,17 @@ import AccountChangePassword from '../account-change-password';
 const TABS = [
   {
     value: 'general',
-    label: 'General',
+    label: 'Akun',
     icon: <Iconify icon="solar:user-id-bold" width={24} />,
   },
-  {
-    value: 'social',
-    label: 'Social links',
-    icon: <Iconify icon="solar:share-bold" width={24} />,
-  },
+  // {
+  //   value: 'social',
+  //   label: 'Social links',
+  //   icon: <Iconify icon="solar:share-bold" width={24} />,
+  // },
   {
     value: 'security',
-    label: 'Security',
+    label: 'Ganti Password',
     icon: <Iconify icon="ic:round-vpn-key" width={24} />,
   },
 ];
