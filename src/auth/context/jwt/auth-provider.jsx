@@ -101,7 +101,6 @@ export function AuthProvider({ children }) {
 
         if (refreshToken) {
           localStorage.setItem('refreshToken', refreshToken);
-          localStorage.setItem('refreshToken', refreshToken);
           console.log('RefreshToken saved:', refreshToken);
         } else {
           console.error('Missing refreshToken!');
@@ -122,13 +121,23 @@ export function AuthProvider({ children }) {
 
         await initialize();
 
+        // 🔁 Redirect berdasarkan role
+        if (user.role === 'admin') {
+          router.push('/dashboard');
+        } else if (user.role === 'pembeli') {
+          router.push('/');
+        } else {
+          console.warn('Role tidak dikenali:', user.role);
+          router.push('/'); // default redirect
+        }
+
         return response.data;
       } catch (error) {
         console.error('Login Error:', error);
         throw error;
       }
     },
-    [initialize]
+    [initialize, router]
   );
 
   const register = useCallback(async (email, password) => {
@@ -181,8 +190,9 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      initialize,
     }),
-    [login, logout, register, state.user, status]
+    [login, logout, register, state.user, status, initialize]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

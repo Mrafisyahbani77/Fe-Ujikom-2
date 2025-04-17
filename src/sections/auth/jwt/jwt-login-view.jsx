@@ -151,7 +151,7 @@ export default function JwtLoginView() {
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Stack spacing={2} sx={{ mb: 5 }}>
-        <Typography variant="h4">Sign in to Barangin</Typography>
+        <Typography variant="h4">Login to Barangin</Typography>
         <Stack direction="row" spacing={0.5}>
           <Typography variant="body2">Pengguna baru?</Typography>
           <Link component={RouterLink} href={paths.auth.jwt.register} variant="subtitle2">

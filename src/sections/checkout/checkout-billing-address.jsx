@@ -77,6 +77,9 @@ export default function CheckoutBillingAddress() {
               }}
               action={
                 <Stack flexDirection="row" flexWrap="wrap" flexShrink={0}>
+                  <Button variant="outlined" size="small">
+                    Edit alamat ini
+                  </Button>
                   {!address.primary && (
                     <Button
                       size="small"
@@ -123,7 +126,7 @@ export default function CheckoutBillingAddress() {
               to="/shipping"
               startIcon={<Iconify icon="mingcute:add-line" />}
             >
-              Buat alamat baru
+              Tambah alamat baru
             </Button>
           </Stack>
         </Grid>

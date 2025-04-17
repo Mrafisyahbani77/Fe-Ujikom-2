@@ -39,6 +39,8 @@ export default function AccountGeneral() {
   const { user } = useAuthContext();
   const users = user.data;
 
+  const { initialize } = useAuthContext();
+
   // console.log(users);
 
   const UpdateUserSchema = Yup.object().shape({
@@ -64,9 +66,10 @@ export default function AccountGeneral() {
   });
 
   const { mutateAsync: updateProfile } = useMutationUpdateProfile({
-    onSuccess: () => {
+    onSuccess: async () => {
       enqueueSnackbar('Update berhasil!', { variant: 'success' });
       queryClient.invalidateQueries(['user']);
+      await initialize();
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
@@ -84,7 +87,7 @@ export default function AccountGeneral() {
     try {
       const formData = new FormData();
 
-      formData.append('name', data.displayName);
+      formData.append('username', data.displayName);
       formData.append('email', data.email);
       formData.append('phone_number', data.phoneNumber);
       formData.append('gender', data.gender);

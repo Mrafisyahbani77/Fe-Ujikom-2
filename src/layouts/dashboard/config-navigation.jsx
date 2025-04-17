@@ -146,20 +146,20 @@ export function useNavData() {
         },
 
         // INVOICE
-        {
-          title: 'invoice',
-          path: paths.dashboard.invoice.root,
-          icon: ICONS.invoice,
-          children: [
-            { title: 'list', path: paths.dashboard.invoice.root },
-            {
-              title: 'details',
-              path: paths.dashboard.invoice.demo.details,
-            },
-            { title: 'create', path: paths.dashboard.invoice.new },
-            { title: 'edit', path: paths.dashboard.invoice.demo.edit },
-          ],
-        },
+        // {
+        //   title: 'invoice',
+        //   path: paths.dashboard.invoice.root,
+        //   icon: ICONS.invoice,
+        //   children: [
+        //     { title: 'list', path: paths.dashboard.invoice.root },
+        //     {
+        //       title: 'details',
+        //       path: paths.dashboard.invoice.demo.details,
+        //     },
+        //     { title: 'create', path: paths.dashboard.invoice.new },
+        //     { title: 'edit', path: paths.dashboard.invoice.demo.edit },
+        //   ],
+        // },
 
         // // MAIL
         // {

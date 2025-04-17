@@ -23,8 +23,7 @@ import DiscountDetailsPage from 'src/pages/dashboard/discount/detail';
 // ----------------------------------------------------------------------
 
 // OVERVIEW
-const IndexPage = lazy(() => import('src/pages/dashboard/app'));
-const OverviewEcommercePage = lazy(() => import('src/pages/dashboard/ecommerce'));
+
 const OverviewAnalyticsPage = lazy(() => import('src/pages/dashboard/analytics'));
 // PRODUCT
 const ProductDetailsPage = lazy(() => import('src/pages/dashboard/product/details'));
@@ -62,7 +61,7 @@ export const dashboardRoutes = [
     children: [
       { element: <OverviewAnalyticsPage />, index: true },
       // { element: <IndexPage /> },
-      { path: 'ecommerce', element: <OverviewEcommercePage /> },
+      // { path: 'ecommerce', element: <OverviewEcommercePage /> },
       {
         path: 'user',
         children: [
@@ -87,7 +86,6 @@ export const dashboardRoutes = [
           { path: 'new', element: <CreateDiscountPage /> },
           { path: ':id/edit', element: <EditDiscountPage /> },
           { path: ':id', element: <DiscountDetailsPage /> },
-
         ],
       },
       {

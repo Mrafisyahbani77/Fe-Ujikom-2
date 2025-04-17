@@ -82,7 +82,7 @@ export default function OrderTableRow({
     paid: 'Dikemas',
     shipped: 'Dikirim',
     delivered: 'Selesai',
-    canceled: 'Dibatalkan',
+    cancellation_requested: 'Dibatalkan',
   };
 
   const renderPrimary = (
@@ -144,7 +144,7 @@ export default function OrderTableRow({
           onClose={statusPopover.onClose}
           sx={{ width: 160 }}
         >
-          {['pending', 'paid', 'shipped', 'delivered', 'canceled'].map((option) => (
+          {['pending', 'paid', 'shipped', 'delivered'].map((option) => (
             <MenuItem
               key={option}
               onClick={() => handleChangeStatus(option)}
@@ -163,7 +163,7 @@ export default function OrderTableRow({
             (status === 'paid' && 'info') ||
             (status === 'shipped' && 'primary') ||
             (status === 'delivered' && 'success') ||
-            (status === 'canceled' && 'error') ||
+            (status === 'cancellation_requested' && 'error') ||
             'default'
           }
           onClick={statusPopover.onOpen}
