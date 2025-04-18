@@ -32,26 +32,6 @@ import { usefetchReviewPublicById } from 'src/utils/review';
 
 // ----------------------------------------------------------------------
 
-const SUMMARY = [
-  {
-    title: '100% Original',
-    description: 'Chocolate bar candy canes ice cream toffee cookie halvah.',
-    icon: 'solar:verified-check-bold',
-  },
-  {
-    title: '10 Day Replacement',
-    description: 'Marshmallow biscuit donut dragée fruitcake wafer.',
-    icon: 'solar:clock-circle-bold',
-  },
-  {
-    title: 'Year Warranty',
-    description: 'Cotton candy gingerbread cake I love sugar sweet.',
-    icon: 'solar:shield-check-bold',
-  },
-];
-
-// ----------------------------------------------------------------------
-
 export default function ProductShopDetailsView({ id }) {
   const settings = useSettingsContext();
 

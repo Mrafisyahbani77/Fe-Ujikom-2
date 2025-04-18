@@ -97,7 +97,7 @@ export function AuthProvider({ children }) {
         const response = await axiosInstance.post(endpoints.auth.login, { email, password });
         const { accessToken, refreshToken, user } = response.data;
 
-        console.log('Before saving:', { accessToken, refreshToken });
+        // console.log('Before saving:', { accessToken, refreshToken });
 
         if (refreshToken) {
           localStorage.setItem('refreshToken', refreshToken);

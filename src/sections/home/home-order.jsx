@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -33,6 +33,9 @@ import { useSnackbar } from 'notistack';
 import Label from 'src/components/label';
 import { useMutationCancel } from 'src/utils/order/useMutationCancel';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'src/routes/hooks';
+import { useCheckoutContext } from '../checkout/context';
+import { paths } from 'src/routes/paths';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Semua', color: 'default' },
@@ -43,9 +46,10 @@ const STATUS_OPTIONS = [
   { value: 'cancellation_requested', label: 'Dibatalkan', color: 'error' },
 ];
 
-// Define order status options for tabs
 export default function HomeOrder() {
+  const router = useRouter();
   const { data, isLoading, error } = useFetchOrder();
+  const { onAddToCart } = useCheckoutContext();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const review = useBoolean();
@@ -68,6 +72,7 @@ export default function HomeOrder() {
     onSuccess: () => {
       enqueueSnackbar('Order berhasil dibatalkan', { variant: 'success' });
       queryClient.invalidateQueries(['order']);
+      queryClient.invalidateQueries(['order.id']);
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
@@ -77,7 +82,6 @@ export default function HomeOrder() {
 
   const { mutate: Payment, isLoading: Load } = useMutationBuy({
     onSuccess: (res) => {
-      // console.log('Payment success', res);
       enqueueSnackbar('Redirecting to payment...', { variant: 'success' });
 
       const redirectUrl = res?.redirect_url;
@@ -86,9 +90,10 @@ export default function HomeOrder() {
       } else {
         enqueueSnackbar('Redirect URL tidak ditemukan!', { variant: 'error' });
       }
+      queryClient.invalidateQueries(['order']);
+      queryClient.invalidateQueries(['order.id']);
     },
     onError: (error) => {
-      // console.log('Payment error', error);
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     },
@@ -112,6 +117,36 @@ export default function HomeOrder() {
 
     Cancel({ id: orderId, reason });
   };
+
+  const handleBuyAgain = useCallback(
+    (item) => {
+      try {
+        if (!item || !item.product) {
+          enqueueSnackbar('Data produk tidak lengkap', { variant: 'error' });
+          return;
+        }
+
+        const productData = {
+          id: item.products_id, // Use products_id from item
+          name: item.product.name,
+          cover: item.product.images?.[0]?.image_url,
+          price: item.product.discount_price || item.product.price,
+          color: item?.color,
+          size: item.size,
+          quantity: item.quantity,
+          subTotal: (item.product.discount_price || item.product.price) * item.quantity,
+        };
+
+        onAddToCart(productData);
+        enqueueSnackbar('Produk berhasil ditambahkan ke keranjang', { variant: 'success' });
+        router.push(paths.product.checkout);
+      } catch (error) {
+        console.error('Error in handleBuyAgain:', error);
+        enqueueSnackbar('Gagal menambahkan ke keranjang', { variant: 'error' });
+      }
+    },
+    [onAddToCart, router, enqueueSnackbar]
+  );
 
   if (isLoading) {
     return (
@@ -291,15 +326,18 @@ export default function HomeOrder() {
                               Lihat Detail
                             </Button>
 
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              size="large"
-                              startIcon={<Iconify icon="eva:close-circle-fill" />}
-                              onClick={() => handleClickCancel(order.id)}
-                            >
-                              Batalkan Pesanan
-                            </Button>
+                            {/* Batalkan Pesanan button - only show for pending orders */}
+                            {order.status === 'pending' && (
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                startIcon={<Iconify icon="eva:close-circle-fill" />}
+                                onClick={() => handleClickCancel(order.id)}
+                              >
+                                Batalkan Pesanan
+                              </Button>
+                            )}
 
                             {order.status === 'delivered' ? (
                               <Button
@@ -329,22 +367,22 @@ export default function HomeOrder() {
                                 size="large"
                                 startIcon={<Iconify icon="eva:credit-card-fill" />}
                                 onClick={() => handlePayment(order.id)}
-                                disabled={isLoading} // disable saat loading
+                                disabled={Load}
                               >
-                                {isLoading ? 'Proses...' : 'Bayar Sekarang'}
+                                {Load ? 'Proses...' : 'Bayar Sekarang'}
                               </Button>
                             ) : order.status === 'delivered' ? (
                               <Button
-                                variant="outlined"
+                                variant="contained"
                                 color="primary"
-                                component={Link}
-                                to={`/product/${order.productId}`}
+                                onClick={() => handleBuyAgain(item)}
                               >
                                 Beli Lagi
                               </Button>
                             ) : (
                               <Button variant="contained" disabled>
-                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                {STATUS_MAP[order.status]?.label ||
+                                  order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                               </Button>
                             )}
                           </Box>

@@ -27,6 +27,7 @@ export const paths = {
   error: '/error',
   contact: '/contact-us',
   category: '/category/:slug',
+  promo:'/promo/:id',
   profile: `/profile`,
   faqs: '/faqs',
   page403: '/403',

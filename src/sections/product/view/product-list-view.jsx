@@ -177,7 +177,7 @@ export default function ProductListView() {
 
   const stockOptions = [
     { value: 'available', label: 'Tersedia' },
-    { value: 'out_stock', label: 'Habis' },
+    { value: 'sold_out', label: 'Habis' },
   ];
 
   return (

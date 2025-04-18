@@ -141,6 +141,8 @@ export default function ProductDetailsSummary({
         colors: values.color,
         subTotal: values.price * values.quantity,
       });
+      onGotoStep?.(0);
+      router.push(paths.product.checkout);
     } catch (error) {
       console.error(error);
     }
@@ -196,6 +198,7 @@ export default function ProductDetailsSummary({
   };
 
   const isWishlisted = wishlist.some((item) => item.product.id === product?.id);
+  const isOutOfStock = stock.status === 'sold_out' || stock.quantity === 0;
 
   const renderPrice = (
     <Box sx={{ typography: 'h5' }}>
@@ -337,8 +340,8 @@ export default function ProductDetailsSummary({
         <IncrementerButton
           name="quantity"
           quantity={values.quantity}
-          disabledDecrease={values.quantity <= 1}
-          disabledIncrease={values.quantity >= available}
+          disabledDecrease={isOutOfStock || values.quantity <= 1}
+          disabledIncrease={isOutOfStock || values.quantity >= available}
           onIncrease={() => setValue('quantity', values.quantity + 1)}
           onDecrease={() => setValue('quantity', values.quantity - 1)}
         />
@@ -354,7 +357,7 @@ export default function ProductDetailsSummary({
     <Stack direction="row" spacing={2}>
       <Button
         fullWidth
-        disabled={isMaxQuantity || disabledActions}
+        disabled={isMaxQuantity || disabledActions || isOutOfStock}
         size="large"
         color="warning"
         variant="contained"
@@ -369,21 +372,16 @@ export default function ProductDetailsSummary({
 
       <Button
         fullWidth
+        disabled={isMaxQuantity || disabledActions || isOutOfStock}
         size="large"
-        type="submit"
-        variant="contained"
-        disabled={disabledActions}
-        onClick={(e) => {
-          if (!user) {
-            e.preventDefault(); // supaya submit form-nya nggak jalan
-            enqueueSnackbar('Anda harus login dulu', { variant: 'warning' });
-            router.push('/auth/login');
-            return;
-          }
-          // kalau sudah login, lanjut submit
-        }}
+        color="primary"
+        variant="outlined"
+        onClick={handleAddCart}
+        sx={{ whiteSpace: 'nowrap' }}
       >
-        Beli sekarang
+        <Typography variant="button" sx={{ fontSize: '0.75rem' }}>
+          Beli Sekarang
+        </Typography>
       </Button>
     </Stack>
   );

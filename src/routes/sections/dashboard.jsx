@@ -19,6 +19,7 @@ import DiscountPage from 'src/pages/dashboard/discount/discount';
 import CreateDiscountPage from 'src/pages/dashboard/discount/create';
 import EditDiscountPage from 'src/pages/dashboard/discount/edit';
 import DiscountDetailsPage from 'src/pages/dashboard/discount/detail';
+import RoleBaseGuard from 'src/auth/guard/role-based-guard';
 
 // ----------------------------------------------------------------------
 
@@ -51,11 +52,13 @@ export const dashboardRoutes = [
     path: 'dashboard',
     element: (
       <AuthGuard>
-        <DashboardLayout>
-          <Suspense fallback={<LoadingScreen />}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        {/* <RoleBaseGuard allowedRoles={['admin']}> */}
+          <DashboardLayout>
+            <Suspense fallback={<LoadingScreen />}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        {/* </RoleBaseGuard> */}
       </AuthGuard>
     ),
     children: [

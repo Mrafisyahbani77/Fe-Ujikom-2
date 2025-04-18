@@ -3,7 +3,7 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 
 export const useFetchOrderById = (id) =>
   useQuery({
-    queryKey: ['order', id],
+    queryKey: ['order.id', id],
     queryFn: async () => {
       if (!id) {
         throw new Error('Order ID is required'); // ⬅️ Biar jelas errornya
