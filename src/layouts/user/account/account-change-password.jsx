@@ -24,16 +24,18 @@ export default function AccountChangePassword() {
   const password = useBoolean();
 
   const ChangePassWordSchema = Yup.object().shape({
-    oldPassword: Yup.string().nullable('Old Password is required'),
+    oldPassword: Yup.string().required('Old Password is required'),
     newPassword: Yup.string()
       .required('New Password is required')
-      .min(6, 'Password must be at least 6 characters')
+      .min(8, 'Password must be at least 8 characters')
       .test(
         'no-match',
         'New password must be different than old password',
         (value, { parent }) => value !== parent.oldPassword
       ),
-    confirmNewPassword: Yup.string().oneOf([Yup.ref('newPassword')], 'Passwords must match'),
+    confirmNewPassword: Yup.string()
+      .required('Please confirm your new password')
+      .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
   });
 
   const defaultValues = {
@@ -66,16 +68,13 @@ export default function AccountChangePassword() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const formData = new FormData();
+      const formData = {
+        current_password: data.oldPassword,
+        new_password: data.newPassword,
+        confirm_new_password: data.confirmNewPassword,
+      };
 
-      formData.append('current_password ', data.oldPassword);
-      formData.append('new_password', data.newPassword);
-      formData.append('confirm_new_password', data.confirmNewPassword);
-
-      updatePassword({
-        user_id: data.user_id,
-        data: formData,
-      });
+      await updatePassword({ data: formData });
     } catch (error) {
       console.error(error);
     }

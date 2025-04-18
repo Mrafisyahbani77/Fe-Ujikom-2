@@ -177,7 +177,7 @@ export default function ProductListView() {
 
   const stockOptions = [
     { value: 'available', label: 'Tersedia' },
-    { value: 'out_of_stock', label: 'Habis' },
+    { value: 'out_stock', label: 'Habis' },
   ];
 
   return (
@@ -200,7 +200,7 @@ export default function ProductListView() {
               variant="contained"
               startIcon={<Iconify icon="mingcute:add-line" />}
             >
-              New Product
+              Buat produk
             </Button>
           }
           sx={{ mb: { xs: 3, md: 5 } }}

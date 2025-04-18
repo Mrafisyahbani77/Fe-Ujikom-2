@@ -19,7 +19,7 @@ const processQueue = (error, token = null) => {
     } else {
       prom.reject(error);
     }
-  });
+  }); 
   failedQueue = [];
 };
 
@@ -152,7 +152,7 @@ export const endpoints = {
   category: {
     list: '/api/categories',
     getByid: 'api/categories',
-    getBySlug: 'api/categories',
+    getBySlug: 'api/categories/slug',
     create: '/api/categories/store',
     update: '/api/categories',
     delete: '/api/categories',

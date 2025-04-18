@@ -21,7 +21,7 @@ export default function CategoryEditView({ id }) {
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
-      <EditForm currentProduct={data} />
+      <EditForm category={data} />
     </Container>
   );
 }

@@ -52,19 +52,32 @@ export default function ProductNewEditForm({ currentProduct }) {
   const queryClient = useQueryClient();
   const mdUp = useResponsive('up', 'md');
   const { enqueueSnackbar } = useSnackbar();
-  // const [includeTaxes, setIncludeTaxes] = useState(false);
-  // const [status, setStatus] = useState('publish'); // Default ke 'publish'
   const { data, productsLoading, productsEmpty } = useFetchCategory();
+
+  // State untuk menyimpan kategori yang sudah dipilih
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  // State untuk menyimpan subkategori yang sudah dipilih
+  const [selectedSubcategories, setSelectedSubcategories] = useState([]);
+
+  const CATEGORY_OPTIONS =
+    data?.map((item) => ({
+      label: item.name,
+      value: item.id,
+    })) || [];
+
+  // Mendapatkan opsi-opsi untuk gender (diubah format dari PRODUCT_GENDER_OPTIONS)
+  const GENDER_OPTIONS = PRODUCT_GENDER_OPTIONS.map((item) => ({
+    label: item.label,
+    value: item.value,
+  }));
 
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     images: Yup.array().min(1, 'Images is required'),
-    tags: Yup.array().min(2, 'Must have at least 2 tags'),
-    categories_id: Yup.number().required('Category is required'), // Perbaikan: ID kategori biasanya angka
     price: Yup.number()
       .transform((value, originalValue) => {
         if (typeof originalValue === 'string') {
-          const cleaned = originalValue.replace(/,/g, ''); // hapus koma
+          const cleaned = originalValue.replace(/,/g, '');
           return Number(cleaned);
         }
         return value;
@@ -73,15 +86,19 @@ export default function ProductNewEditForm({ currentProduct }) {
       .required('Price is required'),
     stock: Yup.number().min(0, 'Stock should not be negative'),
     description: Yup.string().required('Description is required'),
-    // taxes: Yup.number().nullable(),
-    // newLabel: Yup.object().shape({
-    //   enabled: Yup.boolean(),
-    //   content: Yup.string(),
-    // }),
-    // saleLabel: Yup.object().shape({
-    //   enabled: Yup.boolean(),
-    //   content: Yup.string(),
-    // }),
+    // Kategori sebagai array tapi dengan validasi hanya satu item
+    categories_id: Yup.array()
+      .min(1, 'Kategori wajib diisi')
+      .max(1, 'Pilih hanya satu kategori')
+      .required('Kategori wajib diisi'),
+    // Subkategori menjadi array untuk multi select
+    subcategories_id: Yup.array()
+      .min(1, 'Pilih minimal satu subkategori')
+      .required('Subkategori wajib diisi'),
+    // Gender juga menjadi array untuk multi select
+    gender_categories_id: Yup.array()
+      .min(1, 'Pilih minimal satu gender')
+      .required('Gender wajib diisi'),
   });
 
   const defaultValues = useMemo(
@@ -90,13 +107,17 @@ export default function ProductNewEditForm({ currentProduct }) {
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
       price: currentProduct?.price || 0,
-      stock: currentProduct?.stock.quantity || 0,
-      categories_id: currentProduct?.categories.id || '',
+      stock: currentProduct?.stock?.quantity || 0,
+      // Kategori sebagai array dengan satu nilai saja
+      categories_id: currentProduct?.categories?.id ? [currentProduct.categories.id] : [],
+      // Subkategori dan gender sebagai array
+      subcategories_id: currentProduct?.subcategories?.id ? [currentProduct.subcategories.id] : [],
+      gender_categories_id: currentProduct?.gender_categories?.id
+        ? [currentProduct.gender_categories.id]
+        : [],
       color: currentProduct?.color || [],
       size: currentProduct?.size || [],
       status: currentProduct?.status || 'publish',
-      // newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
-      // saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
     }),
     [currentProduct]
   );
@@ -116,20 +137,50 @@ export default function ProductNewEditForm({ currentProduct }) {
 
   const values = watch();
   const status = watch('status');
+  const currentCategories = watch('categories_id') || [];
+  const currentSubcategories = watch('subcategories_id') || [];
+
+  // Ensure we're working with arrays
+  const safeCurrentCategories = Array.isArray(currentCategories) ? currentCategories : [];
+  const safeCurrentSubcategories = Array.isArray(currentSubcategories) ? currentSubcategories : [];
+
+  // Filter kategori untuk opsi subkategori
+  const filteredSubcategoryOptions = useMemo(() => {
+    return CATEGORY_OPTIONS.filter((option) => {
+      // Safely check if value exists in array
+      return !safeCurrentCategories.some((id) => id === option.value);
+    });
+  }, [CATEGORY_OPTIONS, safeCurrentCategories]);
+
+  // Filter kategori untuk opsi kategori utama
+  const filteredCategoryOptions = useMemo(() => {
+    return CATEGORY_OPTIONS.filter((option) => {
+      // Safely check if value exists in array
+      return !safeCurrentSubcategories.some((id) => id === option.value);
+    });
+  }, [CATEGORY_OPTIONS, safeCurrentSubcategories]);
+
+  // Effect untuk memperbarui selectedCategory ketika nilai kategori berubah
+  useEffect(() => {
+    setSelectedCategory(safeCurrentCategories);
+  }, [safeCurrentCategories]);
+
+  // Effect untuk memperbarui selectedSubcategories ketika nilai subkategori berubah
+  useEffect(() => {
+    setSelectedSubcategories(safeCurrentSubcategories);
+  }, [safeCurrentSubcategories]);
 
   useEffect(() => {
     if (currentProduct) {
       reset(defaultValues);
+      if (currentProduct?.categories?.id) {
+        setSelectedCategory([currentProduct.categories.id]);
+      }
+      if (currentProduct?.subcategories?.id) {
+        setSelectedSubcategories([currentProduct.subcategories.id]);
+      }
     }
   }, [currentProduct, defaultValues, reset]);
-
-  // useEffect(() => {
-  //   if (includeTaxes) {
-  //     setValue('taxes', 0);
-  //   } else {
-  //     setValue('taxes', currentProduct?.taxes || 0);
-  //   }
-  // }, [currentProduct?.taxes, includeTaxes, setValue]);
 
   // Create mutation hook
   const createMutation = useMutationCreate({
@@ -165,18 +216,36 @@ export default function ProductNewEditForm({ currentProduct }) {
       formData.append('description', data.description);
       formData.append('price', data.price.toString());
       formData.append('stock', data.stock.toString());
-      formData.append('categories_id', data.categories_id.toString());
 
-      if (data.size.length) {
+      // Kategori - ambil nilai pertama dari array
+      if (data.categories_id && data.categories_id.length) {
+        formData.append('categories_id', data.categories_id[0].toString());
+      }
+
+      // Subkategori multi value - kirim sebagai JSON string
+      if (data.subcategories_id && data.subcategories_id.length) {
+        formData.append('subcategories_id', data.subcategories_id[0].toString());
+      }
+
+      if (data.gender_categories_id && data.gender_categories_id.length) {
+        formData.append('gender_categories_id', data.gender_categories_id[0].toString());
+      }
+
+      // Gender multi value - kirim sebagai JSON string
+      // if (data.gender_categories_id && data.gender_categories_id.length) {
+      //   formData.append('gender_categories_id', JSON.stringify(data.gender_categories_id));
+      // }
+
+      if (data.size && data.size.length) {
         formData.append('size', JSON.stringify(data.size));
       }
-      if (data.color.length) {
+      if (data.color && data.color.length) {
         formData.append('color', JSON.stringify(data.color));
       }
 
       formData.append('status', status);
 
-      if (data.images.length) {
+      if (data.images && data.images.length) {
         data.images.forEach((image) => {
           formData.append('images', image);
         });
@@ -194,8 +263,8 @@ export default function ProductNewEditForm({ currentProduct }) {
 
   function formatNumber(value) {
     if (!value) return value;
-    const onlyNumbers = value.toString().replace(/[^\d]/g, ''); // Buang semua selain angka
-    return onlyNumbers.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // Tambahin koma setiap 3 digit
+    const onlyNumbers = value.toString().replace(/[^\d]/g, '');
+    return onlyNumbers.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   const handleDrop = useCallback(
@@ -225,24 +294,85 @@ export default function ProductNewEditForm({ currentProduct }) {
     setValue('images', []);
   }, [setValue]);
 
-  // const handleChangeIncludeTaxes = useCallback((event) => {
-  //   setIncludeTaxes(event.target.checked);
-  // }, []);
+  // Custom handler untuk kategori untuk memastikan hanya satu yang dipilih
+  const handleCategoryChange = (event) => {
+    try {
+      // Get value directly from event target if available
+      let newValues = event?.target?.value;
 
-  const handleChangeStatus = useCallback((event) => {
-    setValue(event.target.checked ? 'publish' : 'private');
-  }, []);
+      // If not in expected format, try to safely handle
+      if (!Array.isArray(newValues)) {
+        // If we got a direct value (like from an onChange event), convert to array
+        newValues = [newValues];
+      }
+
+      // Ensure we have an array
+      newValues = Array.isArray(newValues) ? newValues : [];
+
+      // If array is empty, clear the field
+      if (newValues.length === 0) {
+        setValue('categories_id', []);
+        return;
+      }
+
+      // If more than one item, take only the latest one
+      if (newValues.length > 1) {
+        // Get the latest selection
+        const lastValue = newValues[newValues.length - 1];
+        setValue('categories_id', [lastValue]);
+        return;
+      }
+
+      // Check if selected value is already in subcategories
+      const valueAlreadyInSubcategories = safeCurrentSubcategories.some(
+        (id) => String(id) === String(newValues[0])
+      );
+
+      if (valueAlreadyInSubcategories) {
+        // Don't allow selection if already in subcategories
+        setValue('categories_id', safeCurrentCategories);
+        return;
+      }
+
+      // Set the value
+      setValue('categories_id', newValues);
+    } catch (error) {
+      console.error('Error in handleCategoryChange:', error);
+      // Fallback to just setting the value directly
+      setValue('categories_id', safeCurrentCategories);
+    }
+  };
+
+  // Custom handler untuk subkategori
+  const handleSubcategoryChange = (event) => {
+    try {
+      // Get value directly from event target if available
+      let newValues = event?.target?.value;
+
+      // If not in expected format, use fallback
+      if (!Array.isArray(newValues)) {
+        newValues = [];
+      }
+
+      // Filter out any values that are already in categories
+      const filteredValues = newValues.filter((value) => {
+        return !safeCurrentCategories.some((catId) => String(catId) === String(value));
+      });
+
+      setValue('subcategories_id', filteredValues);
+    } catch (error) {
+      console.error('Error in handleSubcategoryChange:', error);
+      // Fallback to just setting the current value
+      setValue('subcategories_id', safeCurrentSubcategories);
+    }
+  };
 
   const renderForm = (
     <>
       <Grid xs={12} md={8}>
         <Card>
-          {/* {!mdUp && <CardHeader title="Details" />} */}
-
           <Stack spacing={3} sx={{ p: 3 }}>
             <RHFTextField name="name" label="Nama Produk" />
-
-            {/* <RHFTextField name="subDescription" label="Sub Description" multiline rows={4} /> */}
 
             <Stack spacing={1.5}>
               <Typography variant="subtitle2">Deskripsi</Typography>
@@ -264,8 +394,6 @@ export default function ProductNewEditForm({ currentProduct }) {
             </Stack>
           </Stack>
 
-          {/* {!mdUp && <CardHeader title="Properties" />} */}
-
           <Stack spacing={3} sx={{ p: 3 }}>
             <Box
               columnGap={2}
@@ -276,10 +404,6 @@ export default function ProductNewEditForm({ currentProduct }) {
                 md: 'repeat(2, 1fr)',
               }}
             >
-              {/* <RHFTextField name="code" label="Product Code" />
-
-              <RHFTextField name="sku" label="Product SKU" /> */}
-
               <RHFTextField
                 name="stock"
                 label="Stok"
@@ -288,16 +412,23 @@ export default function ProductNewEditForm({ currentProduct }) {
                 InputLabelProps={{ shrink: true }}
               />
 
-              <RHFSelect name="categories_id" label="Kategori">
-                <option value="" disabled>
-                  Select category
-                </option>
-                {data?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </RHFSelect>
+              {/* Kategori sebagai RHFMultiSelect tapi dengan batasan satu pilihan */}
+              <RHFMultiSelect
+                checkbox
+                name="categories_id"
+                label="Kategori (pilih satu)"
+                options={filteredCategoryOptions}
+                onChange={handleCategoryChange}
+              />
+
+              {/* Subkategori sebagai multi select */}
+              <RHFMultiSelect
+                checkbox
+                name="subcategories_id"
+                label="Subkategori"
+                options={filteredSubcategoryOptions}
+                onChange={handleSubcategoryChange}
+              />
 
               <RHFMultiSelect
                 checkbox
@@ -307,61 +438,17 @@ export default function ProductNewEditForm({ currentProduct }) {
               />
 
               <RHFMultiSelect checkbox name="size" label="Ukuran" options={PRODUCT_SIZE_OPTIONS} />
+
+              {/* Gender sebagai multi select */}
+              <RHFMultiSelect
+                checkbox
+                name="gender_categories_id"
+                label="Gender"
+                options={GENDER_OPTIONS}
+              />
             </Box>
 
-            {/* <RHFAutocomplete
-              name="tags"
-              label="Tags"
-              placeholder="+ Tags"
-              multiple
-              freeSolo
-              options={_tags.map((option) => option)}
-              getOptionLabel={(option) => option}
-              renderOption={(props, option) => (
-                <li {...props} key={option}>
-                  {option}
-                </li>
-              )}
-              renderTags={(selected, getTagProps) =>
-                selected.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option}
-                    label={option}
-                    size="small"
-                    color="info"
-                    variant="soft"
-                  />
-                ))
-              }
-            /> */}
-
-            {/* <Stack spacing={1}>
-              <Typography variant="subtitle2">Gender</Typography>
-              <RHFMultiCheckbox row name="gender" spacing={2} options={PRODUCT_GENDER_OPTIONS} />
-            </Stack> */}
-
             <Divider sx={{ borderStyle: 'dashed' }} />
-
-            {/* <Stack direction="row" alignItems="center" spacing={3}>
-              <RHFSwitch name="saleLabel.enabled" label={null} sx={{ m: 0 }} />
-              <RHFTextField
-                name="saleLabel.content"
-                label="Sale Label"
-                fullWidth
-                disabled={!values.saleLabel.enabled}
-              />
-            </Stack>
-
-            <Stack direction="row" alignItems="center" spacing={3}>
-              <RHFSwitch name="newLabel.enabled" label={null} sx={{ m: 0 }} />
-              <RHFTextField
-                name="newLabel.content"
-                label="New Label"
-                fullWidth
-                disabled={!values.newLabel.enabled}
-              />
-            </Stack> */}
           </Stack>
 
           <Stack spacing={3} sx={{ p: 3 }}>
@@ -370,53 +457,12 @@ export default function ProductNewEditForm({ currentProduct }) {
               label="Harga"
               onChange={(e) => {
                 const formattedValue = formatNumber(e.target.value);
-                setValue('price', formattedValue); // setValue dari react-hook-form
+                setValue('price', formattedValue);
               }}
               InputProps={{
                 startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
               }}
             />
-
-            {/* <RHFTextField
-              name="priceSale"
-              label="Sale Price"
-              placeholder="0.00"
-              type="number"
-              InputLabelProps={{ shrink: true }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Box component="span" sx={{ color: 'text.disabled' }}>
-                      $
-                    </Box>
-                  </InputAdornment>
-                ),
-              }}
-            /> */}
-
-            {/* <FormControlLabel
-              control={<Switch checked={includeTaxes} onChange={handleChangeIncludeTaxes} />}
-              label="Price includes taxes"
-            />
-
-            {!includeTaxes && (
-              <RHFTextField
-                name="taxes"
-                label="Tax (%)"
-                placeholder="0.00"
-                type="number"
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Box component="span" sx={{ color: 'text.disabled' }}>
-                        %
-                      </Box>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )} */}
           </Stack>
         </Card>
       </Grid>
@@ -452,7 +498,7 @@ export default function ProductNewEditForm({ currentProduct }) {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          minHeight: '100vh', // Jika ingin di tengah layar
+          minHeight: '100vh',
         }}
       >
         {renderForm}

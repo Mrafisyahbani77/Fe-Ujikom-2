@@ -4,8 +4,7 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 export const useMutationUpdatePassword = ({ onSuccess, onError }) => {
   return useMutation({
     mutationKey: ['edit.password'],
-    mutationFn: async (variables) => {
-      const { id, data } = variables;
+    mutationFn: async ({ data, id }) => {
       const response = await axiosInstance.put(`${endpoints.auth.updatePassword}`, data);
       return response.data;
     },

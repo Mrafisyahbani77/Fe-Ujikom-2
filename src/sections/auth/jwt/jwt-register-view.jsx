@@ -195,10 +195,19 @@ export default function JwtRegisterView() {
           />
           <TextField
             label="Konfirmasi Password"
-            type="password"
+            type={password.value ? 'text' : 'password'}
             {...register('confirm_password')}
             error={!!errors.confirm_password}
             helperText={errors.confirm_password?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={password.onToggle} edge="end">
+                    <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <LoadingButton
             fullWidth

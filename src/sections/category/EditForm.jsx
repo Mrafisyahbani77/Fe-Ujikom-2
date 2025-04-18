@@ -11,7 +11,9 @@ import { useRouter } from 'src/routes/hooks';
 // utils
 import { useMutationUpdate } from 'src/utils/category';
 
-export default function EditForm({ currentProduct }) {
+export default function EditForm({ category }) {
+  const currentProduct = category?.category;
+  console.log(category)
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 

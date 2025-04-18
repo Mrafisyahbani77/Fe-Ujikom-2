@@ -1,9 +1,10 @@
 // ----------------------------------------------------------------------
 
 export const PRODUCT_GENDER_OPTIONS = [
-  { label: 'Men', value: 'Men' },
-  { label: 'Women', value: 'Women' },
-  { label: 'Kids', value: 'Kids' },
+  { label: 'Laki-Laki', value: '1' },
+  { label: 'Wanita', value: '2' },
+  { label: 'Anak-Anak', value: '3' },
+  { label: 'Unisex', value: '4' },
 ];
 
 export const PRODUCT_CATEGORY_OPTIONS = ['Shose', 'Apparel', 'Accessories'];
