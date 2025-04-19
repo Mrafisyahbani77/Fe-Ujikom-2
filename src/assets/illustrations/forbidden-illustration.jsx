@@ -28,7 +28,7 @@ function ForbiddenIllustration({ ...other }) {
     >
       <BackgroundShape />
 
-      <image href="/public/logo/icon-login3.png" height="450" x="20" y="0" />
+      <image href="/logo/icon-login3.png" height="450" x="20" y="0" />
 
       <path
         fill={PRIMARY_MAIN}

@@ -29,7 +29,7 @@ function PageNotFoundIllustration({ ...other }) {
     >
       <BackgroundShape />
 
-      <image href="/public/logo/icon-login3.png" height="340" x="70" y="10" />
+      <image href="/logo/icon-login3.png" height="340" x="70" y="10" />
       {/* 
       <path
         fill="#FFAB00"

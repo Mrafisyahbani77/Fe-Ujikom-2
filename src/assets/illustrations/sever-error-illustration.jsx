@@ -31,7 +31,7 @@ function SeverErrorIllustration({ ...other }) {
     >
       <BackgroundShape />
 
-      <image href="/public/logo/icon-login3.png" height="300" x="200" y="30" />
+      <image href="/logo/icon-login3.png" height="300" x="200" y="30" />
 
       <path
         fill={PRIMARY_MAIN}
