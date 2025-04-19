@@ -61,7 +61,7 @@ const TABLE_HEAD = [
   // { id: 'company', label: 'Company', width: 220 },
   { id: 'role', label: 'Role', width: 180 },
   { id: 'status', label: 'Status', width: 100 },
-  // { id: '', width: 88 },
+  { id: '', width: 88 },
 ];
 
 const defaultFilters = {

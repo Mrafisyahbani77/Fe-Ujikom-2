@@ -77,7 +77,7 @@ export default function JwtRegisterView() {
       }
     },
     onError: (error) => {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Data input tidak valid';
+      const errorMessage = error?.response?.data?.error || error?.message || 'Data input tidak valid';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });

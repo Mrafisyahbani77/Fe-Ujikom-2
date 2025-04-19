@@ -10,13 +10,15 @@ import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
 import UserNewEditForm from '../user-new-edit-form';
+import { useFetchUserById } from 'src/utils/users';
 
 // ----------------------------------------------------------------------
 
 export default function UserEditView({ id }) {
   const settings = useSettingsContext();
 
-  const currentUser = _userList.find((user) => user.id === id);
+  // const currentUser = _userList.find((user) => user.id === id);
+  const { data } = useFetchUserById(id);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -29,16 +31,16 @@ export default function UserEditView({ id }) {
           },
           {
             name: 'User',
-            href: paths.dashboard.user.root,
+            href: paths.dashboard.user.list,
           },
-          { name: currentUser?.name },
+          { name: data?.user?.username },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },
         }}
       />
 
-      <UserNewEditForm currentUser={currentUser} />
+      <UserNewEditForm User={data} />
     </Container>
   );
 }

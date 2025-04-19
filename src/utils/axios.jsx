@@ -19,7 +19,7 @@ const processQueue = (error, token = null) => {
     } else {
       prom.reject(error);
     }
-  }); 
+  });
   failedQueue = [];
 };
 
@@ -42,7 +42,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 403) {
-      window.location.href = '/403'; // Ganti dengan URL halaman 403
+      window.location.href = '/403';
       return Promise.reject(error);
     }
 
@@ -155,7 +155,7 @@ export const endpoints = {
     getBySlug: 'api/categories/slug',
     create: '/api/categories/store',
     update: '/api/categories',
-    delete: '/api/categories',
+    delete: '/api/categories', //need id
   },
   discount: {
     user: {
@@ -182,6 +182,7 @@ export const endpoints = {
     delete: '/api/products',
     create: '/api/products/store',
     search: '/api/product/search',
+    chartNew:'/api/products/newest'
   },
   whishlist: {
     list: '/api/wishlist',

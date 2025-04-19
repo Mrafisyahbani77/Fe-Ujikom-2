@@ -32,6 +32,7 @@ import {
   useFetchChartYearly,
   useFetchTotalUser,
   useFetchTotalProducts,
+  useFetchNewProduct,
 } from 'src/utils/chart';
 import { useMemo } from 'react';
 import { SeoIllustration } from 'src/assets/illustrations';
@@ -62,6 +63,7 @@ export default function OverviewAnalyticsView() {
   const { data: year, isLoading: isloading, isError: iserror } = useFetchChartYearly();
   const { data: User } = useFetchTotalUser();
   const { data: total_product } = useFetchTotalProducts();
+  const {data: newProduct} = useFetchNewProduct();
 
   const chartData = {
     categories: [
@@ -260,7 +262,7 @@ export default function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
-          <EcommerceLatestProducts title="Latest Products" list={_ecommerceLatestProducts} />
+          <EcommerceLatestProducts title="Produk terbaru" list={newProduct} />
         </Grid>
 
         {/* <Grid xs={12} md={4}>

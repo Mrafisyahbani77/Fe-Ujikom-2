@@ -7,7 +7,7 @@ export const useFetchUserById = (id) =>
     queryFn: async () => {
       if (!id) return null;
       const response = await axiosInstance.get(`${endpoints.user.getById}/${id}`);
-      return response.data.data;
+      return response.data;
     },
     enabled: !!id,
   });

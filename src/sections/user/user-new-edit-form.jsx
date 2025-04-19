@@ -30,11 +30,14 @@ import FormProvider, {
   RHFUploadAvatar,
   RHFAutocomplete,
 } from 'src/components/hook-form';
+import { Avatar } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-export default function UserNewEditForm({ currentUser }) {
+export default function UserNewEditForm({ User }) {
   const router = useRouter();
+  const currentUser = User?.user;
+  console.log(currentUser);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -45,8 +48,8 @@ export default function UserNewEditForm({ currentUser }) {
     address: Yup.string().required('Address is required'),
     country: Yup.string().required('Country is required'),
     company: Yup.string().required('Company is required'),
-    state: Yup.string().required('State is required'),
-    city: Yup.string().required('City is required'),
+    state: Yup.string().required('gender is required'),
+    gender: Yup.string().required('City is required'),
     role: Yup.string().required('Role is required'),
     zipCode: Yup.string().required('Zip code is required'),
     avatarUrl: Yup.mixed().nullable().required('Avatar is required'),
@@ -57,8 +60,8 @@ export default function UserNewEditForm({ currentUser }) {
 
   const defaultValues = useMemo(
     () => ({
-      name: currentUser?.name || '',
-      city: currentUser?.city || '',
+      name: currentUser?.username || '',
+      gender: currentUser?.gender || '',
       role: currentUser?.role || '',
       email: currentUser?.email || '',
       state: currentUser?.state || '',
@@ -67,8 +70,8 @@ export default function UserNewEditForm({ currentUser }) {
       country: currentUser?.country || '',
       zipCode: currentUser?.zipCode || '',
       company: currentUser?.company || '',
-      avatarUrl: currentUser?.avatarUrl || null,
-      phoneNumber: currentUser?.phoneNumber || '',
+      avatarUrl: currentUser?.profile_photo || null,
+      phoneNumber: currentUser?.phone_number || '',
       isVerified: currentUser?.isVerified || true,
     }),
     [currentUser]
@@ -151,13 +154,14 @@ export default function UserNewEditForm({ currentUser }) {
                       color: 'text.disabled',
                     }}
                   >
-                    Allowed *.jpeg, *.jpg, *.png, *.gif
-                    <br /> max size of {fData(3145728)}
+                    {/* Allowed *.jpeg, *.jpg, *.png, *.gif
+                    <br /> max size of {fData(3145728)} */}
                   </Typography>
                 }
               />
+              {/* <Avatar alt={username} src={profile_photo} sx={{ mr: 2 }} /> */}
             </Box>
-
+            {/* 
             {currentUser && (
               <FormControlLabel
                 labelPlacement="start"
@@ -188,9 +192,9 @@ export default function UserNewEditForm({ currentUser }) {
                 }
                 sx={{ mx: 0, mb: 3, width: 1, justifyContent: 'space-between' }}
               />
-            )}
+            )} */}
 
-            <RHFSwitch
+            {/* <RHFSwitch
               name="isVerified"
               labelPlacement="start"
               label={
@@ -204,15 +208,15 @@ export default function UserNewEditForm({ currentUser }) {
                 </>
               }
               sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
-            />
+            /> */}
 
-            {currentUser && (
+            {/* {currentUser && (
               <Stack justifyContent="center" alignItems="center" sx={{ mt: 3 }}>
                 <Button variant="soft" color="error">
                   Delete User
                 </Button>
               </Stack>
-            )}
+            )} */}
           </Card>
         </Grid>
 
@@ -231,48 +235,19 @@ export default function UserNewEditForm({ currentUser }) {
               <RHFTextField name="email" label="Email Address" />
               <RHFTextField name="phoneNumber" label="Phone Number" />
 
-              <RHFAutocomplete
-                name="country"
-                label="Country"
-                options={countries.map((country) => country.label)}
-                getOptionLabel={(option) => option}
-                isOptionEqualToValue={(option, value) => option === value}
-                renderOption={(props, option) => {
-                  const { code, label, phone } = countries.filter(
-                    (country) => country.label === option
-                  )[0];
-
-                  if (!label) {
-                    return null;
-                  }
-
-                  return (
-                    <li {...props} key={label}>
-                      <Iconify
-                        key={label}
-                        icon={`circle-flags:${code.toLowerCase()}`}
-                        width={28}
-                        sx={{ mr: 1 }}
-                      />
-                      {label} ({code}) +{phone}
-                    </li>
-                  );
-                }}
-              />
-
-              <RHFTextField name="state" label="State/Region" />
-              <RHFTextField name="city" label="City" />
-              <RHFTextField name="address" label="Address" />
+              {/* <RHFTextField name="gender" label="Gender" /> */}
+              <RHFTextField name="gender" label="Gender" />
+              {/* <RHFTextField name="address" label="Address" />
               <RHFTextField name="zipCode" label="Zip/Code" />
-              <RHFTextField name="company" label="Company" />
+              <RHFTextField name="company" label="Company" /> */}
               <RHFTextField name="role" label="Role" />
             </Box>
 
-            <Stack alignItems="flex-end" sx={{ mt: 3 }}>
+            {/* <Stack alignItems="flex-end" sx={{ mt: 3 }}>
               <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
                 {!currentUser ? 'Create User' : 'Save Changes'}
               </LoadingButton>
-            </Stack>
+            </Stack> */}
           </Card>
         </Grid>
       </Grid>

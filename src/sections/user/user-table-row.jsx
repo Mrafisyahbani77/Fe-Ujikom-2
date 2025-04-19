@@ -162,17 +162,17 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
           </Label>
         </TableCell>
 
-        {/* <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-          <Tooltip title="Quick Edit" placement="top" arrow>
+        <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
+          {/* <Tooltip title="Quick Edit" placement="top" arrow>
             <IconButton color={quickEdit.value ? 'inherit' : 'default'} onClick={quickEdit.onTrue}>
               <Iconify icon="solar:pen-bold" />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
 
           <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
-        </TableCell> */}
+        </TableCell>
       </TableRow>
 
       <UserQuickEditForm currentUser={row} open={quickEdit.value} onClose={quickEdit.onFalse} />
@@ -185,23 +185,14 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
       >
         <MenuItem
           onClick={() => {
-            confirm.onTrue();
-            popover.onClose();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Iconify icon="solar:trash-bin-trash-bold" />
-          Delete
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
             onEditRow();
             popover.onClose();
           }}
         >
-          <Iconify icon="solar:pen-bold" />
-          Edit
+          {/* <Iconify icon="solar:pen-bold" />
+           */}
+          <Iconify icon="solar:eye-bold" />
+          Lihat
         </MenuItem>
       </CustomPopover>
 

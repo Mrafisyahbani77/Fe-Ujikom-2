@@ -5,3 +5,4 @@ export * from './useFetchChartWeekly';
 export * from './useFetchChartYearly';
 export * from './useFetchTotalUser';
 export * from './useFetchTotalProducts';
+export * from './useFetchNewProduct';

@@ -40,14 +40,14 @@ EcommerceLatestProducts.propTypes = {
 // ----------------------------------------------------------------------
 
 function ProductItem({ product }) {
-  const { name, coverUrl, price, priceSale } = product;
+  const { name, coverUrl, price, priceSale, images } = product;
 
   return (
     <Stack direction="row" spacing={2}>
       <Avatar
         variant="rounded"
         alt={name}
-        src={coverUrl}
+        src={images[0]}
         sx={{ width: 48, height: 48, flexShrink: 0 }}
       />
 
@@ -74,7 +74,7 @@ function ProductItem({ product }) {
         }}
       />
 
-      <ColorPreview limit={3} colors={product.colors} />
+      {/* <ColorPreview limit={3} colors={product.color} /> */}
     </Stack>
   );
 }
