@@ -4,7 +4,6 @@ import { useCallback, useState } from 'react';
 // @mui
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
@@ -18,14 +17,12 @@ import {
   PRODUCT_RATING_OPTIONS,
   PRODUCT_CATEGORY_OPTIONS,
 } from 'src/_mock';
-// api
-// import { useGetProducts, useSearchProducts } from 'src/api/product';
 // components
 import EmptyContent from 'src/components/empty-content';
 import { useSettingsContext } from 'src/components/settings';
 //
 import { useCheckoutContext } from '../../checkout/context';
-import CartIcon from '../common/cart-icon';
+// import CartIcon from '../common/cart-icon';
 import ProductList from '../product-list';
 import ProductSort from '../product-sort';
 import ProductSearch from '../product-search';
