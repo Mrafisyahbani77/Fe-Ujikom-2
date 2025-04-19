@@ -21,10 +21,6 @@ export const HomePage = lazy(() => import('src/pages/home'));
 const Page500 = lazy(() => import('src/pages/500'));
 const Page403 = lazy(() => import('src/pages/403'));
 const Page404 = lazy(() => import('src/pages/404'));
-const FaqsPage = lazy(() => import('src/pages/faqs'));
-const AboutPage = lazy(() => import('src/pages/about-us'));
-const ContactPage = lazy(() => import('src/pages/contact-us'));
-const PaymentPage = lazy(() => import('src/pages/payment'));
 // PRODUCT
 const ProductListPage = lazy(() => import('src/pages/product/list'));
 const ProductDetailsPage = lazy(() => import('src/pages/product/details'));
@@ -42,9 +38,6 @@ export const mainRoutes = [
       </MainLayout>
     ),
     children: [
-      // { path: 'about-us', element: <AboutPage /> },
-      // { path: 'contact-us', element: <ContactPage /> },
-      // { path: 'faqs', element: <FaqsPage /> },
       { path: 'profile', element: <AccountUser /> },
       { path: 'category/:slug', element: <Category /> },
       { path: 'success', element: <Success /> },
