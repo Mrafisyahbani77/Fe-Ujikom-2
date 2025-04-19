@@ -178,7 +178,7 @@ export default function AccountGeneral() {
               {/* <RHFTextField name="address" label="Address" /> */}
               <RHFSelect name="gender" label="Jenis Kelamin">
                 <MenuItem value="pria">Laki-laki</MenuItem>
-                <MenuItem value="wanita">Perempuan</MenuItem>
+                <MenuItem value="wanita">Wanita</MenuItem>
               </RHFSelect>
 
               {/* <RHFAutocomplete

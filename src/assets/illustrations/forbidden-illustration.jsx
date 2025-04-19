@@ -11,11 +11,8 @@ function ForbiddenIllustration({ ...other }) {
   const theme = useTheme();
 
   const PRIMARY_LIGHT = theme.palette.primary.light;
-
   const PRIMARY_MAIN = theme.palette.primary.main;
-
   const PRIMARY_DARK = theme.palette.primary.dark;
-
   const PRIMARY_DARKER = theme.palette.primary.darker;
 
   return (
@@ -23,13 +20,15 @@ function ForbiddenIllustration({ ...other }) {
       component="svg"
       width="100%"
       height="100%"
+      maxWidth={360}
+      maxHeight={900}
       viewBox="0 0 480 360"
       xmlns="http://www.w3.org/2000/svg"
       {...other}
     >
       <BackgroundShape />
 
-      <image href="/assets/illustrations/characters/character_4.png" height="300" x="220" y="30" />
+      <image href="/public/logo/icon-login3.png" height="450" x="20" y="0" />
 
       <path
         fill={PRIMARY_MAIN}
@@ -37,18 +36,10 @@ function ForbiddenIllustration({ ...other }) {
         opacity="0.08"
       />
 
-      <path
-        fill="#FFAB00"
-        d="M111.045 142.2c58.7-1 58.6-88.3 0-89.2-58.6 1-58.6 88.3 0 89.2z"
-        opacity="0.12"
-      />
-
-      <path fill="#FFD666" d="M111.045 121c30.8-.5 30.8-46.3 0-46.8-30.8.5-30.8 46.3 0 46.8z" />
-
-      <path
+      {/* <path
         fill="#FBCDBE"
         d="M278.045 250.1c-4.6-6.5-14 5.1-18.1 7.2-.6-2.1 1.5-41.3-1.4-41.8-2.8-3-8.1-.7-8 3.3.2-4 .5-11.3-5.6-10.2-4.8.6-3.8 6.9-3.8 10.2.1-6.1-9.5-6.1-9.4 0v5.6c.2-4.2-5.7-6.4-8.3-3-2.6-.2-.4 41.8-1.1 43.3-.2 10 8.7 19 18.8 18.7 6.1.4 12.6-1.2 16.8-5.9l19.7-21c1.7-1.6 1.8-4.5.4-6.4z"
-      />
+      /> */}
 
       <path
         fill="#000"
@@ -71,10 +62,10 @@ function ForbiddenIllustration({ ...other }) {
       <defs>
         <linearGradient
           id="paint0_linear_1_129"
-          x1="78.245"
-          x2="78.245"
-          y1="187.309"
-          y2="307.306"
+          x1="169.245"
+          x2="169.245"
+          y1="200"
+          y2="300"
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor={PRIMARY_LIGHT} />

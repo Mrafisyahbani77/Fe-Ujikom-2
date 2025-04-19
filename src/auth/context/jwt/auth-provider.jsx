@@ -121,14 +121,13 @@ export function AuthProvider({ children }) {
 
         await initialize();
 
-        // 🔁 Redirect berdasarkan role
-        if (user.role === 'admin') {
+        const userRole = user.role;
+        console.log(userRole);
+        // Redirect sesuai role
+        if (userRole?.includes('admin')) {
           router.push('/dashboard');
-        } else if (user.role === 'pembeli') {
+        } else if (userRole?.includes('pembeli')) {
           router.push('/');
-        } else {
-          console.warn('Role tidak dikenali:', user.role);
-          router.push('/'); // default redirect
         }
 
         return response.data;

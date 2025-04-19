@@ -41,8 +41,8 @@ export default function CheckoutCart() {
 
           {empty ? (
             <EmptyContent
-              title="Cart is Empty!"
-              description="Look like you have no items in your shopping cart."
+              title="Keranjang kosong!"
+              description="Sepertinya Anda tidak memiliki barang dalam keranjang belanja Anda."
               imgUrl="/assets/icons/empty/ic_cart.svg"
               sx={{ pt: 5, pb: 10 }}
             />

@@ -23,12 +23,12 @@ export default function NotFoundView() {
           </Typography>
         </m.div>
 
-        <m.div variants={varBounce().in}>
+        {/* <m.div variants={varBounce().in}>
           <Typography sx={{ color: 'text.secondary' }}>
             Sorry, we couldn’t find the page you’re looking for. Perhaps you’ve mistyped the URL? Be
             sure to check your spelling.
           </Typography>
-        </m.div>
+        </m.div> */}
 
         <m.div variants={varBounce().in}>
           <PageNotFoundIllustration
@@ -40,7 +40,7 @@ export default function NotFoundView() {
         </m.div>
 
         <Button component={RouterLink} href="/" size="large" variant="contained">
-          Go to Home
+          Kembali ke beranda
         </Button>
       </MotionContainer>
     </CompactLayout>

@@ -174,7 +174,7 @@ export default function JwtRegisterView() {
             <InputLabel>Jenis Kelamin</InputLabel>
             <Select {...register('gender')} error={!!errors.gender}>
               <MenuItem value="pria">Laki-laki</MenuItem>
-              <MenuItem value="wanita">Perempuan</MenuItem>
+              <MenuItem value="wanita">Wanita</MenuItem>
             </Select>
           </FormControl>
           <TextField

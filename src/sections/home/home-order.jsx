@@ -131,8 +131,8 @@ export default function HomeOrder() {
           name: item.product.name,
           cover: item.product.images?.[0]?.image_url,
           price: item.product.discount_price || item.product.price,
-          color: item?.color,
-          size: item.size,
+          colors: item?.color,
+          size: item?.size,
           quantity: item.quantity,
           subTotal: (item.product.discount_price || item.product.price) * item.quantity,
         };

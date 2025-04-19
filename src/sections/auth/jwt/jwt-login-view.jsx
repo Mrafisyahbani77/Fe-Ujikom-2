@@ -96,14 +96,13 @@ export default function JwtLoginView() {
 
       const userRole = response.user.role;
       console.log(userRole);
-
-      if (userRole === 'admin') {
+      // Redirect sesuai role
+      if (userRole?.includes('admin')) {
         router.push('/dashboard');
-      } else if (userRole === 'pembeli') {
+      } else if (userRole?.includes('pembeli')) {
         router.push('/');
       } else {
         enqueueSnackbar('Role tidak dikenal!', { variant: 'error' });
-        return;
       }
 
       enqueueSnackbar('Login berhasil!', { variant: 'success' });
