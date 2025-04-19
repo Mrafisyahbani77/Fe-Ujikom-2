@@ -77,26 +77,7 @@ export default function JwtRegisterView() {
       }
     },
     onError: (error) => {
-      let errorMessage = 'Registrasi gagal';
-
-      if (error?.response) {
-        const { status, data } = error.response;
-
-        if (status === 400) {
-          if (data?.message?.includes('Username, email, atau nomor telepon sudah terdaftar')) {
-            errorMessage =
-              'Username, email, atau nomor telepon sudah terdaftar! Silakan gunakan data lain.';
-          } else {
-            errorMessage = data?.message || 'Input tidak valid. Periksa kembali data Anda.';
-          }
-        } else if (status === 500) {
-          errorMessage = 'Terjadi kesalahan pada server. Silakan coba lagi nanti.';
-        }
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-
-      setErrorMsg(errorMessage);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Data input tidak valid';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     },
   });
