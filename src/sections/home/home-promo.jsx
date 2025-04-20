@@ -156,19 +156,25 @@ export default function HomePromo() {
                 </Box>
 
                 <CardContent
-                  component={Link}
-                  to={`/promo/${promo.slug}`}
                   sx={{
                     flexGrow: 1,
-                    textDecoration: 'none',
-                    color: 'inherit', // Atau bisa pakai 'text.primary' sesuai tema
-                    '&:hover': {
-                      textDecoration: 'none',
-                      color: 'primary.main', // Kalau mau ada efek hover, bisa diatur di sini
-                    },
                   }}
                 >
-                  <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                  <Typography
+                    component={Link}
+                    to={`/promo/${promo.slug}`}
+                    gutterBottom
+                    variant="h6"
+                    sx={{
+                      fontWeight: 'bold',
+                      textDecoration: 'none',
+                      color: 'inherit', // Atau bisa pakai 'text.primary' sesuai tema
+                      '&:hover': {
+                        textDecoration: 'none',
+                        color: 'primary.main', // Kalau mau ada efek hover, bisa diatur di sini
+                      },
+                    }}
+                  >
                     {promo.title || `Promo Special ${index + 1}`}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
