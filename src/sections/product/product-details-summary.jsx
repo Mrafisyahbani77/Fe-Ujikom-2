@@ -88,16 +88,16 @@ export default function ProductDetailsSummary({
   });
 
   const { reset, watch, control, setValue, handleSubmit } = methods;
-  const { data: wishlistData } = useFetchWhislist();
+  // const { data: wishlistData } = useFetchWhislist();
   const [wishlist, setWishlist] = useState([]);
 
-  useEffect(() => {
-    if (Array.isArray(wishlistData?.data)) {
-      setWishlist(wishlistData.data);
-    } else {
-      setWishlist([]);
-    }
-  }, [wishlistData]);
+  // useEffect(() => {
+  //   if (Array.isArray(wishlistData?.data)) {
+  //     setWishlist(wishlistData.data);
+  //   } else {
+  //     setWishlist([]);
+  //   }
+  // }, [wishlistData]);
 
   const values = watch();
 
@@ -235,7 +235,7 @@ export default function ProductDetailsSummary({
 
       <Link
         variant="subtitle2"
-        onClick={() => handleWishlist(product?.id)} // Call the handleWishlist function with the product id
+        // onClick={() => handleWishlist(product?.id)} // Call the handleWishlist function with the product id
         sx={{
           cursor: 'pointer',
           color: isWishlisted ? 'primary.main' : 'text.secondary', // Change color based on wishlist status
