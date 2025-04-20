@@ -32,6 +32,15 @@ export default function OrderTableFiltersResult({
     onFilters('endDate', null);
   };
 
+  const STATUS_LABELS = {
+    all: 'Semua',
+    pending: 'Belum Bayar',
+    paid: 'Dikemas',
+    shipped: 'Dikirim',
+    delivered: 'Selesai',
+    cancellation_requested: 'Dibatalkan',
+  };
+
   return (
     <Stack spacing={1.5} {...other}>
       <Box sx={{ typography: 'body2' }}>
@@ -44,7 +53,11 @@ export default function OrderTableFiltersResult({
       <Stack flexGrow={1} spacing={1} direction="row" flexWrap="wrap" alignItems="center">
         {filters.status !== 'all' && (
           <Block label="Status:">
-            <Chip size="small" label={filters.status} onDelete={handleRemoveStatus} />
+            <Chip
+              size="small"
+              label={STATUS_LABELS[filters.status] || filters.status}
+              onDelete={handleRemoveStatus}
+            />
           </Block>
         )}
 

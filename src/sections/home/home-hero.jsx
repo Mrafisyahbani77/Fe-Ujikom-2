@@ -10,16 +10,6 @@ import { useFetchBanner } from 'src/utils/banner/public/useFetchBanner';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
-// const StyledRoot = styled('div')(() => ({
-//   width: '100vw',
-//   minHeight: '100vh',
-//   position: 'relative',
-//   display: 'flex',
-//   alignItems: 'center',
-//   justifyContent: 'center',
-//   overflow: 'hidden',
-// }));
-
 export default function HomeHero() {
   const { data, isLoading } = useFetchBanner();
 
@@ -37,11 +27,12 @@ export default function HomeHero() {
 
   if (isLoading) return null;
 
+  const isBannerAvailable = data && data.length > 0;
+
   return (
     <Container
       sx={{
         width: '100vw',
-        // minHeight: '100vh',
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
@@ -58,24 +49,48 @@ export default function HomeHero() {
         }}
       >
         <Carousel ref={carousel.carouselRef} {...carousel.carouselSettings}>
-          {data?.map((item) => (
+          {isBannerAvailable ? (
+            data.map((item) => (
+              <Card
+                key={item.id}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  borderRadius: 1,
+                  boxShadow: 10,
+                }}
+              >
+                <Image
+                  alt={item.title}
+                  src={item.image_url}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: 'inherit',
+                  }}
+                />
+              </Card>
+            ))
+          ) : (
             <Card
-              key={item.id}
               sx={{
                 width: '100%',
                 height: '100%',
                 overflow: 'hidden',
                 position: 'relative',
-                borderRadius: 1, // Lebih gede, lebih bulet
+                borderRadius: 1,
                 boxShadow: 10,
               }}
             >
               <Image
-                alt={item.title}
-                src={item.image_url}
-                sx={{ width: '100%', height: '100%', objectFit: 'cover',  borderRadius: 'inherit' }}
+                alt="Default Banner"
+                src="https://picsum.photos/1840/600"
+                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }}
               />
-              {/* Optional: Tambah isi Card (judul, tombol, dll) */}
+              {/* Bisa tambahkan fallback text jika mau */}
               {/* <CardContent
                 sx={{
                   position: 'absolute',
@@ -87,13 +102,12 @@ export default function HomeHero() {
                   padding: 2,
                 }}
               >
-                <Typography variant="h5">{item.title}</Typography>
+                <Typography variant="h5">Tidak ada banner tersedia</Typography>
               </CardContent> */}
             </Card>
-          ))}
+          )}
         </Carousel>
 
-        {/* ARROWS */}
         <CarouselArrows
           onNext={carousel.onNext}
           onPrev={carousel.onPrev}

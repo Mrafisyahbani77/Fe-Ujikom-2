@@ -152,7 +152,7 @@ export default function ProductTableToolbar({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             popover.onClose();
           }}
@@ -168,7 +168,7 @@ export default function ProductTableToolbar({
         >
           <Iconify icon="solar:import-bold" />
           Import
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => {

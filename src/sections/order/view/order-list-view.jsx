@@ -235,9 +235,9 @@ export default function OrderListView() {
                       color={
                         (tab.value === 'delivered' && 'success') ||
                         (tab.value === 'pending' && 'warning') ||
-                        (tab.value === 'cancelled' && 'error') ||
+                        (tab.value === 'paid' && 'primary') ||
                         (tab.value === 'shipped' && 'info') ||
-                        (tab.value === 'processing' && 'default') ||
+                        (tab.value === 'cancellation_requested' && 'error') ||
                         'default'
                       }
                     >

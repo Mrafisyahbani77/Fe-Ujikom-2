@@ -30,6 +30,24 @@ export default function OrderDetailsToolbar({
   const popover = usePopover();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
+  const STATUS_OPTIONS = [
+    { value: 'all', label: 'Semua', color: 'default' },
+    { value: 'pending', label: 'Belum Bayar', color: 'warning' },
+    { value: 'paid', label: 'Dikemas', color: 'warning' },
+    { value: 'shipped', label: 'Dikirim', color: 'info' },
+    { value: 'delivered', label: 'Selesai', color: 'success' },
+    { value: 'cancellation_requested', label: 'Dibatalkan', color: 'error' },
+  ];
+
+  const getStatusLabel = (status) => {
+    const found = STATUS_OPTIONS.find((opt) => opt.value === status);
+    return found ? found.label : status;
+  };
+
+  const getStatusColor = (status) => {
+    const found = STATUS_OPTIONS.find((opt) => opt.value === status);
+    return found ? found.color : 'default';
+  };
 
   const { mutate: generateInvoice } = useMutationCreateInvoice({
     onSuccess: async () => {
@@ -78,16 +96,8 @@ export default function OrderDetailsToolbar({
           <Stack spacing={0.5}>
             <Stack spacing={1} direction="row" alignItems="center">
               <Typography variant="h4"> Order {orderNumber} </Typography>
-              <Label
-                variant="soft"
-                color={
-                  (status === 'completed' && 'success') ||
-                  (status === 'pending' && 'warning') ||
-                  (status === 'cancelled' && 'error') ||
-                  'default'
-                }
-              >
-                {status}
+              <Label variant="soft" color={getStatusColor(status)}>
+                {getStatusLabel(status)}
               </Label>
             </Stack>
 

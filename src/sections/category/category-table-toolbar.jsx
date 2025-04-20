@@ -152,14 +152,14 @@ export default function CategoryTableToolbar({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             popover.onClose();
           }}
         >
           <Iconify icon="solar:printer-minimalistic-bold" />
           Print
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => {

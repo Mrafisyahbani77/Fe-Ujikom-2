@@ -106,13 +106,13 @@ export default function OrderDetailsInfo({ customer, delivery, payment, shipping
       <Stack spacing={1.5} sx={{ p: 3, typography: 'body2' }}>
         <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Address
+            Alamat
           </Box>
           {shippingAddress.address}
         </Stack>
         <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Phone number
+            Nomor Hp
           </Box>
           {shippingAddress.phone_number}
         </Stack>

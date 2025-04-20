@@ -17,14 +17,18 @@ import OrderDetailsToolbar from '../order-details-toolbar';
 import OrderDetailsHistory from '../order-details-history';
 import { useFetchOrderById } from 'src/utils/order';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
 export default function OrderDetailsView({ id }) {
   const settings = useSettingsContext();
+  const { user } = useAuthContext();
+  const users = user?.data?.role;
+  // console.log(users)
 
   const { data, isLoading, error } = useFetchOrderById(id);
-  console.log(data);
+  // console.log(data);
 
   if (isLoading) {
     return (
@@ -49,7 +53,7 @@ export default function OrderDetailsView({ id }) {
   return (
     <Container sx={{ my: 5 }} maxWidth={settings.themeStretch ? false : 'lg'}>
       <OrderDetailsToolbar
-        // backLink={paths.dashboard.order.root}
+        backLink={users === 'admin' ? paths.dashboard.order.root : paths.historyorder}
         orderNumber={currentOrder.id}
         createdAt={currentOrder.created_at}
         status={status}
@@ -75,10 +79,10 @@ export default function OrderDetailsView({ id }) {
 
         <Grid xs={12} md={4}>
           <OrderDetailsInfo
-          customer={currentOrder.user}
-          // delivery={currentOrder.delivery}
-          // payment={currentOrder.payment}
-          shippingAddress={currentOrder.shipping}
+            customer={currentOrder.user}
+            // delivery={currentOrder.delivery}
+            // payment={currentOrder.payment}
+            shippingAddress={currentOrder.shipping}
           />
         </Grid>
       </Grid>
