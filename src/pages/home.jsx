@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>Baringin - Toko Online Terpercaya</title>
+        <title>Barangin - Toko Online Terpercaya</title>
       </Helmet>
 
       <HomeView />

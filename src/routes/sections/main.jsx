@@ -13,6 +13,8 @@ import ShippingView from 'src/sections/checkout/shipping-view';
 import OrderDetailsPage from 'src/pages/dashboard/order/details';
 import HomeOrder from 'src/sections/home/home-order';
 import HomeWishlist from 'src/sections/home/home-wishlist';
+import HomePromo from 'src/sections/home/home-promo';
+import HomePromoSlug from 'src/sections/home/home-promo-slug';
 
 // ----------------------------------------------------------------------
 
@@ -45,6 +47,8 @@ export const mainRoutes = [
       { path: 'riwayat-order/:id', element: <OrderDetailsPage /> },
       { path: 'riwayat-order', element: <HomeOrder /> },
       { path: 'wishlist', element: <HomeWishlist /> },
+      { path: 'promo', element: <HomePromo /> },
+      { path: 'promo/:slug', element: <HomePromoSlug /> },
       {
         path: 'product',
         children: [

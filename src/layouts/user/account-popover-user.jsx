@@ -38,12 +38,16 @@ const OPTIONS = [
     linkTo: paths.profile,
   },
   {
-    label: 'Riwayat order',
+    label: 'Riwayat Order',
     linkTo: paths.historyorder,
   },
   {
     label: 'Wishlist',
     linkTo: paths.wishlist,
+  },
+  {
+    label: 'Lihat Promo',
+    linkTo: paths.promo,
   },
 ];
 
