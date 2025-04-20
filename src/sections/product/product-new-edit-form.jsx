@@ -92,13 +92,13 @@ export default function ProductNewEditForm({ currentProduct }) {
       .max(1, 'Pilih hanya satu kategori')
       .required('Kategori wajib diisi'),
     // Subkategori menjadi array untuk multi select
-    subcategories_id: Yup.array()
-      .min(1, 'Pilih minimal satu subkategori')
-      .required('Subkategori wajib diisi'),
-    // Gender juga menjadi array untuk multi select
-    gender_categories_id: Yup.array()
-      .min(1, 'Pilih minimal satu gender')
-      .required('Gender wajib diisi'),
+    // subcategories_id: Yup.array()
+    //   .min(1, 'Pilih minimal satu subkategori')
+    //   .required('Subkategori wajib diisi'),
+    // // Gender juga menjadi array untuk multi select
+    // gender_categories_id: Yup.array()
+    //   .min(1, 'Pilih minimal satu gender')
+    //   .required('Gender wajib diisi'),
   });
 
   const defaultValues = useMemo(
@@ -111,10 +111,10 @@ export default function ProductNewEditForm({ currentProduct }) {
       // Kategori sebagai array dengan satu nilai saja
       categories_id: currentProduct?.categories?.id ? [currentProduct.categories.id] : [],
       // Subkategori dan gender sebagai array
-      subcategories_id: currentProduct?.subcategories?.id ? [currentProduct.subcategories.id] : [],
-      gender_categories_id: currentProduct?.gender_categories?.id
-        ? [currentProduct.gender_categories.id]
-        : [],
+      // subcategories_id: currentProduct?.subcategories?.id ? [currentProduct.subcategories.id] : [],
+      // gender_categories_id: currentProduct?.gender_categories?.id
+      //   ? [currentProduct.gender_categories.id]
+      //   : [],
       color: currentProduct?.color || [],
       size: currentProduct?.size || [],
       status: currentProduct?.status || 'publish',
@@ -223,13 +223,13 @@ export default function ProductNewEditForm({ currentProduct }) {
       }
 
       // Subkategori multi value - kirim sebagai JSON string
-      if (data.subcategories_id && data.subcategories_id.length) {
-        formData.append('subcategories_id', data.subcategories_id[0].toString());
-      }
+      // if (data.subcategories_id && data.subcategories_id.length) {
+      //   formData.append('subcategories_id', data.subcategories_id[0].toString());
+      // }
 
-      if (data.gender_categories_id && data.gender_categories_id.length) {
-        formData.append('gender_categories_id', data.gender_categories_id[0].toString());
-      }
+      // if (data.gender_categories_id && data.gender_categories_id.length) {
+      //   formData.append('gender_categories_id', data.gender_categories_id[0].toString());
+      // }
 
       // Gender multi value - kirim sebagai JSON string
       // if (data.gender_categories_id && data.gender_categories_id.length) {
@@ -422,13 +422,13 @@ export default function ProductNewEditForm({ currentProduct }) {
               />
 
               {/* Subkategori sebagai multi select */}
-              <RHFMultiSelect
+              {/* <RHFMultiSelect
                 checkbox
                 name="subcategories_id"
                 label="Subkategori"
                 options={filteredSubcategoryOptions}
                 onChange={handleSubcategoryChange}
-              />
+              /> */}
 
               <RHFMultiSelect
                 checkbox
@@ -440,12 +440,12 @@ export default function ProductNewEditForm({ currentProduct }) {
               <RHFMultiSelect checkbox name="size" label="Ukuran" options={PRODUCT_SIZE_OPTIONS} />
 
               {/* Gender sebagai multi select */}
-              <RHFMultiSelect
+              {/* <RHFMultiSelect
                 checkbox
                 name="gender_categories_id"
                 label="Gender"
                 options={GENDER_OPTIONS}
-              />
+              /> */}
             </Box>
 
             <Divider sx={{ borderStyle: 'dashed' }} />

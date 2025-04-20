@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 // @mui
 import Box from '@mui/material/Box';
@@ -9,11 +10,29 @@ import { ProductItemSkeleton } from './product-skeleton';
 // ----------------------------------------------------------------------
 
 export default function ProductList({ products, loading, ...other }) {
-  // console.log(products)
+  const [page, setPage] = useState(1);
+  const [displayedProducts, setDisplayedProducts] = useState([]);
+
+  const itemsPerPage = 5;
+  const totalPages = products ? Math.ceil(products.length / itemsPerPage) : 0;
+
+  useEffect(() => {
+    if (products) {
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      setDisplayedProducts(products.slice(startIndex, endIndex));
+    }
+  }, [page, products]);
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+    // Scroll to top of the product list when page changes (optional)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const renderSkeleton = (
     <>
-      {[...Array(16)].map((_, index) => (
+      {[...Array(itemsPerPage)].map((_, index) => (
         <ProductItemSkeleton key={index} />
       ))}
     </>
@@ -21,7 +40,7 @@ export default function ProductList({ products, loading, ...other }) {
 
   const renderList = (
     <>
-      {products?.map((product) => (
+      {displayedProducts?.map((product) => (
         <ProductItem key={product.id} product={product} />
       ))}
     </>
@@ -45,7 +64,9 @@ export default function ProductList({ products, loading, ...other }) {
 
       {products?.length > 0 && (
         <Pagination
-          // count={8}
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
           sx={{
             mt: 8,
             [`& .${paginationClasses.ul}`]: {
