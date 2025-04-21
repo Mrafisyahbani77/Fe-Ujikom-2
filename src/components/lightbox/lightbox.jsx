@@ -20,7 +20,7 @@ const ICON_SIZE = 24;
 export default function Lightbox({
   slides,
   disabledZoom,
-  disabledVideo,
+  disabledVideo = false,
   disabledTotal,
   disabledCaptions,
   disabledSlideshow,
@@ -61,6 +61,10 @@ export default function Lightbox({
             'close',
           ],
         }}
+        video={{
+          autoPlay: false,
+          controls: true,
+        }}
         render={{
           iconClose: () => <Iconify width={ICON_SIZE} icon="carbon:close" />,
           iconZoomIn: () => <Iconify width={ICON_SIZE} icon="carbon:zoom-in" />,
@@ -71,6 +75,8 @@ export default function Lightbox({
           iconNext: () => <Iconify width={ICON_SIZE + 8} icon="carbon:chevron-right" />,
           iconExitFullscreen: () => <Iconify width={ICON_SIZE} icon="carbon:center-to-fit" />,
           iconEnterFullscreen: () => <Iconify width={ICON_SIZE} icon="carbon:fit-to-screen" />,
+          iconVideoPlay: () => <Iconify width={ICON_SIZE} icon="carbon:play" />,
+          iconVideoPause: () => <Iconify width={ICON_SIZE} icon="carbon:pause" />,
         }}
         {...other}
       />

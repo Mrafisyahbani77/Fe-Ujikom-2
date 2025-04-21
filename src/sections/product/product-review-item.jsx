@@ -5,99 +5,164 @@ import Stack from '@mui/material/Stack';
 import Rating from '@mui/material/Rating';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import ListItemText from '@mui/material/ListItemText';
 // utils
 import { fDate } from 'src/utils/format-time';
 // components
 import Iconify from 'src/components/iconify';
+import Lightbox from 'src/components/lightbox';
+import useLightBox from 'src/components/lightbox/use-light-box';
 
 // ----------------------------------------------------------------------
 
 export default function ProductReviewItem({ review }) {
-  const {
-    name,
-    rating,
-    comment,
-    postedAt,
-    avatarUrl,
-    attachments,
-    isPurchased,
-    images,
-    created_at,
-    user_name,
-    user,
-  } = review;
-  console.log(review);
+  const { rating, created_at, user, media } = review;
+
+  const slides =
+    media?.map((item) => {
+      if (item.type === 'video') {
+        return {
+          type: 'video',
+          width: 1280,
+          height: 720,
+          poster: item.url,
+          sources: [
+            {
+              src: item.url,
+              type: 'video/mp4',
+            },
+          ],
+        };
+      }
+
+      return {
+        src: item.url,
+      };
+    }) || [];
+
+  const lightbox = useLightBox(slides);
 
   const renderInfo = (
-    <Box
+    <Avatar
+      src={user.photo_profile}
       sx={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 2, // jarak avatar dan content
-        mb: 3, // margin bawah antar review
-        pl: { xs: 2, md: 3 }, // ⬅️ tambah padding left (pl = paddingLeft)
+        width: { xs: 40, md: 40 },
+        height: { xs: 40, md: 40 },
+      }}
+    />
+  );
+
+  const renderMediaThumbnails = (
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{
+        mt: 1.5,
+        flexWrap: 'wrap',
+        gap: 1,
       }}
     >
-      <Avatar
-        src={user.photo_profile}
-        sx={{
-          width: { xs: 42, md: 45 },
-          height: { xs: 42, md: 45 },
-        }}
-      />
-    </Box>
+      {media?.map((item, index) => {
+        if (item.type === 'video') {
+          return (
+            <Box
+              key={`${item.url}-${index}`}
+              sx={{
+                position: 'relative',
+                width: 80,
+                height: 80,
+                borderRadius: 1,
+                overflow: 'hidden',
+                cursor: 'pointer',
+              }}
+              onClick={() => lightbox.onOpen(index)}
+            >
+              <Box
+                component="video"
+                src={item.url}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: 'rgba(0,0,0,0.3)',
+                }}
+              >
+                <Iconify icon="eva:play-fill" sx={{ color: 'white', width: 30, height: 30 }} />
+                <Typography
+                  variant="caption"
+                  sx={{
+                    position: 'absolute',
+                    bottom: 4,
+                    right: 4,
+                    color: 'white',
+                    bgcolor: 'rgba(0,0,0,0.6)',
+                    px: 0.5,
+                    borderRadius: 0.5,
+                  }}
+                >
+                  0:26
+                </Typography>
+              </Box>
+            </Box>
+          );
+        }
+
+        return (
+          <Box
+            component="img"
+            key={`${item.url}-${index}`}
+            src={item.url}
+            onClick={() => lightbox.onOpen(index)}
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: 1,
+              objectFit: 'cover',
+              cursor: 'pointer',
+            }}
+          />
+        );
+      })}
+    </Stack>
   );
 
   const renderContent = (
-    <Stack spacing={1} flexGrow={1}>
-      <ListItemText
-        primary={user.name}
-        secondary={fDate(created_at)}
-        primaryTypographyProps={{
-          noWrap: true,
-          typography: 'subtitle2',
-          mb: 0.5,
-        }}
-        secondaryTypographyProps={{
-          noWrap: true,
-          typography: 'caption',
-          component: 'span',
-        }}
-      />
-      <Rating size="small" value={rating} precision={0.1} readOnly />
-
-      {isPurchased && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={{
-            color: 'success.main',
-            typography: 'caption',
-          }}
-        >
-          <Iconify icon="ic:round-verified" width={16} sx={{ mr: 0.5 }} />
-          Verified purchase
+    <Stack sx={{ flex: 1 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center">
+          {renderInfo}
+          <Box>
+            <Typography variant="subtitle2" noWrap>
+              {user.name}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
+              {fDate(created_at)}
+            </Typography>
+            <Typography variant="subtitle2" noWrap>
+              <Rating size="small" value={rating} precision={0.5} readOnly />
+            </Typography>
+          </Box>
         </Stack>
-      )}
+      </Stack>
 
-      <Typography variant="body2">{review.review}</Typography>
+      <Typography variant="body2" sx={{ mt: 1.5 }}>
+        {review.review}
+      </Typography>
 
-      {!!images?.length && (
-        <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ pt: 1 }}>
-          {images.map((attachment) => (
-            <Box
-              component="img"
-              key={attachment}
-              alt={attachment}
-              src={attachment}
-              sx={{ width: 64, height: 64, borderRadius: 1.5 }}
-            />
-          ))}
-        </Stack>
-      )}
+      {!!media?.length && renderMediaThumbnails}
 
-      <Stack direction="row" spacing={2} sx={{ pt: 1.5 }}>
+      <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         <Stack direction="row" alignItems="center" sx={{ typography: 'caption' }}>
           <Iconify icon="solar:like-outline" width={16} sx={{ mr: 0.5 }} />
           123
@@ -112,17 +177,22 @@ export default function ProductReviewItem({ review }) {
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'flex-start', // supaya rata atas
-        gap: 2, // kecilin jarak, bisa 1.5 atau 2
-        mt: 5,
-      }}
-    >
-      {renderInfo}
-      {renderContent}
-    </Box>
+    <>
+      <Stack
+        spacing={2}
+        sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2, mb: 3 }}
+      >
+        {renderContent}
+      </Stack>
+
+      <Lightbox
+        index={lightbox.selected}
+        slides={slides}
+        open={lightbox.open}
+        close={lightbox.onClose}
+        onGetCurrentIndex={(index) => lightbox.setSelected(index)}
+      />
+    </>
   );
 }
 

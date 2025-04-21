@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -36,6 +36,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'src/routes/hooks';
 import { useCheckoutContext } from '../checkout/context';
 import { paths } from 'src/routes/paths';
+import { useFetchReview } from 'src/utils/review'; // Tambahkan import ini jika ada
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Semua', color: 'default' },
@@ -49,6 +50,8 @@ const STATUS_OPTIONS = [
 export default function HomeOrder() {
   const router = useRouter();
   const { data, isLoading, error } = useFetchOrder();
+  // Tambahkan ini jika API untuk mengambil review tersedia
+  // const { data: userReviews } = useFetchReviews();
   const { onAddToCart } = useCheckoutContext();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
@@ -58,6 +61,9 @@ export default function HomeOrder() {
   const confirmCancel = useBoolean();
   const [cancelOrderId, setCancelOrderId] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
+
+  // State untuk menyimpan informasi produk yang sudah direview
+  const [reviewedProducts, setReviewedProducts] = useState({});
 
   const handleChangeTab = (event, newValue) => {
     setCurrentTab(newValue);
@@ -126,6 +132,12 @@ export default function HomeOrder() {
           return;
         }
 
+        // Cek stok produk
+        if (item.product.stock <= 0) {
+          enqueueSnackbar('Stok produk tidak tersedia', { variant: 'error' });
+          return;
+        }
+
         const productData = {
           id: item.products_id, // Use products_id from item
           name: item.product.name,
@@ -147,6 +159,109 @@ export default function HomeOrder() {
     },
     [onAddToCart, router, enqueueSnackbar]
   );
+
+  // Function untuk handle buy again multiple items
+  const handleBuyAgainMultiple = useCallback(
+    (items) => {
+      try {
+        // Filter item yang masih ada stoknya
+        const availableItems = items.filter((item) => item.product && item.product.stock > 0);
+
+        if (availableItems.length === 0) {
+          enqueueSnackbar('Semua produk tidak tersedia stoknya', { variant: 'error' });
+          return;
+        }
+
+        // Tambahkan semua produk ke keranjang
+        availableItems.forEach((item) => {
+          const productData = {
+            id: item.products_id,
+            name: item.product.name,
+            cover: item.product.images?.[0]?.image_url,
+            price: item.product.discount_price || item.product.price,
+            colors: item?.color,
+            size: item?.size,
+            quantity: item.quantity,
+            subTotal: (item.product.discount_price || item.product.price) * item.quantity,
+          };
+          onAddToCart(productData);
+        });
+
+        enqueueSnackbar(`${availableItems.length} produk berhasil ditambahkan ke keranjang`, {
+          variant: 'success',
+        });
+        router.push(paths.product.checkout);
+      } catch (error) {
+        console.error('Error in handleBuyAgainMultiple:', error);
+        enqueueSnackbar('Gagal menambahkan produk ke keranjang', { variant: 'error' });
+      }
+    },
+    [onAddToCart, router, enqueueSnackbar]
+  );
+
+  // Function to handle successful review submission
+  const handleReviewSubmitted = (userId, productId) => {
+    setReviewedProducts((prev) => ({
+      ...prev,
+      [`${userId}-${productId}`]: true,
+    }));
+    queryClient.invalidateQueries(['order']);
+    // Jika ada API untuk mengambil review, refresh data
+    // queryClient.invalidateQueries(['reviews']);
+  };
+
+  // Check if a product has been reviewed
+  const hasReview = (userId, productId) => {
+    // Option 1: Check local state (simpel tapi reset setelah refresh)
+    return !!reviewedProducts[`${userId}-${productId}`];
+
+    // Option 2: Check from API data (jika ada)
+    // if (!userReviews) return false;
+    // return userReviews.some(review =>
+    //   review.users_id === userId &&
+    //   review.products_id === productId
+    // );
+  };
+
+  // Function to check review status from API error
+  const checkReviewStatus = (userId, productId) => {
+    return new Promise((resolve) => {
+      // Simulate API call to check if review exists
+      fetch(`/api/reviews/check?userId=${userId}&productId=${productId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === 'error' && data.message.includes('sudah memberikan review')) {
+            resolve(true); // Review already exists
+          } else {
+            resolve(false); // Review doesn't exist
+          }
+        })
+        .catch(() => resolve(false)); // Assume no review on error
+    });
+  };
+
+  const openReviewForm = async (userId, productId) => {
+    try {
+      // Check if the user has already submitted a review
+      const hasExistingReview = await checkReviewStatus(userId, productId);
+
+      setSelectedReview({
+        userId: userId,
+        productId: productId,
+        isEdit: hasExistingReview,
+      });
+      review.onTrue();
+    } catch (error) {
+      console.error('Error checking review status:', error);
+      // Fallback to local state
+      setSelectedReview({
+        userId: userId,
+        productId: productId,
+        isEdit: hasReview(userId, productId),
+      });
+      review.onTrue();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -226,190 +341,236 @@ export default function HomeOrder() {
             </Card>
           </Grid>
         ) : (
-          filteredOrders?.map((order) => (
-            <Grid item xs={12} key={order.id}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      mb: 2,
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="h6">Order #{order.id}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {fDateTime(order.created_at)}
-                      </Typography>
+          filteredOrders?.map((order) => {
+            // Cek apakah ada produk yang berbeda dalam order
+            const uniqueProductIds = [...new Set(order.items.map((item) => item.products_id))];
+            const hasDifferentProducts = uniqueProductIds.length > 1;
+
+            // Cek apakah semua produk memiliki stok 0
+            const allProductsOutOfStock = order.items.every((item) => item.product?.stock <= 0);
+
+            return (
+              <Grid item xs={12} key={order.id}>
+                <Card>
+                  <CardContent>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mb: 2,
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6">Order #{order.id}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {fDateTime(order.created_at)}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Chip
+                          label={STATUS_MAP[order.status]?.label || order.status}
+                          color={STATUS_MAP[order.status]?.color || 'default'}
+                          size="small"
+                          sx={{ mb: 1 }}
+                        />
+
+                        <Typography variant="subtitle2">
+                          Total: {fCurrency(order.total_price)}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box sx={{ textAlign: 'right' }}>
-                      <Chip
-                        label={STATUS_MAP[order.status]?.label || order.status}
-                        color={STATUS_MAP[order.status]?.color || 'default'}
-                        size="small"
-                        sx={{ mb: 1 }}
-                      />
 
-                      <Typography variant="subtitle2">
-                        Total: {fCurrency(order.total_price)}
-                      </Typography>
-                    </Box>
-                  </Box>
+                    <Divider sx={{ mb: 2 }} />
 
-                  <Divider sx={{ mb: 2 }} />
+                    {/* Loop item di dalam order */}
+                    {order.items.map((item, itemIndex) => (
+                      <Box key={item.id} sx={{ mb: 3 }}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6} md={8}>
+                            <Stack direction="row" spacing={2} alignItems="center">
+                              <Avatar
+                                variant="square"
+                                src={item?.product?.images?.[0]?.image_url}
+                                sx={{ width: 64, height: 64 }}
+                              />
+                              <Box>
+                                <Typography variant="subtitle1">{item.product?.name}</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  Size: {item.size} | Color: {item.color}
+                                </Typography>
+                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                  Jumlah: x{item.quantity}
+                                </Typography>
 
-                  {/* Loop item di dalam order */}
-                  {order.items.map((item, itemIndex) => (
-                    <Box key={item.id} sx={{ mb: 3 }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={8}>
-                          <Stack direction="row" spacing={2} alignItems="center">
-                            <Avatar
-                              variant="square"
-                              src={item?.product?.images?.[0]?.image_url}
-                              sx={{ width: 64, height: 64 }}
-                            />
-                            <Box>
-                              <Typography variant="subtitle1">{item.product?.name}</Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                Size: {item.size} | Color: {item.color}
-                              </Typography>
-                              <Typography variant="body2" sx={{ mt: 1 }}>
-                                Jumlah: x{item.quantity}
-                              </Typography>
+                                {/* Stock info */}
+                                <Typography
+                                  variant="body2"
+                                  color={item.product?.stock > 0 ? 'success.main' : 'error.main'}
+                                  sx={{ mt: 0.5 }}
+                                >
+                                  {item.product?.stock > 0
+                                    ? `Stok: ${item.product?.stock}`
+                                    : 'Stok Habis'}
+                                </Typography>
 
-                              {/* Price display with discount handling */}
-                              <Box sx={{ mt: 1 }}>
-                                {item.product?.discount_price ? (
-                                  <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
-                                        textDecoration: 'line-through',
-                                        color: 'text.secondary',
-                                      }}
-                                    >
-                                      {fCurrency(item.product.price)}
+                                {/* Price display with discount handling */}
+                                <Box sx={{ mt: 1 }}>
+                                  {item.product?.discount_price ? (
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                      <Typography
+                                        variant="body2"
+                                        sx={{
+                                          textDecoration: 'line-through',
+                                          color: 'text.secondary',
+                                        }}
+                                      >
+                                        {fCurrency(item.product.price)}
+                                      </Typography>
+                                      <Typography variant="subtitle2" color="error">
+                                        {fCurrency(item.product.discount_price)}
+                                      </Typography>
+                                    </Stack>
+                                  ) : (
+                                    <Typography variant="subtitle2">
+                                      {fCurrency(item.product?.price)}
                                     </Typography>
-                                    <Typography variant="subtitle2" color="error">
-                                      {fCurrency(item.product.discount_price)}
-                                    </Typography>
-                                  </Stack>
-                                ) : (
-                                  <Typography variant="subtitle2">
-                                    {fCurrency(item.product?.price)}
-                                  </Typography>
-                                )}
+                                  )}
+                                </Box>
                               </Box>
-                            </Box>
-                          </Stack>
-                        </Grid>
+                            </Stack>
+                          </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: 1,
-                              justifyContent: 'flex-end',
-                              height: '100%',
-                            }}
-                          >
-                            <Button
-                              component={Link}
-                              to={`/riwayat-order/${order.id}`}
-                              variant="outlined"
-                              fullWidth
+                          <Grid item xs={12} sm={6} md={4}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1,
+                                justifyContent: 'flex-end',
+                                height: '100%',
+                              }}
                             >
-                              Lihat Detail
-                            </Button>
-
-                            {/* Batalkan Pesanan button - only show for pending orders */}
-                            {order.status === 'pending' && (
+                              {/* Detail button - always show */}
                               <Button
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                                startIcon={<Iconify icon="eva:close-circle-fill" />}
-                                onClick={() => handleClickCancel(order.id)}
-                              >
-                                Batalkan Pesanan
-                              </Button>
-                            )}
-
-                            {order.status === 'delivered' ? (
-                              <Button
-                                variant="contained"
-                                color="primary"
+                                component={Link}
+                                to={`/riwayat-order/${order.id}`}
+                                variant="outlined"
                                 fullWidth
-                                onClick={() => {
-                                  setSelectedReview({
-                                    userId: order.users_id,
-                                    productId: item.products_id,
-                                  });
-                                  review.onTrue();
-                                }}
                               >
-                                Beri Nilai
+                                Lihat Detail
                               </Button>
-                            ) : (
-                              <Button variant="outlined" color="primary" disabled fullWidth>
-                                Beri Nilai (Menunggu Pengiriman)
-                              </Button>
-                            )}
 
-                            {order.status === 'pending' ? (
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                                startIcon={<Iconify icon="eva:credit-card-fill" />}
-                                onClick={() => handlePayment(order.id)}
-                                disabled={Load}
-                              >
-                                {Load ? 'Proses...' : 'Bayar Sekarang'}
-                              </Button>
-                            ) : order.status === 'delivered' ? (
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => handleBuyAgain(item)}
-                              >
-                                Beli Lagi
-                              </Button>
-                            ) : (
-                              <Button variant="contained" disabled>
-                                {STATUS_MAP[order.status]?.label ||
-                                  order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                              </Button>
-                            )}
-                          </Box>
+                              {/* Conditional rendering based on order status */}
+                              {order.status === 'cancellation_requested' ? (
+                                // If order is canceled, only show cancellation status button
+                                <Button variant="contained" color="error" disabled fullWidth>
+                                  Pesanan Dibatalkan
+                                </Button>
+                              ) : (
+                                <>
+                                  {/* Cancel button - only for pending orders */}
+                                  {order.status === 'pending' && (
+                                    <Button
+                                      variant="contained"
+                                      color="error"
+                                      fullWidth
+                                      startIcon={<Iconify icon="eva:close-circle-fill" />}
+                                      onClick={() => handleClickCancel(order.id)}
+                                    >
+                                      Batalkan Pesanan
+                                    </Button>
+                                  )}
+
+                                  {/* Review button - only for delivered orders */}
+                                  {order.status === 'delivered' && (
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      fullWidth
+                                      onClick={() =>
+                                        openReviewForm(order.users_id, item.products_id)
+                                      }
+                                    >
+                                      {hasReview(order.users_id, item.products_id)
+                                        ? 'Edit Review'
+                                        : 'Beri Nilai'}
+                                    </Button>
+                                  )}
+
+                                  {/* Payment button - only for pending orders */}
+                                  {order.status === 'pending' ? (
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      fullWidth
+                                      startIcon={<Iconify icon="eva:credit-card-fill" />}
+                                      onClick={() => handlePayment(order.id)}
+                                      disabled={Load}
+                                    >
+                                      {Load ? 'Proses...' : 'Bayar Sekarang'}
+                                    </Button>
+                                  ) : order.status === 'delivered' && !hasDifferentProducts ? (
+                                    // Jika produk sama dan hanya satu jenis produk
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      fullWidth
+                                      onClick={() => handleBuyAgain(item)}
+                                      disabled={item.product?.stock <= 0}
+                                    >
+                                      {item.product?.stock <= 0 ? 'Stok Habis' : 'Beli Lagi'}
+                                    </Button>
+                                  ) : (
+                                    <Button variant="contained" disabled fullWidth>
+                                      {STATUS_MAP[order.status]?.label ||
+                                        order.status.charAt(0).toUpperCase() +
+                                          order.status.slice(1)}
+                                    </Button>
+                                  )}
+                                </>
+                              )}
+                            </Box>
+                          </Grid>
                         </Grid>
-                      </Grid>
 
-                      {itemIndex < order.items.length - 1 && <Divider sx={{ my: 2 }} />}
-                    </Box>
-                  ))}
+                        {itemIndex < order.items.length - 1 && <Divider sx={{ my: 2 }} />}
+                      </Box>
+                    ))}
 
-                  {/* Shipping information */}
-                  {order.shipping && (
-                    <Box sx={{ mt: 2, bgcolor: 'background.neutral', p: 2, borderRadius: 1 }}>
-                      <Typography variant="subtitle2">Informasi Pengiriman:</Typography>
-                      <Typography variant="body2">
-                        Penerima: {order.shipping.recipient_name} ({order.shipping.phone_number})
-                      </Typography>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        Alamat: {order.shipping.address}, {order.shipping.postal_code}
-                        {order.shipping.notes && ` - ${order.shipping.notes}`}
-                      </Typography>
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
+                    {/* Tambahkan tombol "Beli Semua Lagi" jika order sudah selesai (delivered) dan ada produk yang berbeda */}
+                    {order.status === 'delivered' && hasDifferentProducts && (
+                      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<Iconify icon="eva:shopping-cart-fill" />}
+                          onClick={() => handleBuyAgainMultiple(order.items)}
+                          disabled={allProductsOutOfStock}
+                        >
+                          {allProductsOutOfStock ? 'Semua Stok Habis' : 'Beli Semua Lagi'}
+                        </Button>
+                      </Box>
+                    )}
+
+                    {/* Shipping information */}
+                    {order.shipping && (
+                      <Box sx={{ mt: 2, bgcolor: 'background.neutral', p: 2, borderRadius: 1 }}>
+                        <Typography variant="subtitle2">Informasi Pengiriman:</Typography>
+                        <Typography variant="body2">
+                          Penerima: {order.shipping.recipient_name} ({order.shipping.phone_number})
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>
+                          Alamat: {order.shipping.address}, {order.shipping.postal_code}
+                          {order.shipping.notes && ` - ${order.shipping.notes}`}
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })
         )}
       </Grid>
 
@@ -457,6 +618,10 @@ export default function HomeOrder() {
             review.onFalse();
             setSelectedReview(null);
           }}
+          isEdit={selectedReview.isEdit}
+          onSubmitSuccess={() =>
+            handleReviewSubmitted(selectedReview.userId, selectedReview.productId)
+          }
         />
       )}
     </Container>
