@@ -4,8 +4,10 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 export const useMutationReadById = ({ onSuccess, onError }) => {
   return useMutation({
     mutationKey: ['read.id'],
-    mutationFn: async ({ data, id }) => {
-      const response = await axiosInstance.put(`${endpoints.nontification.updateNontificationById}/${id}`, data);
+    mutationFn: async (id) => {
+      const response = await axiosInstance.put(
+        `${endpoints.nontification.updateNontificationById}/${id}`
+      );
       return response.data;
     },
     onSuccess,

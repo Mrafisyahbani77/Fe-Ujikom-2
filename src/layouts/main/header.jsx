@@ -28,6 +28,7 @@ import Iconify from 'src/components/iconify';
 import AccountPopoverUser from '../user/account-popover-user';
 import { useAuthContext } from 'src/auth/hooks';
 import { useEffect, useState } from 'react';
+import NotificationsPopoverUser from '../user/notifications-popover';
 
 // ----------------------------------------------------------------------
 
@@ -87,7 +88,10 @@ export default function Header() {
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
             {authenticated ? (
-              <AccountPopoverUser />
+              <Box sx={{ spacing: 1, display: 'flex', alignItems: 'center' }}>
+                <NotificationsPopoverUser />
+                <AccountPopoverUser />
+              </Box>
             ) : (
               <Button
                 component={RouterLink}
