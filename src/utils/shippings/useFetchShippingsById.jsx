@@ -7,7 +7,7 @@ export const useFetchShippingsById = (id) =>
     queryFn: async () => {
       if (!id) return null; // Hindari fetch jika id tidak tersedia
       const response = await axiosInstance.get(`${endpoints.shippings.details}/${id}`);
-      return response.data.data;
+      return response.data;
     },
     enabled: !!id,
   });

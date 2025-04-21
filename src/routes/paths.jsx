@@ -24,6 +24,7 @@ export const paths = {
   promoSlug: '/promo/:slug',
   wishlist: '/wishlist',
   shipping: '/shipping',
+  shippingById: '/shipping/:id',
   historyorder: '/riwayat-order',
   historyorderId: '/riwayat-order/:id',
   error: '/error',

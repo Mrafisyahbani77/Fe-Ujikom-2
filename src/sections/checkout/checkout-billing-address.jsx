@@ -2,8 +2,6 @@
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
-// _mock
-import { _addressBooks } from 'src/_mock';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
@@ -17,7 +15,8 @@ import { useSnackbar } from 'notistack';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +24,7 @@ export default function CheckoutBillingAddress() {
   const checkout = useCheckoutContext();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [openConfirm, setOpenConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -61,6 +61,10 @@ export default function CheckoutBillingAddress() {
     }
   };
 
+  const handleEditAddress = (id) => {
+    navigate(`/shipping/${id}`);
+  };
+
   return (
     <>
       <Grid container spacing={3}>
@@ -70,14 +74,18 @@ export default function CheckoutBillingAddress() {
               key={address.id}
               address={{
                 recipient_name: address.recipient_name,
-                fullAddress: `${address.address}, ${address.postal_code}`, // atau bisa lebih lengkap nanti
-                addressType: 'Utama', // atau bisa 'Rumah', 'Kantor', bebas tergantung logic
+                fullAddress: `${address.address}, ${address.postal_code}`,
+                addressType: 'Utama',
                 phone_number: address.phone_number,
-                primary: true, // kalau mau kasih tanda primary address
+                primary: address.primary,
               }}
               action={
                 <Stack flexDirection="row" flexWrap="wrap" flexShrink={0}>
-                  <Button variant="outlined" size="small">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => handleEditAddress(address.id)}
+                  >
                     Edit alamat ini
                   </Button>
                   {!address.primary && (

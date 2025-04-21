@@ -15,6 +15,10 @@ import HomeOrder from 'src/sections/home/home-order';
 import HomeWishlist from 'src/sections/home/home-wishlist';
 import HomePromo from 'src/sections/home/home-promo';
 import HomePromoSlug from 'src/sections/home/home-promo-slug';
+import CreateShippingView from 'src/sections/checkout/create-shipping-view';
+import EditShippingView from 'src/sections/checkout/edit-shipping-view';
+import ShippingCreatePage from 'src/pages/shipping/new';
+import ShippingEditPage from 'src/pages/shipping/edit';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +47,8 @@ export const mainRoutes = [
       { path: 'category/:slug', element: <Category /> },
       { path: 'success', element: <Success /> },
       { path: 'error', element: <Error /> },
-      { path: 'shipping', element: <ShippingView /> },
+      { path: 'shipping', element: <ShippingCreatePage /> },
+      { path: 'shipping/:id', element: <ShippingEditPage /> },
       { path: 'riwayat-order/:id', element: <OrderDetailsPage /> },
       { path: 'riwayat-order', element: <HomeOrder /> },
       { path: 'wishlist', element: <HomeWishlist /> },
