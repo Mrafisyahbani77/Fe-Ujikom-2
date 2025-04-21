@@ -127,7 +127,7 @@ export const endpoints = {
   },
   public: {
     fetchAllCategory: '/api/categories',
-    fetchByIdCategory: '/api/categories',
+    fetchByIdCategory: '/api/categories', //need id
   },
   statistik: {
     total_order: '/api/chart/total-orders',
@@ -144,17 +144,17 @@ export const endpoints = {
       detail: '/api/banners/public', //need id
     },
     list: '/api/banners',
-    getByid: 'api/banners',
+    getByid: 'api/banners', //need id
     create: '/api/banners/store',
-    update: '/api/banners',
-    delete: '/api/banners',
+    update: '/api/banners', //need id
+    delete: '/api/banners', //need id
   },
   category: {
     list: '/api/categories',
-    getByid: 'api/categories',
-    getBySlug: 'api/categories/slug',
+    getByid: 'api/categories', //need id
+    getBySlug: 'api/categories/slug', //need slug
     create: '/api/categories/store',
-    update: '/api/categories',
+    update: '/api/categories', //need id
     delete: '/api/categories', //need id
   },
   discount: {
@@ -167,22 +167,22 @@ export const endpoints = {
       Available: '/api/discounts/available',
     },
     list: '/api/discounts',
-    getByid: 'api/discounts',
-    getBySlug: 'api/discounts',
+    getByid: 'api/discounts', //need id
+    getBySlug: 'api/discounts', //need slug
     create: '/api/discounts/store',
-    update: '/api/discounts',
-    delete: '/api/discounts',
+    update: '/api/discounts', //need id
+    delete: '/api/discounts', //need id
   },
   product: {
     list: '/api/products/users/all',
     listAdmin: '/api/products/admin/all',
-    detailAdmin: '/api/products/admin',
-    details: '/api/products/users',
-    update: '/api/products',
-    delete: '/api/products',
+    detailAdmin: '/api/products/admin', //need id
+    details: '/api/products/users', //need id
+    update: '/api/products', //need id
+    delete: '/api/products', //need id
     create: '/api/products/store',
     search: '/api/product/search',
-    chartNew:'/api/products/newest'
+    chartNew: '/api/products/newest',
   },
   whishlist: {
     list: '/api/wishlist',
@@ -193,16 +193,16 @@ export const endpoints = {
   },
   cart: {
     list: '/api/cart',
-    details: '/api/cart',
-    update: '/api/cart',
-    delete: '/api/cart',
+    details: '/api/cart', //need id
+    update: '/api/cart', //need id
+    delete: '/api/cart', //need id
     create: '/api/cart/store',
   },
   order: {
     list: '/api/order',
-    details: '/api/order',
-    update: '/api/order',
-    delete: '/api/order',
+    details: '/api/order', //need id
+    update: '/api/order', //need id
+    delete: '/api/order', //need id
     create: '/api/order/from-cart',
     exportInvoice: '/api/order', //need id
     downloadInvoice: '/api/order', // need  id
@@ -216,31 +216,37 @@ export const endpoints = {
   },
   shippings: {
     list: '/api/shippings',
-    details: '/api/shippings',
+    details: '/api/shippings', //need id
     provinces: '/api/shippings/provinces',
     city: '/api/shippings/cities', // need id provinsi
     districts: '/api/shippings/districts', //need id city
     village: '/api/shippings/villages', //need id districts
-    update: '/api/shippings',
-    delete: '/api/shippings',
-    deleteAll: '/api/shippings',
+    update: '/api/shippings', //need id
+    delete: '/api/shippings', //need id
+    deleteAll: '/api/shippings', //need id
     create: '/api/shippings/store',
   },
   review: {
     public: {
       // list: '/api/reviews',
-      details: '/api/reviews/product',
+      details: '/api/reviews/product', //need id
     },
     list: '/api/reviews',
-    details: '/api/reviews',
-    update: '/api/reviews',
-    delete: '/api/reviews',
+    details: '/api/reviews', //need id
+    update: '/api/reviews', //need id
+    delete: '/api/reviews', //need id
     create: '/api/reviews/store',
   },
   user: {
     getAllUser: '/api/users',
-    getById: '/api/users',
-    banUser: '/api/users',
-    unbanUser: '/api/users',
+    getById: '/api/users', //need id
+    banUser: '/api/users', //need id
+    unbanUser: '/api/users', //need id
+  },
+  nontification: {
+    getNontification: '/api/notifications',
+    getUnReadNontification: '/api/notifications/unread/count',
+    updateNontificationReadAll: '/api/notifications/read/all',
+    updateNontificationById: '/api/notifications/read', //need id
   },
 };
