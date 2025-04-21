@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 // @mui
 import { alpha, useTheme, styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -13,7 +13,7 @@ import Carousel, { CarouselArrowIndex, useCarousel } from 'src/components/carous
 
 // ----------------------------------------------------------------------
 
-const THUMB_SIZE = 64;
+const THUMB_SIZE = 64; // Set a consistent size for thumbnails
 
 const StyledThumbnailsContainer = styled('div')(({ length, theme }) => ({
   position: 'relative',
@@ -21,23 +21,18 @@ const StyledThumbnailsContainer = styled('div')(({ length, theme }) => ({
   '& .slick-slide': {
     lineHeight: 0,
   },
-
   ...(length === 1 && {
     maxWidth: THUMB_SIZE * 1 + 16,
   }),
-
   ...(length === 2 && {
     maxWidth: THUMB_SIZE * 2 + 32,
   }),
-
   ...((length === 3 || length === 4) && {
     maxWidth: THUMB_SIZE * 3 + 48,
   }),
-
   ...(length >= 5 && {
     maxWidth: THUMB_SIZE * 6,
   }),
-
   ...(length > 3 && {
     '&:before, &:after': {
       ...bgGradient({
@@ -62,14 +57,40 @@ const StyledThumbnailsContainer = styled('div')(({ length, theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function ProductDetailsCarousel({ product }) {
-  // console.log(product.images)
   const theme = useTheme();
+  const videoRefs = useRef({});
 
-  const slides = product?.images?.map((img) => ({
-    src: img,
-  }));
+  // Separate slides for carousel and lightbox
+  const carouselSlides = [
+    ...(product?.images?.map((img) => ({
+      type: 'image',
+      src: img.image_url,
+    })) || []),
+    ...(product?.videos?.map((vid) => ({
+      type: 'video',
+      src: vid.video_url,
+    })) || []),
+  ];
 
-  const lightbox = useLightBox(slides);
+  // Create a special format for lightbox that won't break video playback
+  const lightboxSlides = carouselSlides.map((slide, index) => {
+    if (slide.type === 'image') {
+      return {
+        src: slide.src,
+        type: 'image',
+      };
+    }
+
+    // For videos, we need to use a special format
+    return {
+      src: slide.src,
+      type: 'video',
+      width: 1280,
+      height: 720,
+    };
+  });
+
+  const lightbox = useLightBox(lightboxSlides);
 
   const carouselLarge = useCarousel({
     rtl: false,
@@ -84,7 +105,7 @@ export default function ProductDetailsCarousel({ product }) {
     focusOnSelect: true,
     variableWidth: true,
     centerPadding: '0px',
-    slidesToShow: slides?.length > 3 ? 3 : slides?.length,
+    slidesToShow: carouselSlides?.length > 3 ? 3 : carouselSlides?.length,
   });
 
   useEffect(() => {
@@ -97,6 +118,18 @@ export default function ProductDetailsCarousel({ product }) {
       carouselLarge.onTogo(lightbox.selected);
     }
   }, [carouselLarge, lightbox.open, lightbox.selected]);
+
+  // Custom function to properly handle lightbox open with videos
+  const handleOpenLightbox = (index) => {
+    // Pause all videos in the carousel before opening lightbox
+    Object.values(videoRefs.current).forEach((ref) => {
+      if (ref && ref.pause) {
+        ref.pause();
+      }
+    });
+
+    lightbox.onOpen(index);
+  };
 
   const renderLargeImg = (
     <Box
@@ -112,21 +145,45 @@ export default function ProductDetailsCarousel({ product }) {
         asNavFor={carouselThumb.nav}
         ref={carouselLarge.carouselRef}
       >
-        {slides?.map((slide) => (
-          <Image
-            key={slide.src}
-            alt={slide.src}
-            src={slide.src}
-            ratio="1/1"
-            onClick={() => lightbox.onOpen(slide.src)}
-            sx={{ cursor: 'zoom-in' }}
-          />
-        ))}
+        {carouselSlides?.map((slide, index) =>
+          slide.type === 'image' ? (
+            <Image
+              key={`slide-image-${index}`}
+              alt={`Product image ${index + 1}`}
+              src={slide.src}
+              ratio="1/1"
+              onClick={() => handleOpenLightbox(index)}
+              sx={{ cursor: 'zoom-in' }}
+            />
+          ) : (
+            <Box key={`slide-video-${index}`} sx={{ position: 'relative', pt: '100%', height: 0 }}>
+              <Box
+                component="video"
+                ref={(el) => {
+                  videoRefs.current[index] = el;
+                }}
+                src={slide.src}
+                controls
+                autoPlay={false}
+                onClick={() => handleOpenLightbox(index)}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  cursor: 'pointer',
+                }}
+              />
+            </Box>
+          )
+        )}
       </Carousel>
 
       <CarouselArrowIndex
         index={carouselLarge.currentIndex}
-        total={slides?.length}
+        total={carouselSlides?.length}
         onNext={carouselThumb.onNext}
         onPrev={carouselThumb.onPrev}
       />
@@ -134,35 +191,121 @@ export default function ProductDetailsCarousel({ product }) {
   );
 
   const renderThumbnails = (
-    <StyledThumbnailsContainer length={slides?.length}>
+    <StyledThumbnailsContainer length={carouselSlides?.length}>
       <Carousel
         {...carouselThumb.carouselSettings}
         asNavFor={carouselLarge.nav}
         ref={carouselThumb.carouselRef}
       >
-        {slides?.map((item, index) => (
-          <Box key={item.src} sx={{ px: 0.5 }}>
-            <Avatar
-              key={item.src}
-              alt={item.src}
-              src={item.src}
-              variant="rounded"
-              sx={{
-                width: THUMB_SIZE,
-                height: THUMB_SIZE,
-                opacity: 0.48,
-                cursor: 'pointer',
-                ...(carouselLarge.currentIndex === index && {
-                  opacity: 1,
-                  border: `solid 2.5px ${theme.palette.primary.main}`,
-                }),
-              }}
-            />
+        {carouselSlides?.map((item, index) => (
+          <Box key={`thumb-${index}`} sx={{ px: 0.5 }}>
+            {item.type === 'image' ? (
+              <Avatar
+                alt={`Product thumbnail ${index + 1}`}
+                src={item.src}
+                variant="rounded"
+                sx={{
+                  width: THUMB_SIZE,
+                  height: THUMB_SIZE,
+                  opacity: 0.48,
+                  cursor: 'pointer',
+                  ...(carouselLarge.currentIndex === index && {
+                    opacity: 1,
+                    border: `solid 2.5px ${theme.palette.primary.main}`,
+                  }),
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: THUMB_SIZE,
+                  height: THUMB_SIZE,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'grey.200',
+                  borderRadius: 1,
+                  opacity: 0.48,
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  ...(carouselLarge.currentIndex === index && {
+                    opacity: 1,
+                    border: `solid 2.5px ${theme.palette.primary.main}`,
+                  }),
+                }}
+              >
+                {/* Play icon overlay for video thumbnails */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(0,0,0,0.3)',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 0,
+                      height: 0,
+                      borderTop: '8px solid transparent',
+                      borderBottom: '8px solid transparent',
+                      borderLeft: '12px solid white',
+                      ml: '3px',
+                    }}
+                  />
+                </Box>
+              </Box>
+            )}
           </Box>
         ))}
       </Carousel>
     </StyledThumbnailsContainer>
   );
+
+  // Custom renderer for lightbox content
+  const renderLightboxContent = () => {
+    if (!lightbox.open) return null;
+
+    const currentSlide = lightboxSlides[lightbox.selected];
+
+    if (currentSlide.type === 'video') {
+      return (
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: '80vw',
+            maxHeight: '80vh',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            component="video"
+            src={currentSlide.src}
+            controls
+            autoPlay
+            sx={{
+              width: '100%',
+              height: 'auto',
+              maxHeight: '80vh',
+              outline: 'none',
+            }}
+          />
+        </Box>
+      );
+    }
+
+    // For images, let the default lightbox handle it
+    return null;
+  };
 
   return (
     <Box
@@ -178,10 +321,11 @@ export default function ProductDetailsCarousel({ product }) {
 
       <Lightbox
         index={lightbox.selected}
-        slides={slides}
+        slides={lightboxSlides}
         open={lightbox.open}
         close={lightbox.onClose}
         onGetCurrentIndex={(index) => lightbox.setSelected(index)}
+        customContent={renderLightboxContent()}
       />
     </Box>
   );

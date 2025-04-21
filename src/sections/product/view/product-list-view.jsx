@@ -37,6 +37,8 @@ import ProductTableRow from '../product-table-row';
 import ProductTableToolbar from '../product-table-toolbar';
 import ProductTableFiltersResult from '../product-table-filters-result';
 import { useFetchProduct, useFetchProductAdmin, useMutationDelete } from 'src/utils/product';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
@@ -64,6 +66,10 @@ const defaultFilters = {
 
 export default function ProductListView() {
   const router = useRouter();
+
+  const queryClient = useQueryClient();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const table = useTable();
 

@@ -45,9 +45,12 @@ export default function ProductItem({ product }) {
     saleLabel,
     total_sold,
     review,
+    videos,
   } = product;
 
   console.log(product);
+
+  const imageSrc = images?.[0]?.image_url || videos?.[0]?.video_url || '/placeholder.png'; // fallback ke placeholder
 
   const linkTo = paths.product.details(id);
 
@@ -133,7 +136,7 @@ export default function ProductItem({ product }) {
       <Tooltip title={isOutOfStock ? 'Stok habis' : ''} placement="bottom-end">
         <Image
           alt={name}
-          src={images[0]}
+          src={imageSrc}
           ratio="1/1"
           sx={{
             borderRadius: 1.5,

@@ -73,7 +73,7 @@ export default function ProductNewEditForm({ currentProduct }) {
 
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    images: Yup.array().min(1, 'Images is required'),
+    files: Yup.array().min(1, 'File is required'),
     price: Yup.number()
       .transform((value, originalValue) => {
         if (typeof originalValue === 'string') {
@@ -86,26 +86,26 @@ export default function ProductNewEditForm({ currentProduct }) {
       .required('Price is required'),
     stock: Yup.number().min(0, 'Stock should not be negative'),
     description: Yup.string().required('Description is required'),
-    // Kategori sebagai array tapi dengan validasi hanya satu item
     categories_id: Yup.array()
       .min(1, 'Kategori wajib diisi')
       .max(1, 'Pilih hanya satu kategori')
       .required('Kategori wajib diisi'),
-    // Subkategori menjadi array untuk multi select
-    // subcategories_id: Yup.array()
-    //   .min(1, 'Pilih minimal satu subkategori')
-    //   .required('Subkategori wajib diisi'),
-    // // Gender juga menjadi array untuk multi select
-    // gender_categories_id: Yup.array()
-    //   .min(1, 'Pilih minimal satu gender')
-    //   .required('Gender wajib diisi'),
   });
 
   const defaultValues = useMemo(
     () => ({
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
-      images: currentProduct?.images || [],
+      files: [
+        ...(currentProduct?.images?.map((img) => ({
+          preview: img.image_url,
+          type: 'image',
+        })) || []),
+        ...(currentProduct?.videos?.map((vid) => ({
+          preview: vid.video_url,
+          type: 'video',
+        })) || []),
+      ],
       price: currentProduct?.price || 0,
       stock: currentProduct?.stock?.quantity || 0,
       // Kategori sebagai array dengan satu nilai saja
@@ -245,9 +245,9 @@ export default function ProductNewEditForm({ currentProduct }) {
 
       formData.append('status', status);
 
-      if (data.images && data.images.length) {
-        data.images.forEach((image) => {
-          formData.append('images', image);
+      if (data.files && data.files.length) {
+        data.files.forEach((file) => {
+          formData.append('files', file);
         });
       }
 
@@ -269,7 +269,7 @@ export default function ProductNewEditForm({ currentProduct }) {
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
-      const files = values.images || [];
+      const files = values.files || [];
 
       const newFiles = acceptedFiles.map((file) =>
         Object.assign(file, {
@@ -277,21 +277,21 @@ export default function ProductNewEditForm({ currentProduct }) {
         })
       );
 
-      setValue('images', [...files, ...newFiles], { shouldValidate: true });
+      setValue('files', [...files, ...newFiles], { shouldValidate: true });
     },
-    [setValue, values.images]
+    [setValue, values.files]
   );
 
   const handleRemoveFile = useCallback(
     (inputFile) => {
-      const filtered = values.images && values.images?.filter((file) => file !== inputFile);
-      setValue('images', filtered);
+      const filtered = values.files?.filter((file) => file !== inputFile);
+      setValue('files', filtered);
     },
-    [setValue, values.images]
+    [setValue, values.files]
   );
 
   const handleRemoveAllFiles = useCallback(() => {
-    setValue('images', []);
+    setValue('files', []);
   }, [setValue]);
 
   // Custom handler untuk kategori untuk memastikan hanya satu yang dipilih
@@ -384,8 +384,9 @@ export default function ProductNewEditForm({ currentProduct }) {
               <RHFUpload
                 multiple
                 thumbnail
-                name="images"
+                name="files"
                 maxSize={3145728}
+                accept="image/*, video/*"
                 onDrop={handleDrop}
                 onRemove={handleRemoveFile}
                 onRemoveAll={handleRemoveAllFiles}

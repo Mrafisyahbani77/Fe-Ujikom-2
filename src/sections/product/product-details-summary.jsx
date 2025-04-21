@@ -401,8 +401,8 @@ export default function ProductDetailsSummary({
         typography: 'body2',
       }}
     >
-      <Rating size="small" value={review.average_rating} precision={0.1} readOnly sx={{ mr: 1 }} />
-      {`(${fShortenNumber(review.total_review)} review)`}
+      <Rating size="small" value={review?.average_rating} precision={0.1} readOnly sx={{ mr: 1 }} />
+      {`(${fShortenNumber(review?.total_review)} review)`}
     </Stack>
   );
 

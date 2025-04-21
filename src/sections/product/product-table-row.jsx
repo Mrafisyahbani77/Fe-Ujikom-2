@@ -39,6 +39,7 @@ export default function ProductTableRow({
     description,
     stock,
     images,
+    videos,
     size,
     color,
     created_at,
@@ -54,6 +55,8 @@ export default function ProductTableRow({
     inventoryType,
     categories_id,
   } = row;
+
+  const imageSrc = images?.[0]?.image_url || videos?.[0]?.video_url || '/placeholder.png'; // fallback ke placeholder
 
   const translateInventoryType = (type) => {
     switch (type) {
@@ -86,7 +89,7 @@ export default function ProductTableRow({
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar
             alt={name}
-            src={images[0]}
+            src={imageSrc}
             variant="rounded"
             sx={{ width: 64, height: 64, mr: 2 }}
           />
