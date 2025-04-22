@@ -13,7 +13,7 @@ export default function ProductList({ products, loading, ...other }) {
   const [page, setPage] = useState(1);
   const [displayedProducts, setDisplayedProducts] = useState([]);
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
   const totalPages = products ? Math.ceil(products.length / itemsPerPage) : 0;
 
   useEffect(() => {
