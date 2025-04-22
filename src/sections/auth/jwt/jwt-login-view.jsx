@@ -96,7 +96,6 @@ export default function JwtLoginView() {
 
       const userRole = response.user.role;
       console.log(userRole);
-      // Redirect sesuai role
       if (userRole?.includes('admin')) {
         router.push('/dashboard');
       } else if (userRole?.includes('pembeli')) {

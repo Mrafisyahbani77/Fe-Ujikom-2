@@ -1,4 +1,3 @@
-// @mui
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -17,68 +16,24 @@ import { _socials } from 'src/_mock';
 // components
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
-
-// ----------------------------------------------------------------------
-
-const LINKS = [
-  {
-    headline: 'Shop',
-    children: [
-      { name: 'Men', href: '#' },
-      { name: 'Women', href: '#' },
-      { name: 'Kids', href: '#' },
-      { name: 'New Arrivals', href: '#' },
-      { name: 'Best Sellers', href: '#' },
-    ],
-  },
-  {
-    headline: 'Company',
-    children: [
-      { name: 'About Us', href: paths.about },
-      { name: 'Contact Us', href: paths.contact },
-      { name: 'Careers', href: '#' },
-    ],
-  },
-  {
-    headline: 'Support',
-    children: [
-      { name: 'FAQs', href: paths.faqs },
-      { name: 'Shipping & Returns', href: '#' },
-      { name: 'Size Guide', href: '#' },
-    ],
-  },
-];
+import { useFetchCategory } from 'src/utils/category';
 
 // ----------------------------------------------------------------------
 
 export default function Footer() {
   const pathname = usePathname();
-
   const isHome = pathname === '/';
 
-  const simpleFooter = (
-    <Box
-      component="footer"
-      sx={{
-        py: 5,
-        textAlign: 'center',
-        position: 'relative',
-        bgcolor: 'background.default',
-      }}
-    >
-      <Container>
-        <Logo sx={{ mb: 1, mx: 'auto' }} />
+  // Menggunakan hooks langsung tanpa useEffect
+  const { data: categoryData } = useFetchCategory();
 
-        <Typography variant="caption" component="div">
-          © All rights reserved
-          <br /> made by
-          <Link href="https://minimals.cc/"> minimals.cc </Link>
-        </Typography>
-      </Container>
-    </Box>
-  );
+  // Mengambil hanya beberapa kategori (maksimal 5)
+  const categories = categoryData?.slice(0, 5) || [];
 
-  const mainFooter = (
+  const whatsappNumber = '85697091846';
+  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+
+  return (
     <Box
       component="footer"
       sx={{
@@ -86,7 +41,13 @@ export default function Footer() {
         bgcolor: 'background.default',
       }}
     >
-      <Divider />
+      <Divider
+        sx={{
+          backgroundColor: '#ffffff',
+          boxShadow: '0 4px 6px -1px rgba(25, 118, 210, 0.2)',
+          borderBottom: 'none',
+        }}
+      />
 
       <Container
         sx={{
@@ -95,39 +56,35 @@ export default function Footer() {
           textAlign: { xs: 'center', md: 'unset' },
         }}
       >
-        <Logo sx={{ mb: 3 }} />
+        <Logo />
 
-        <Grid
-          container
-          justifyContent={{
-            xs: 'center',
-            md: 'space-between',
-          }}
-        >
-          <Grid xs={8} md={3}>
+        <Grid container spacing={4} justifyContent="center">
+          <Grid xs={12} md={5}>
             <Typography
-              variant="body2"
+              variant=""
               sx={{
-                maxWidth: 270,
-                mx: { xs: 'auto', md: 'unset' },
+                maxWidth: { xs: '100%', md: '90%' },
+                mx: 'auto',
+                textAlign: 'center',
               }}
             >
-              Step into style with our premium shoes collection. Find the perfect fit for any
-              occasion.
+              Temukan koleksi sepatu premium kami yang dirancang untuk gaya dan kenyamanan. Kami
+              menawarkan sepatu sempurna untuk setiap kesempatan dan gaya hidup.
             </Typography>
 
-            <Stack
+            {/* <Stack
               direction="row"
-              justifyContent={{ xs: 'center', md: 'flex-start' }}
+              justifyContent="center"
               sx={{
                 mt: 3,
-                mb: { xs: 5, md: 0 },
+                mb: { xs: 3, md: 3 },
               }}
             >
               {_socials.map((social) => (
                 <IconButton
                   key={social.name}
                   sx={{
+                    mx: 0.5,
                     '&:hover': {
                       bgcolor: alpha(social.color, 0.08),
                     },
@@ -136,45 +93,92 @@ export default function Footer() {
                   <Iconify color={social.color} icon={social.icon} />
                 </IconButton>
               ))}
+            </Stack> */}
+          </Grid>
+
+          <Grid xs={12} md={3}>
+            <Stack spacing={2} alignItems="center" sx={{ mb: { xs: 4, md: 0 } }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                Kategori Produk
+              </Typography>
+
+              <Stack spacing={1} alignItems="center">
+                {categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    component={RouterLink}
+                    to={`/category/${category.slug}`}
+                    color="inherit"
+                    variant="body2"
+                    sx={{
+                      textAlign: 'center',
+                      transition: 'all 0.2s',
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: 1,
+                      textDecoration: 'none',
+                      '&:hover': {
+                        color: 'primary.main',
+                        textDecoration: 'none',
+                        fontWeight: 'fontWeightMedium',
+                      },
+                    }}
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </Stack>
             </Stack>
           </Grid>
 
-          <Grid xs={12} md={6}>
-            <Stack spacing={5} direction={{ xs: 'column', md: 'row' }}>
-              {LINKS.map((list) => (
-                <Stack
-                  key={list.headline}
-                  spacing={2}
-                  alignItems={{ xs: 'center', md: 'flex-start' }}
-                  sx={{ width: 1 }}
-                >
-                  <Typography component="div" variant="overline">
-                    {list.headline}
-                  </Typography>
+          <Grid xs={12} md={4}>
+            <Stack spacing={2} alignItems="center">
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                Hubungi Kami
+              </Typography>
 
-                  {list.children.map((link) => (
-                    <Link
-                      key={link.name}
-                      component={RouterLink}
-                      href={link.href}
-                      color="inherit"
-                      variant="body2"
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
-                </Stack>
-              ))}
+              <Link
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'primary.main',
+                  '&:hover': {
+                    textDecoration: 'none',
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                <Iconify icon="ic:baseline-whatsapp" width={24} height={24} sx={{ mr: 1 }} />
+                <Typography variant="body2">+62 856-9709-1846</Typography>
+              </Link>
+
+              <Typography
+                variant="body2"
+                sx={{
+                  textAlign: 'center',
+                  maxWidth: '80%',
+                }}
+              >
+                Jalan Bukit Asri, Ciomas
+                <br />
+                Bogor, Jawa Barat
+                <br />
+                Indonesia
+              </Typography>
             </Stack>
           </Grid>
         </Grid>
 
-        <Typography variant="body2" sx={{ mt: 10, textAlign: 'center' }}>
-          © {new Date().getFullYear()} Lorem inpsum dolor
+        <Divider sx={{ my: 5 }} />
+
+        <Typography variant="body2" sx={{ textAlign: 'center' }}>
+          © Barangin {new Date().getFullYear()}. Hak Cipta Dilindungi
         </Typography>
       </Container>
     </Box>
   );
-
-  return mainFooter;
 }

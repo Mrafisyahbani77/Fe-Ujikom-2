@@ -52,7 +52,7 @@ export default function ProductDetailsSummary({
     name,
     size,
     price,
-    images,
+    image_url,
     color,
     newLabel,
     available,
@@ -66,21 +66,23 @@ export default function ProductDetailsSummary({
     stock,
   } = product;
 
+  const stockQuantity = stock?.quantity || available || 0;
+
   const existProduct = !!items?.length && items.map((item) => item.id).includes(id);
 
   const isMaxQuantity =
     !!items?.length &&
-    items.filter((item) => item.id === id).map((item) => item.quantity)[0] >= available;
+    items.filter((item) => item.id === id).map((item) => item.quantity)[0] >= stockQuantity;
 
   const defaultValues = {
     id,
     name,
-    images,
-    available,
+    image_url,
+    available: stockQuantity,
     price,
     color: color[0],
     size: size[0],
-    quantity: available < 1 ? 0 : 1,
+    quantity: stockQuantity < 1 ? 0 : 1,
   };
 
   const methods = useForm({
@@ -88,16 +90,16 @@ export default function ProductDetailsSummary({
   });
 
   const { reset, watch, control, setValue, handleSubmit } = methods;
-  // const { data: wishlistData } = useFetchWhislist();
+  const { data: wishlistData } = user ? useFetchWhislist() : { data: null };
   const [wishlist, setWishlist] = useState([]);
 
-  // useEffect(() => {
-  //   if (Array.isArray(wishlistData?.data)) {
-  //     setWishlist(wishlistData.data);
-  //   } else {
-  //     setWishlist([]);
-  //   }
-  // }, [wishlistData]);
+  useEffect(() => {
+    if (user && Array.isArray(wishlistData?.data)) {
+      setWishlist(wishlistData.data);
+    } else {
+      setWishlist([]);
+    }
+  }, [wishlistData, user]);
 
   const values = watch();
 
@@ -130,11 +132,6 @@ export default function ProductDetailsSummary({
       return;
     }
 
-    // if (!data.size) {
-    //   enqueueSnackbar('Silakan pilih ukuran terlebih dahulu', { variant: 'error' });
-    //   return;
-    // }
-
     try {
       onAddCart?.({
         ...values,
@@ -146,7 +143,7 @@ export default function ProductDetailsSummary({
     } catch (error) {
       console.error(error);
     }
-  }, [onAddCart, values]);
+  }, [onAddCart, values, user, enqueueSnackbar, router]);
 
   const { mutateAsync: AddWishlist } = useMutationCreateWhislist({
     onSuccess: () => {
@@ -177,28 +174,47 @@ export default function ProductDetailsSummary({
   });
 
   const handleWishlist = async (productId) => {
+    if (!user) {
+      enqueueSnackbar('Anda harus login dulu untuk menyimpan produk', { variant: 'warning' });
+      router.push('/auth/login');
+      return;
+    }
+
     const existingItem = wishlist.find((item) => item.product.id === productId);
 
     try {
       if (existingItem) {
-        const wishlistId = existingItem.wishlist_id; // ambil wishlist_id yang sebenarnya
+        const wishlistId = existingItem.wishlist_id || existingItem.id; // Get the correct wishlist ID
         await RemoveWishlist(wishlistId);
-
         setWishlist((prev) => prev.filter((item) => item.product.id !== productId));
       } else {
         await AddWishlist({ products_id: productId });
-
-        // biasanya respons create akan return data baru, tapi kalau tidak ada:
-        const newItem = { id: new Date().getTime(), product: { id: productId }, is_wishlist: true }; // id sementara
-        setWishlist((prev) => [...prev, newItem]);
+        // We don't need to manually update state here as the queryClient.invalidateQueries
+        // will trigger a refetch of the wishlist data
       }
     } catch (error) {
       console.error('Error with wishlist operation:', error);
     }
   };
 
-  const isWishlisted = wishlist.some((item) => item.product.id === product?.id);
-  const isOutOfStock = stock.status === 'sold_out' || stock.quantity === 0;
+  const handleQuantityIncrease = () => {
+    const newQuantity = values.quantity + 1;
+    if (newQuantity <= stockQuantity) {
+      setValue('quantity', newQuantity);
+    } else {
+      enqueueSnackbar(`Maksimal pembelian adalah ${stockQuantity} item`, { variant: 'warning' });
+    }
+  };
+
+  const handleQuantityDecrease = () => {
+    const newQuantity = values.quantity - 1;
+    if (newQuantity >= 1) {
+      setValue('quantity', newQuantity);
+    }
+  };
+
+  const isWishlisted = user && wishlist.some((item) => item.product.id === product?.id);
+  const isOutOfStock = stock.status === 'sold_out' || stockQuantity === 0;
 
   const renderPrice = (
     <Box sx={{ typography: 'h5' }}>
@@ -221,24 +237,12 @@ export default function ProductDetailsSummary({
 
   const renderShare = (
     <Stack direction="row" spacing={3} justifyContent="center">
-      {/* <Link
-        variant="subtitle2"
-        sx={{
-          color: 'text.secondary',
-          display: 'inline-flex',
-          alignItems: 'center',
-        }}
-      >
-        <Iconify icon="mingcute:add-line" width={16} sx={{ mr: 1 }} />
-        Compare
-      </Link> */}
-
       <Link
         variant="subtitle2"
-        // onClick={() => handleWishlist(product?.id)} // Call the handleWishlist function with the product id
+        onClick={() => handleWishlist(product?.id)}
         sx={{
           cursor: 'pointer',
-          color: isWishlisted ? 'primary.main' : 'text.secondary', // Change color based on wishlist status
+          color: isWishlisted ? 'primary.main' : 'text.secondary',
           display: 'inline-flex',
           alignItems: 'center',
         }}
@@ -280,17 +284,6 @@ export default function ProductDetailsSummary({
       >
         {color.map((color) => (
           <MenuItem key={color} value={color}>
-            {/* <Box
-              sx={{
-                width: 20,
-                height: 20,
-                backgroundColor: color,
-                display: 'inline-block',
-                marginRight: 1,
-                borderRadius: '50%',
-                border: '1px solid #ddd',
-              }}
-            /> */}
             {color}
           </MenuItem>
         ))}
@@ -307,11 +300,6 @@ export default function ProductDetailsSummary({
       <RHFSelect
         name="size"
         size="small"
-        // helperText={
-        //   <Link underline="always" color="textPrimary">
-        //     Size Chart
-        //   </Link>
-        // }
         sx={{
           maxWidth: 88,
           [`& .${formHelperTextClasses.root}`]: {
@@ -341,13 +329,13 @@ export default function ProductDetailsSummary({
           name="quantity"
           quantity={values.quantity}
           disabledDecrease={isOutOfStock || values.quantity <= 1}
-          disabledIncrease={isOutOfStock || values.quantity >= available}
-          onIncrease={() => setValue('quantity', values.quantity + 1)}
-          onDecrease={() => setValue('quantity', values.quantity - 1)}
+          disabledIncrease={isOutOfStock || values.quantity >= stockQuantity}
+          onIncrease={handleQuantityIncrease}
+          onDecrease={handleQuantityDecrease}
         />
 
         <Typography variant="caption" component="div" sx={{ textAlign: 'right' }}>
-          {stock.status} {stock.quantity}
+          Stok tersedia: {stockQuantity}
         </Typography>
       </Stack>
     </Stack>
@@ -386,12 +374,6 @@ export default function ProductDetailsSummary({
     </Stack>
   );
 
-  // const renderSubDescription = (
-  //   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-  //     {subDescription}
-  //   </Typography>
-  // );
-
   const renderRating = (
     <Stack
       direction="row"
@@ -406,35 +388,10 @@ export default function ProductDetailsSummary({
     </Stack>
   );
 
-  // const renderLabels = (newLabel.enabled || saleLabel.enabled) && (
-  //   <Stack direction="row" alignItems="center" spacing={1}>
-  //     {newLabel.enabled && <Label color="info">{newLabel.content}</Label>}
-  //     {saleLabel.enabled && <Label color="error">{saleLabel.content}</Label>}
-  //   </Stack>
-  // );
-
-  // const renderInventoryType = (
-  //   <Box
-  //     component="span"
-  //     sx={{
-  //       typography: 'overline',
-  //       color:
-  //         (stock.status === 'out of stock' && 'error.main') ||
-  //         (stock.status === 'low stock' && 'warning.main') ||
-  //         'success.main',
-  //     }}
-  //   >
-  //     {stock.status}
-  //   </Box>
-  // );
-
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Stack spacing={3} sx={{ pt: 3 }} {...other}>
         <Stack spacing={2} alignItems="flex-start">
-          {/* {renderLabels} */}
-
-          {/* {renderInventoryType} */}
           <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
             <Typography variant="h5" noWrap>
               {name}
@@ -446,8 +403,6 @@ export default function ProductDetailsSummary({
           {renderRating}
 
           {renderPrice}
-
-          {/* {renderSubDescription} */}
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />

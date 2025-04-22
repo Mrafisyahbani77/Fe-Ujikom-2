@@ -22,10 +22,18 @@ export default function ShoesCategories() {
           {data && data.length > 0 ? (
             <Box
               sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                display: 'flex',
+                overflowX: 'auto',
                 borderTop: '1px solid #e0e0e0',
-                borderLeft: '1px solid #e0e0e0',
+                '&::-webkit-scrollbar': {
+                  height: 6,
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  borderRadius: 3,
+                  backgroundColor: 'rgba(0,0,0,0.1)',
+                },
+                scrollbarWidth: 'thin',
+                pb: 0.5, // Adds a bit of padding at the bottom for the scrollbar
               }}
             >
               {data.map((category) => (
@@ -34,16 +42,17 @@ export default function ShoesCategories() {
                   component={Link}
                   to={`/category/${category.slug}`}
                   sx={{
+                    minWidth: 120, // Fixed minimum width for each category
                     textAlign: 'center',
                     p: 2,
                     borderRight: '0.5px solid #e0e0e0',
-                    borderBottom: '0.5px solid #e0e0e0',
                     textDecoration: 'none',
                     color: 'inherit',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    flexShrink: 0, // Prevents items from shrinking
                   }}
                 >
                   <Image
@@ -51,7 +60,9 @@ export default function ShoesCategories() {
                     src={category.image_url}
                     sx={{ width: 64, height: 64, borderRadius: '50%', mb: 1 }}
                   />
-                  <Typography variant="body2">{category.name}</Typography>
+                  <Typography variant="body2" noWrap sx={{ width: '100%' }}>
+                    {category.name}
+                  </Typography>
                 </Box>
               ))}
             </Box>

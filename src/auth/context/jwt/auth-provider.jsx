@@ -121,14 +121,14 @@ export function AuthProvider({ children }) {
 
         await initialize();
 
-        const userRole = user.role;
-        console.log(userRole);
-        // Redirect sesuai role
-        if (userRole?.includes('admin')) {
-          router.push('/dashboard');
-        } else if (userRole?.includes('pembeli')) {
-          router.push('/');
-        }
+        // const userRole = user.role;
+        // console.log(userRole);
+        // // Redirect sesuai role
+        // if (userRole?.includes('admin')) {
+        //   router.push('/dashboard');
+        // } else if (userRole?.includes('pembeli')) {
+        //   router.push('/');
+        // }
 
         return response.data;
       } catch (error) {

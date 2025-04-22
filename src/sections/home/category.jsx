@@ -41,7 +41,7 @@ export default function Category() {
         heading={`Daftar kategori ${category.name}`}
         links={[
           {
-            name: 'Home',
+            name: 'Beranda',
             href: '/',
           },
           { name: `${category.name}` },

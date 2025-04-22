@@ -71,7 +71,7 @@ export default function ProductShopDetailsView({ id }) {
   const renderProduct = data && (
     <>
       <CustomBreadcrumbs
-        links={[{ name: 'Home', href: '/' }, { name: data?.name }]}
+        links={[{ name: 'Beranda', href: '/' }, { name: data?.name }]}
         sx={{ mb: 5 }}
       />
 

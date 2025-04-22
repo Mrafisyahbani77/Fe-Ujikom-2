@@ -28,15 +28,20 @@ export default function ProductSearch({ query, results, onSearch, hrefItem, load
       if (event.key === 'Enter') {
         const selectItem = results.filter((product) => product.name === query)[0];
 
-        handleClick(selectItem.id);
+        if (selectItem) {
+          handleClick(selectItem.id);
+        }
       }
     }
   };
 
+  // Hanya tampilkan loading indicator jika query tidak kosong dan loading = true
+  const showLoading = loading && !!query;
+
   return (
     <Autocomplete
       sx={{ width: { xs: 1, sm: 260 } }}
-      loading={loading}
+      loading={showLoading}
       autoHighlight
       popupIcon={null}
       options={results}
@@ -73,7 +78,7 @@ export default function ProductSearch({ query, results, onSearch, hrefItem, load
             ),
             endAdornment: (
               <>
-                {loading ? <Iconify icon="svg-spinners:8-dots-rotate" sx={{ mr: -3 }} /> : null}
+                {showLoading ? <Iconify icon="svg-spinners:8-dots-rotate" sx={{ mr: -3 }} /> : null}
                 {params.InputProps.endAdornment}
               </>
             ),
@@ -89,7 +94,7 @@ export default function ProductSearch({ query, results, onSearch, hrefItem, load
             <Avatar
               key={product.id}
               alt={product.name}
-              src={product.images[0]}
+              src={product?.images[0]?.image_url}
               variant="rounded"
               sx={{
                 width: 48,
