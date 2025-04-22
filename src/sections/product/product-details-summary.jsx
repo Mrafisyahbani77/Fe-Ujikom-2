@@ -12,6 +12,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { formHelperTextClasses } from '@mui/material/FormHelperText';
 import Menu from '@mui/material/Menu';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 // routes
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -45,6 +47,9 @@ export default function ProductDetailsSummary({
   ...other
 }) {
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const { user } = useAuthContext(); // Cek user login
   const { enqueueSnackbar } = useSnackbar(); // Buat notif
   const queryClient = useQueryClient();
@@ -95,7 +100,6 @@ export default function ProductDetailsSummary({
   const { data: wishlistData } = user ? useFetchWhislist() : { data: null };
   const [wishlist, setWishlist] = useState([]);
   const { data: shareData } = useShareProduct(id);
-  console.log(shareData);
 
   // For share menu
   const [shareAnchorEl, setShareAnchorEl] = useState(null);
@@ -115,7 +119,7 @@ export default function ProductDetailsSummary({
     if (product) {
       reset(defaultValues);
     }
-  }, [product]);
+  }, [product, reset]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -151,7 +155,7 @@ export default function ProductDetailsSummary({
     } catch (error) {
       console.error(error);
     }
-  }, [onAddCart, values, user, enqueueSnackbar, router]);
+  }, [onAddCart, values, user, enqueueSnackbar, router, onGotoStep]);
 
   const { mutateAsync: AddWishlist } = useMutationCreateWhislist({
     onSuccess: () => {
@@ -268,7 +272,13 @@ export default function ProductDetailsSummary({
   );
 
   const renderShare = (
-    <Stack direction="row" spacing={3} justifyContent="center">
+    <Stack
+      direction={isMobile ? 'column' : 'row'}
+      spacing={isMobile ? 1 : 3}
+      justifyContent={isMobile ? 'flex-start' : 'center'}
+      width={isMobile ? '100%' : 'auto'}
+      mt={isMobile ? 1 : 0}
+    >
       <Link
         variant="subtitle2"
         onClick={() => handleWishlist(product?.id)}
@@ -277,6 +287,8 @@ export default function ProductDetailsSummary({
           color: isWishlisted ? 'primary.main' : 'text.secondary',
           display: 'inline-flex',
           alignItems: 'center',
+          justifyContent: isMobile ? 'flex-start' : 'center',
+          width: isMobile ? '100%' : 'auto',
         }}
       >
         <Iconify
@@ -295,6 +307,8 @@ export default function ProductDetailsSummary({
           color: 'text.secondary',
           display: 'inline-flex',
           alignItems: 'center',
+          justifyContent: isMobile ? 'flex-start' : 'center',
+          width: isMobile ? '100%' : 'auto',
         }}
       >
         <Iconify icon="solar:share-bold" width={16} sx={{ mr: 1 }} />
@@ -307,11 +321,18 @@ export default function ProductDetailsSummary({
         onClose={handleShareClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right',
+          horizontal: isMobile ? 'left' : 'right',
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'right',
+          horizontal: isMobile ? 'left' : 'right',
+        }}
+        PaperProps={{
+          sx: {
+            width: isMobile ? '100%' : 'auto',
+            maxWidth: isMobile ? '100%' : 200,
+            mt: 1,
+          },
         }}
       >
         {!shareData ? (
@@ -359,7 +380,7 @@ export default function ProductDetailsSummary({
         name="color"
         size="small"
         sx={{
-          maxWidth: 120,
+          maxWidth: { xs: 100, sm: 120 },
         }}
       >
         {color.map((color) => (
@@ -381,7 +402,7 @@ export default function ProductDetailsSummary({
         name="size"
         size="small"
         sx={{
-          maxWidth: 88,
+          maxWidth: { xs: 80, sm: 88 },
           [`& .${formHelperTextClasses.root}`]: {
             mx: 0,
             mt: 1,
@@ -422,7 +443,7 @@ export default function ProductDetailsSummary({
   );
 
   const renderActions = (
-    <Stack direction="row" spacing={2}>
+    <Stack direction={isTablet ? 'column' : 'row'} spacing={2}>
       <Button
         fullWidth
         disabled={isMaxQuantity || disabledActions || isOutOfStock}
@@ -431,9 +452,17 @@ export default function ProductDetailsSummary({
         variant="contained"
         startIcon={<Iconify icon="solar:cart-plus-bold" width={24} />}
         onClick={handleAddCart}
-        sx={{ whiteSpace: 'nowrap' }}
+        sx={{
+          whiteSpace: { xs: 'normal', sm: 'nowrap' },
+          height: { xs: 'auto', sm: 48 },
+        }}
       >
-        <Typography variant="button" sx={{ fontSize: '0.75rem' }}>
+        <Typography
+          variant="button"
+          sx={{
+            fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' },
+          }}
+        >
           Masukan keranjang
         </Typography>
       </Button>
@@ -445,9 +474,17 @@ export default function ProductDetailsSummary({
         color="primary"
         variant="outlined"
         onClick={handleAddCart}
-        sx={{ whiteSpace: 'nowrap' }}
+        sx={{
+          whiteSpace: { xs: 'normal', sm: 'nowrap' },
+          height: { xs: 'auto', sm: 48 },
+        }}
       >
-        <Typography variant="button" sx={{ fontSize: '0.75rem' }}>
+        <Typography
+          variant="button"
+          sx={{
+            fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' },
+          }}
+        >
           Beli Sekarang
         </Typography>
       </Button>
@@ -472,8 +509,14 @@ export default function ProductDetailsSummary({
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Stack spacing={3} sx={{ pt: 3 }} {...other}>
         <Stack spacing={2} alignItems="flex-start">
-          <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
-            <Typography variant="h5" noWrap>
+          <Box
+            display="flex"
+            flexDirection={isMobile ? 'column' : 'row'}
+            alignItems={isMobile ? 'flex-start' : 'center'}
+            justifyContent="space-between"
+            width="100%"
+          >
+            <Typography variant="h5" noWrap sx={{ mb: isMobile ? 1 : 0 }}>
               {name}
             </Typography>
 

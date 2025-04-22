@@ -3,11 +3,14 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 
 export const useFetchVillage = (id) =>
   useQuery({
-    queryKey: ['village.id', id], // Tambahkan id agar cache unik untuk setiap permintaan
+    queryKey: ['village.id', id],
     queryFn: async () => {
-      if (!id) return null; // Hindari fetch jika id tidak tersedia
+      if (!id) return [];
       const response = await axiosInstance.get(`${endpoints.shippings.village}/${id}`);
       return response.data.data;
     },
     enabled: !!id,
+    staleTime: 1000 * 60 * 30, // Data tetap fresh selama 30 menit
+    cacheTime: 1000 * 60 * 60, // Data tetap di cache selama 1 jam
+    placeholderData: [], // Berikan data kosong sebagai placeholder
   });

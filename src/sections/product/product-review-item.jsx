@@ -162,7 +162,7 @@ export default function ProductReviewItem({ review }) {
 
       {!!media?.length && renderMediaThumbnails}
 
-      <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+      {/* <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         <Stack direction="row" alignItems="center" sx={{ typography: 'caption' }}>
           <Iconify icon="solar:like-outline" width={16} sx={{ mr: 0.5 }} />
           123
@@ -172,7 +172,7 @@ export default function ProductReviewItem({ review }) {
           <Iconify icon="solar:dislike-outline" width={16} sx={{ mr: 0.5 }} />
           34
         </Stack>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 

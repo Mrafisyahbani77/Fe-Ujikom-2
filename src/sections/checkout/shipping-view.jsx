@@ -21,6 +21,7 @@ import {
   Card,
   CardContent,
   Autocomplete,
+  CircularProgress,
 } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
@@ -29,15 +30,12 @@ export default function ShippingView({ currentData }) {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const router = useRouter();
+
+  // State terpisah untuk ID lokasi (bukan dalam form values)
   const [provinceId, setProvinceId] = useState('');
   const [cityId, setCityId] = useState('');
   const [districtId, setDistrictId] = useState('');
   const [villageId, setVillageId] = useState('');
-
-  const { data: provinces = [] } = useFetchProvinces();
-  const { data: cities = [] } = useFetchCity(provinceId);
-  const { data: districts = [] } = useFetchDistricts(cityId);
-  const { data: villages = [] } = useFetchVillage(districtId);
 
   const isEditMode = !!currentData?.id;
 
@@ -56,6 +54,7 @@ export default function ShippingView({ currentData }) {
     formState: { errors, isSubmitting },
     reset,
     setValue,
+    getValues,
   } = useForm({
     resolver: yupResolver(NewAddressSchema),
     defaultValues: {
@@ -67,6 +66,12 @@ export default function ShippingView({ currentData }) {
     },
   });
 
+  // Ambil data dengan React Query
+  const { data: provinces = [], isLoading: isLoadingProvinces } = useFetchProvinces();
+  const { data: cities = [], isLoading: isLoadingCities } = useFetchCity(provinceId);
+  const { data: districts = [], isLoading: isLoadingDistricts } = useFetchDistricts(cityId);
+  const { data: villages = [], isLoading: isLoadingVillages } = useFetchVillage(districtId);
+
   // Initialize form with currentData values when in edit mode
   useEffect(() => {
     if (currentData) {
@@ -76,14 +81,40 @@ export default function ShippingView({ currentData }) {
       setValue('postal_code', currentData.postal_code || '');
       setValue('notes', currentData.notes || '');
 
-      // Set location IDs
-      setProvinceId(currentData.province_id || '');
-      setCityId(currentData.city_id || '');
-      setDistrictId(currentData.district_id || '');
-      setVillageId(currentData.village_id || '');
+      // Set state ID untuk lokasi
+      if (currentData.province_id) {
+        setProvinceId(currentData.province_id);
+      }
+      if (currentData.city_id) {
+        setCityId(currentData.city_id);
+      }
+      if (currentData.district_id) {
+        setDistrictId(currentData.district_id);
+      }
+      if (currentData.village_id) {
+        setVillageId(currentData.village_id);
+      }
     }
   }, [currentData, setValue]);
 
+  // Mencari objek lokasi berdasarkan ID
+  const findProvinceOption = () => {
+    return provinceId ? provinces.find((p) => p.id === provinceId) || null : null;
+  };
+
+  const findCityOption = () => {
+    return cityId ? cities.find((c) => c.id === cityId) || null : null;
+  };
+
+  const findDistrictOption = () => {
+    return districtId ? districts.find((d) => d.id === districtId) || null : null;
+  };
+
+  const findVillageOption = () => {
+    return villageId ? villages.find((v) => v.id === villageId) || null : null;
+  };
+
+  // Handle mutations untuk create/update
   const { mutateAsync: createShipping } = useMutationCreateShippings({
     onSuccess: () => {
       enqueueSnackbar('Alamat berhasil ditambahkan!', { variant: 'success' });
@@ -141,22 +172,30 @@ export default function ShippingView({ currentData }) {
     }
   };
 
-  // Find option objects for initial values in edit mode
-  const findProvinceOption = () => {
-    return provinceId ? provinces.find((p) => p.id === provinceId) || null : null;
-  };
+  // Prefetch data ketika ID berubah
+  useEffect(() => {
+    if (provinceId) {
+      queryClient.prefetchQuery({
+        queryKey: ['city.id', provinceId],
+      });
+    }
+  }, [provinceId, queryClient]);
 
-  const findCityOption = () => {
-    return cityId ? cities.find((c) => c.id === cityId) || null : null;
-  };
+  useEffect(() => {
+    if (cityId) {
+      queryClient.prefetchQuery({
+        queryKey: ['districts.id', cityId],
+      });
+    }
+  }, [cityId, queryClient]);
 
-  const findDistrictOption = () => {
-    return districtId ? districts.find((d) => d.id === districtId) || null : null;
-  };
-
-  const findVillageOption = () => {
-    return villageId ? villages.find((v) => v.id === villageId) || null : null;
-  };
+  useEffect(() => {
+    if (districtId) {
+      queryClient.prefetchQuery({
+        queryKey: ['village.id', districtId],
+      });
+    }
+  }, [districtId, queryClient]);
 
   return (
     <Card>
@@ -183,83 +222,126 @@ export default function ShippingView({ currentData }) {
               fullWidth
             />
 
-            <Controller
-              name="province"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  {...field}
-                  options={provinces}
-                  getOptionLabel={(option) => option.name || ''}
-                  value={findProvinceOption()}
-                  onChange={(event, newValue) => {
-                    field.onChange(newValue);
-                    setProvinceId(newValue?.id || '');
-                    setCityId('');
-                    setDistrictId('');
-                    setVillageId('');
+            {/* Provinsi */}
+            <Autocomplete
+              options={provinces}
+              getOptionLabel={(option) => option?.name || ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              loading={isLoadingProvinces}
+              loadingText="Memuat data provinsi..."
+              value={findProvinceOption()}
+              onChange={(event, newValue) => {
+                setProvinceId(newValue?.id || '');
+                // Reset dependent values
+                setCityId('');
+                setDistrictId('');
+                setVillageId('');
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Provinsi"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingProvinces ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
-                  renderInput={(params) => <TextField {...params} label="Provinsi" />}
                 />
               )}
             />
 
-            <Controller
-              name="city"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  {...field}
-                  options={cities}
-                  getOptionLabel={(option) => option.name || ''}
-                  value={findCityOption()}
-                  onChange={(event, newValue) => {
-                    field.onChange(newValue);
-                    setCityId(newValue?.id || '');
-                    setDistrictId('');
-                    setVillageId('');
+            {/* Kota */}
+            <Autocomplete
+              options={cities}
+              getOptionLabel={(option) => option?.name || ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              loading={isLoadingCities}
+              loadingText="Memuat data kota..."
+              disabled={!provinceId}
+              value={findCityOption()}
+              onChange={(event, newValue) => {
+                setCityId(newValue?.id || '');
+                // Reset dependent values
+                setDistrictId('');
+                setVillageId('');
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Kota"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingCities ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
-                  renderInput={(params) => <TextField {...params} label="Kota" />}
-                  disabled={!provinceId}
                 />
               )}
             />
 
-            <Controller
-              name="district"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  {...field}
-                  options={districts}
-                  getOptionLabel={(option) => option.name || ''}
-                  value={findDistrictOption()}
-                  onChange={(event, newValue) => {
-                    field.onChange(newValue);
-                    setDistrictId(newValue?.id || '');
-                    setVillageId('');
+            {/* Kecamatan */}
+            <Autocomplete
+              options={districts}
+              getOptionLabel={(option) => option?.name || ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              loading={isLoadingDistricts}
+              loadingText="Memuat data kecamatan..."
+              disabled={!cityId}
+              value={findDistrictOption()}
+              onChange={(event, newValue) => {
+                setDistrictId(newValue?.id || '');
+                // Reset dependent values
+                setVillageId('');
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Kecamatan"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingDistricts ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
-                  renderInput={(params) => <TextField {...params} label="Kecamatan" />}
-                  disabled={!cityId}
                 />
               )}
             />
 
-            <Controller
-              name="village"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  {...field}
-                  options={villages}
-                  getOptionLabel={(option) => option.name || ''}
-                  value={findVillageOption()}
-                  onChange={(event, newValue) => {
-                    field.onChange(newValue);
-                    setVillageId(newValue?.id || '');
+            {/* Kelurahan */}
+            <Autocomplete
+              options={villages}
+              getOptionLabel={(option) => option?.name || ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              loading={isLoadingVillages}
+              loadingText="Memuat data kelurahan..."
+              disabled={!districtId}
+              value={findVillageOption()}
+              onChange={(event, newValue) => {
+                setVillageId(newValue?.id || '');
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Kelurahan"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingVillages ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
-                  renderInput={(params) => <TextField {...params} label="Kelurahan" />}
-                  disabled={!districtId}
                 />
               )}
             />
