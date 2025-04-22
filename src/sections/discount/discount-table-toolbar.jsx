@@ -130,7 +130,7 @@ export default function DiscountTableToolbar({
             fullWidth
             value={filters.code}
             onChange={handleFilterCode}
-            placeholder="Search..."
+            placeholder="Cari code diskon..."
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -140,9 +140,9 @@ export default function DiscountTableToolbar({
             }}
           />
 
-          <IconButton onClick={popover.onOpen}>
+          {/* <IconButton onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
+          </IconButton> */}
         </Stack>
       </Stack>
 

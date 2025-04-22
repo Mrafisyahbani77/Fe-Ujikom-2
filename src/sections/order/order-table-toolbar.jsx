@@ -87,7 +87,7 @@ export default function OrderTableToolbar({
             fullWidth
             value={filters.name}
             onChange={handleFilterName}
-            placeholder="Cari customer atau nomor order..."
+            placeholder="Cari nama kostumer atau nomor order..."
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -97,9 +97,9 @@ export default function OrderTableToolbar({
             }}
           />
 
-          <IconButton onClick={popover.onOpen}>
+          {/* <IconButton onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
+          </IconButton> */}
         </Stack>
 
         {canReset && (
