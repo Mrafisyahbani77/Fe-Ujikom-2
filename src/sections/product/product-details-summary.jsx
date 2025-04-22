@@ -11,6 +11,7 @@ import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { formHelperTextClasses } from '@mui/material/FormHelperText';
+import Menu from '@mui/material/Menu';
 // routes
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -31,6 +32,7 @@ import {
   useMutationDeleteWhislist,
 } from 'src/utils/whishlist';
 import { useQueryClient } from '@tanstack/react-query';
+import { useShareProduct } from 'src/utils/product';
 
 // ----------------------------------------------------------------------
 
@@ -92,6 +94,12 @@ export default function ProductDetailsSummary({
   const { reset, watch, control, setValue, handleSubmit } = methods;
   const { data: wishlistData } = user ? useFetchWhislist() : { data: null };
   const [wishlist, setWishlist] = useState([]);
+  const { data: shareData } = useShareProduct(id);
+  console.log(shareData);
+
+  // For share menu
+  const [shareAnchorEl, setShareAnchorEl] = useState(null);
+  const shareOpen = Boolean(shareAnchorEl);
 
   useEffect(() => {
     if (user && Array.isArray(wishlistData?.data)) {
@@ -197,6 +205,30 @@ export default function ProductDetailsSummary({
     }
   };
 
+  // Share functionality
+  const handleShareClick = (event) => {
+    setShareAnchorEl(event.currentTarget);
+  };
+
+  const handleShareClose = () => {
+    setShareAnchorEl(null);
+  };
+
+  const handleShareOption = (shareUrl) => {
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    handleShareClose();
+  };
+
+  const handleCopyLink = () => {
+    if (shareData?.data?.socialSharing?.copyLink) {
+      navigator.clipboard.writeText(shareData.data.socialSharing.copyLink);
+      enqueueSnackbar('Link berhasil disalin', { variant: 'success' });
+      handleShareClose();
+    } else {
+      enqueueSnackbar('Tidak dapat menyalin link', { variant: 'error' });
+    }
+  };
+
   const handleQuantityIncrease = () => {
     const newQuantity = values.quantity + 1;
     if (newQuantity <= stockQuantity) {
@@ -257,7 +289,9 @@ export default function ProductDetailsSummary({
 
       <Link
         variant="subtitle2"
+        onClick={handleShareClick}
         sx={{
+          cursor: 'pointer',
           color: 'text.secondary',
           display: 'inline-flex',
           alignItems: 'center',
@@ -266,6 +300,52 @@ export default function ProductDetailsSummary({
         <Iconify icon="solar:share-bold" width={16} sx={{ mr: 1 }} />
         Bagikan
       </Link>
+
+      <Menu
+        anchorEl={shareAnchorEl}
+        open={shareOpen}
+        onClose={handleShareClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        {!shareData ? (
+          <MenuItem>Loading...</MenuItem>
+        ) : !shareData.data ? (
+          <MenuItem>No data available</MenuItem>
+        ) : !shareData.data.socialSharing ? (
+          <MenuItem>No sharing options available</MenuItem>
+        ) : (
+          <>
+            <MenuItem onClick={() => handleShareOption(shareData.data.socialSharing.whatsapp)}>
+              <Iconify icon="ri:whatsapp-fill" width={20} sx={{ mr: 2, color: '#25D366' }} />
+              WhatsApp
+            </MenuItem>
+            <MenuItem onClick={() => handleShareOption(shareData.data.socialSharing.facebook)}>
+              <Iconify icon="ri:facebook-fill" width={20} sx={{ mr: 2, color: '#1877F2' }} />
+              Facebook
+            </MenuItem>
+            <MenuItem onClick={() => handleShareOption(shareData.data.socialSharing.twitter)}>
+              <Iconify icon="ri:twitter-fill" width={20} sx={{ mr: 2, color: '#1DA1F2' }} />
+              Twitter
+            </MenuItem>
+            <MenuItem onClick={() => handleShareOption(shareData.data.socialSharing.telegram)}>
+              <Iconify icon="ri:telegram-fill" width={20} sx={{ mr: 2, color: '#0088cc' }} />
+              Telegram
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleCopyLink}>
+              <Iconify icon="solar:copy-bold" width={20} sx={{ mr: 2 }} />
+              Salin Link
+            </MenuItem>
+          </>
+        )}
+      </Menu>
     </Stack>
   );
 

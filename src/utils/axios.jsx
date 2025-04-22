@@ -183,6 +183,7 @@ export const endpoints = {
     create: '/api/products/store',
     search: '/api/product/search',
     chartNew: '/api/products/newest',
+    shareProduct:'/api/products/share'
   },
   whishlist: {
     list: '/api/wishlist',
