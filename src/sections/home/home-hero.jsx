@@ -9,6 +9,7 @@ import Carousel, { useCarousel, CarouselArrows } from 'src/components/carousel';
 import { useFetchBanner } from 'src/utils/banner/public/useFetchBanner';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import { Link } from 'react-router-dom';
 
 export default function HomeHero() {
   const { data, isLoading } = useFetchBanner();
@@ -49,10 +50,34 @@ export default function HomeHero() {
         }}
       >
         <Carousel ref={carousel.carouselRef} {...carousel.carouselSettings}>
-          {isBannerAvailable ? (
-            data.map((item) => (
+          <Link to="/promo">
+            {isBannerAvailable ? (
+              data.map((item) => (
+                <Card
+                  key={item.id}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    borderRadius: 1,
+                    boxShadow: 10,
+                  }}
+                >
+                  <Image
+                    alt={item.title}
+                    src={item.image_url}
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 'inherit',
+                    }}
+                  />
+                </Card>
+              ))
+            ) : (
               <Card
-                key={item.id}
                 sx={{
                   width: '100%',
                   height: '100%',
@@ -63,8 +88,8 @@ export default function HomeHero() {
                 }}
               >
                 <Image
-                  alt={item.title}
-                  src={item.image_url}
+                  alt="Default Banner"
+                  src="https://picsum.photos/1840/600"
                   sx={{
                     width: '100%',
                     height: '100%',
@@ -72,26 +97,8 @@ export default function HomeHero() {
                     borderRadius: 'inherit',
                   }}
                 />
-              </Card>
-            ))
-          ) : (
-            <Card
-              sx={{
-                width: '100%',
-                height: '100%',
-                overflow: 'hidden',
-                position: 'relative',
-                borderRadius: 1,
-                boxShadow: 10,
-              }}
-            >
-              <Image
-                alt="Default Banner"
-                src="https://picsum.photos/1840/600"
-                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }}
-              />
-              {/* Bisa tambahkan fallback text jika mau */}
-              {/* <CardContent
+                {/* Bisa tambahkan fallback text jika mau */}
+                {/* <CardContent
                 sx={{
                   position: 'absolute',
                   bottom: 16,
@@ -104,8 +111,9 @@ export default function HomeHero() {
               >
                 <Typography variant="h5">Tidak ada banner tersedia</Typography>
               </CardContent> */}
-            </Card>
-          )}
+              </Card>
+            )}
+          </Link>
         </Carousel>
 
         <CarouselArrows

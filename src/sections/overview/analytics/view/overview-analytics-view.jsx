@@ -202,7 +202,7 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={6}>
+        {/* <Grid xs={12} md={6} lg={6}>
           <AnalyticsWebsiteVisits
             title="Website Visits"
             subheader="(+43%) than last year"
@@ -242,11 +242,11 @@ export default function OverviewAnalyticsView() {
               ],
             }}
           />
-        </Grid>
+        </Grid> */}
 
         <Grid xs={12} md={6} lg={4}>
           <EcommerceSaleByGender
-            title="Sale By Gender"
+            title="Terjual Berdasarkan Jenis Kelamin"
             total={gender.total}
             chart={{
               series:
@@ -261,9 +261,9 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={4}>
+        {/* <Grid xs={12} md={6} lg={4}>
           <EcommerceLatestProducts title="Produk terbaru" list={newProduct} />
-        </Grid>
+        </Grid> */}
 
         {/* <Grid xs={12} md={4}>
           <EcommerceWidgetSummary

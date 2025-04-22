@@ -50,7 +50,7 @@ import { useQueryClient } from '@tanstack/react-query';
 const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Order', width: 116 },
+  { id: 'orderNumber', label: 'No Order', width: 146 },
   { id: 'name', label: 'Kostumer' },
   { id: 'createdAt', label: 'Tanggal', width: 140 },
   { id: 'totalQuantity', label: 'Item', width: 120, align: 'center' },

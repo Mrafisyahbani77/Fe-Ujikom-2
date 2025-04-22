@@ -271,12 +271,12 @@ export default function UserListView() {
                   rowCount={tableData.length}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
-                  onSelectAllRows={(checked) =>
-                    table.onSelectAllRows(
-                      checked,
-                      tableData.map((row) => row.id)
-                    )
-                  }
+                  // onSelectAllRows={(checked) =>
+                  //   table.onSelectAllRows(
+                  //     checked,
+                  //     tableData.map((row) => row.id)
+                  //   )
+                  // }
                 />
 
                 <TableBody>
@@ -372,9 +372,12 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     filteredUsers = filteredUsers.filter(
-      (user) => user.username.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (user) =>
+        user.username.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
+        user.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
+
   // Filter by status (is_active / is_banned)
   if (status !== 'all') {
     filteredUsers = filteredUsers.filter((user) => getUserStatus(user) === status);

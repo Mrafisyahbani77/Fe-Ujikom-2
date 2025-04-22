@@ -13,6 +13,7 @@ import {
   Box,
   FormControlLabel,
   Switch,
+  FormHelperText,
 } from '@mui/material';
 // hooks
 import { useSnackbar } from 'src/components/snackbar';
@@ -24,38 +25,48 @@ export default function EditForm({ currentProduct }) {
   const { enqueueSnackbar } = useSnackbar();
 
   // State
-  const [title, setTitle] = useState(currentProduct?.title || '');
-  const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(currentProduct?.image_url || '');
-  const [link, setLink] = useState(currentProduct?.link || '');
-  const [priority, setPriority] = useState(currentProduct?.priority || '');
-  const [isActive, setIsActive] = useState(currentProduct?.is_active || false);
+  const [image, setImage] = useState(null);
+  const [imageRemoved, setImageRemoved] = useState(false); // Track if image was deliberately removed
   const fileInputRef = useRef(null);
 
   // Schema validasi Yup
   const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Judul wajib diisi'),
-    image_url: Yup.mixed().nullable(),
-    link: Yup.string().url('Masukkan URL yang valid').nullable(),
-    priority: Yup.number().integer().min(1, 'Prioritas minimal 1').nullable(),
-    is_active: Yup.boolean(),
+    // title: Yup.string().required('Judul wajib diisi'),
+    // link: Yup.string().url('Masukkan URL yang valid').nullable(),
+    // priority: Yup.number().integer().min(1, 'Prioritas minimal 1').nullable(),
+    // is_active: Yup.boolean(),
   });
 
-  const { handleSubmit, setValue } = useForm({
+  const {
+    handleSubmit,
+    setValue,
+    register,
+    formState: { errors },
+    watch,
+  } = useForm({
     resolver: yupResolver(validationSchema),
+    defaultValues: {
+      title: currentProduct?.title || '',
+      link: currentProduct?.link || '',
+      priority: currentProduct?.priority || '',
+      is_active: currentProduct?.is_active || false,
+    },
   });
+
+  const title = watch('title');
+  const link = watch('link');
+  const priority = watch('priority');
+  const isActive = watch('is_active');
 
   useEffect(() => {
     if (currentProduct) {
-      setTitle(currentProduct.title);
-      setPreview(currentProduct.image_url);
-      setLink(currentProduct.link);
-      setPriority(currentProduct.priority);
-      setIsActive(currentProduct.is_active);
       setValue('title', currentProduct.title);
       setValue('link', currentProduct.link);
       setValue('priority', currentProduct.priority);
       setValue('is_active', currentProduct.is_active);
+      setPreview(currentProduct.image_url);
+      setImageRemoved(false); // Reset the removed flag when product changes
     }
   }, [currentProduct, setValue]);
 
@@ -73,6 +84,7 @@ export default function EditForm({ currentProduct }) {
         if (width >= 1920 && height >= 600) {
           setImage(file);
           setPreview(img.src);
+          setImageRemoved(false); // Reset the removed flag when new image is added
         } else {
           enqueueSnackbar(
             `Ukuran gambar terlalu kecil! Minimal 1920x600 px. (Sekarang ${width}x${height}px)`,
@@ -94,6 +106,7 @@ export default function EditForm({ currentProduct }) {
   const handleRemoveImage = () => {
     setImage(null);
     setPreview('');
+    setImageRemoved(true); // Mark that image was deliberately removed
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -109,22 +122,44 @@ export default function EditForm({ currentProduct }) {
         enqueueSnackbar(error.message || 'Terjadi kesalahan', { variant: 'error' });
       },
     },
-    currentProduct?.id // Menambahkan ID sebagai parameter kedua
+    currentProduct?.id
   );
 
-  const onSubmit = () => {
-    // if (!title || !image) {
-    //   enqueueSnackbar('Judul dan gambar harus diisi', { variant: 'warning' });
-    //   return;
-    // }
+  const onSubmit = (data) => {
+    // Check if title is empty
+    if (!data.title) {
+      enqueueSnackbar('Judul harus diisi', { variant: 'warning' });
+      return;
+    }
+
+    // Check if image was removed and no new image was uploaded
+    if (imageRemoved && !image) {
+      enqueueSnackbar('Gambar harus diisi', { variant: 'warning' });
+      return;
+    }
+
+    // With this logic:
+    // - If imageRemoved=false and no new image: use existing image
+    // - If imageRemoved=true and no new image: show error (above check)
+    // - If new image (image !== null): use new image
 
     try {
       const formData = new FormData();
-      formData.append('title', title);
-      if (image) formData.append('image', image);
-      if (link) formData.append('link', link);
-      if (priority) formData.append('priority', priority);
-      formData.append('is_active', isActive ? '1' : '0');
+      formData.append('title', data.title);
+
+      // Only append image if a new one was selected
+      if (image) {
+        formData.append('image', image);
+      } else if (imageRemoved) {
+        // Should never reach here due to earlier validation, but just in case
+        enqueueSnackbar('Gambar harus diisi', { variant: 'warning' });
+        return;
+      }
+      // If no new image and not removed, the existing image stays as is
+
+      if (data.link) formData.append('link', data.link);
+      if (data.priority) formData.append('priority', data.priority);
+      formData.append('is_active', data.is_active ? '1' : '0');
 
       mutation.mutate(formData);
     } catch (error) {
@@ -143,17 +178,23 @@ export default function EditForm({ currentProduct }) {
             fullWidth
             label="Judul Banner"
             variant="outlined"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...register('title')}
+            error={!!errors.title}
+            helperText={errors.title?.message}
             sx={{ mb: 2 }}
           />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            style={{ display: 'block', marginBottom: 16 }}
-          />
+
+          <Box sx={{ mb: 2 }}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              style={{ display: 'block', marginBottom: 16 }}
+            />
+            {imageRemoved && !image && <FormHelperText error>Gambar wajib diisi</FormHelperText>}
+          </Box>
+
           {preview && (
             <Box sx={{ mb: 3 }}>
               <img
@@ -166,34 +207,40 @@ export default function EditForm({ currentProduct }) {
               </Button>
             </Box>
           )}
-          <TextField
+
+          {/* <TextField
             fullWidth
             label="Link (Opsional)"
             variant="outlined"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
+            {...register('link')}
+            error={!!errors.link}
+            helperText={errors.link?.message}
             sx={{ mb: 2 }}
           />
+
           <TextField
             fullWidth
             label="Prioritas (Opsional)"
             variant="outlined"
             type="number"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
+            {...register('priority')}
+            error={!!errors.priority}
+            helperText={errors.priority?.message}
             sx={{ mb: 2 }}
           />
+
           <FormControlLabel
             control={
               <Switch
                 checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
+                onChange={(e) => setValue('is_active', e.target.checked)}
                 color="primary"
               />
             }
             label="Aktif"
             sx={{ mb: 2 }}
-          />
+          /> */}
+
           <Button type="submit" variant="contained" color="primary" fullWidth>
             Simpan
           </Button>

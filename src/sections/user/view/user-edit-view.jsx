@@ -23,7 +23,7 @@ export default function UserEditView({ id }) {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Edit"
+        heading="Informasi User"
         links={[
           {
             name: 'Dashboard',
