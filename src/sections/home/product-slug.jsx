@@ -117,7 +117,7 @@ export default function ProductSlug({ slug }) {
       />
 
       <Stack direction="row" spacing={1} flexShrink={0}>
-        <ProductFilters
+        {/* <ProductFilters
           open={openFilters.value}
           onOpen={openFilters.onTrue}
           onClose={openFilters.onFalse}
@@ -134,7 +134,7 @@ export default function ProductSlug({ slug }) {
           categoryOptions={[...data]}
           minPrice={minPrice}
           maxPrice={maxPrice}
-        />
+        /> */}
 
         <ProductSort sort={sortBy} onSort={handleSortBy} sortOptions={PRODUCT_SORT_OPTIONS} />
       </Stack>

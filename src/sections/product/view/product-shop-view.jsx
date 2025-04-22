@@ -115,7 +115,7 @@ export default function ProductShopView() {
       />
 
       <Stack direction="row" spacing={1} flexShrink={0}>
-        <ProductFilters
+        {/* <ProductFilters
           open={openFilters.value}
           onOpen={openFilters.onTrue}
           onClose={openFilters.onFalse}
@@ -132,7 +132,7 @@ export default function ProductShopView() {
           categoryOptions={[...data]}
           minPrice={minPrice}
           maxPrice={maxPrice}
-        />
+        /> */}
 
         <ProductSort sort={sortBy} onSort={handleSortBy} sortOptions={PRODUCT_SORT_OPTIONS} />
       </Stack>
