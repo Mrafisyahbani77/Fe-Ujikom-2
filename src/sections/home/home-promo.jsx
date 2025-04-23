@@ -146,7 +146,7 @@ export default function HomePromo() {
                   <Chip
                     label={
                       promo.discount_type === 'percentage'
-                        ? `${promo.discount_value}% OFF`
+                        ? `${fPercent(promo.discount_value)} OFF`
                         : `${fCurrency(promo.discount_value)} OFF`
                     }
                     color="primary"
@@ -247,7 +247,7 @@ export default function HomePromo() {
                       sx={{ mr: 1, color: 'text.disabled' }}
                     />
                     <Typography variant="body2" color="text.secondary">
-                      Berakhir pada: {promo.endDate ? fDate(promo.endDate) : fDate(new Date())}
+                      Berakhir pada: {promo.end_date ? fDate(promo.end_date) : fDate(new Date())}
                     </Typography>
                   </Box>
                 </CardContent>

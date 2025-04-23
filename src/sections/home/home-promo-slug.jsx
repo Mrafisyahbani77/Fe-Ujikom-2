@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import Iconify from 'src/components/iconify';
-import { fCurrency } from 'src/utils/format-number';
+import { fCurrency, fPercent } from 'src/utils/format-number';
 
 export default function HomePromoSlug() {
   const { slug } = useParams();
@@ -128,7 +128,7 @@ export default function HomePromoSlug() {
 
               <Typography variant="h3" sx={{ mb: 2, color: 'primary.main' }}>
                 {promo.discount_type === 'percentage'
-                  ? `${promo.discount_value}% OFF`
+                  ? `${fPercent(promo.discount_value)} OFF`
                   : `${fCurrency(promo.discount_value)} OFF`}
               </Typography>
 
