@@ -9,16 +9,32 @@ import Carousel, { useCarousel, CarouselArrows } from 'src/components/carousel';
 import { useFetchBanner } from 'src/utils/banner/public/useFetchBanner';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+// Buat komponen styled untuk tombol navigasi carousel
+const NavigationButton = styled(Button)(({ theme }) => ({
+  pointerEvents: 'auto',
+  backgroundColor: 'rgba(161, 126, 126, 0.7)',
+  minWidth: 'auto',
+  borderRadius: '50%',
+  color: 'white',
+  '&:hover': {
+    backgroundColor: 'rgba(0,0,0,0.9)',
+  },
+  position: 'absolute',
+  zIndex: 1000,
+  padding: 0,
+}));
 
 export default function HomeHero() {
   const { data, isLoading } = useFetchBanner();
+  const [preventClick, setPreventClick] = useState(false);
 
   const carousel = useCarousel({
     autoplay: true,
     autoplaySpeed: 5000,
-    speed: 500,
+    speed: 300,
     infinite: true,
     pauseOnHover: true,
     draggable: true,
@@ -35,6 +51,24 @@ export default function HomeHero() {
       carousel.carouselRef.current.slickGoTo(0);
     }
   }, [data]);
+
+  // Handler untuk mencegah navigasi ke promo saat mengklik arrow
+  const handleArrowClick = (callback) => (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    callback();
+
+    // Mencegah navigasi selama 100ms setelah mengklik arrow
+    setPreventClick(true);
+    setTimeout(() => setPreventClick(false), 100);
+  };
+
+  // Handler untuk navigasi ke promo
+  const handlePromoClick = (event) => {
+    if (preventClick) {
+      event.preventDefault();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -74,13 +108,48 @@ export default function HomeHero() {
           position: 'relative',
         }}
       >
-        <Carousel ref={carousel.carouselRef} {...carousel.carouselSettings}>
-          {isBannerAvailable ? (
-            data.map((item) => (
+        {/* Main carousel with slides */}
+        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Carousel ref={carousel.carouselRef} {...carousel.carouselSettings}>
+            {isBannerAvailable ? (
+              data.map((item) => (
+                <Box key={item.id} sx={{ position: 'relative' }}>
+                  <Link
+                    to="/promo"
+                    onClick={handlePromoClick}
+                    style={{
+                      textDecoration: 'none',
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  >
+                    <Card
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        borderRadius: 1,
+                        boxShadow: 10,
+                      }}
+                    >
+                      <Image
+                        alt={item.title}
+                        src={item.image_url}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: 'inherit',
+                        }}
+                      />
+                    </Card>
+                  </Link>
+                </Box>
+              ))
+            ) : (
               <Card
-                component={Link}
-                to="/promo"
-                key={item.id}
                 sx={{
                   width: '100%',
                   height: '100%',
@@ -91,8 +160,8 @@ export default function HomeHero() {
                 }}
               >
                 <Image
-                  alt={item.title}
-                  src={item.image_url}
+                  alt="Default Banner"
+                  src="https://picsum.photos/1840/600"
                   sx={{
                     width: '100%',
                     height: '100%',
@@ -101,67 +170,44 @@ export default function HomeHero() {
                   }}
                 />
               </Card>
-            ))
-          ) : (
-            <Card
-              sx={{
-                width: '100%',
-                height: '100%',
-                overflow: 'hidden',
-                position: 'relative',
-                borderRadius: 1,
-                boxShadow: 10,
-              }}
-            >
-              <Image
-                alt="Default Banner"
-                src="https://picsum.photos/1840/600"
-                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }}
-              />
-            </Card>
-          )}
-        </Carousel>
+            )}
+          </Carousel>
 
-        {/* Only show arrows if we have multiple items */}
-        {isBannerAvailable && data.length > 1 && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              pointerEvents: 'none', // This allows clicks to pass through to the carousel
-            }}
-          >
-            <CarouselArrows
-              onNext={carousel.onNext}
-              onPrev={carousel.onPrev}
-              sx={{
-                position: 'relative',
-                height: '100%',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                zIndex: 9,
-                '& .arrow': {
-                  pointerEvents: 'auto', // Re-enable pointer events for the arrows
-                  backgroundColor: 'rgba(161, 126, 126, 0.7)',
-                  width: { xs: 40, sm: 50, md: 70 }, // Responsive width
-                  height: { xs: 30, sm: 40, md: 48 }, // Responsive height
-                  borderRadius: '50%',
-                  color: 'white',
-                  fontSize: { xs: 20, sm: 24, md: 28 }, // Responsive font size
-                  mx: { xs: 1, sm: 2, md: 3 }, // Responsive margin
-                  '&:hover': {
-                    backgroundColor: 'rgba(0,0,0,0.9)',
-                  },
-                },
-              }}
-            />
-          </Box>
-        )}
+          {/* Completely separate navigation arrows with medium size */}
+          {isBannerAvailable && data.length > 1 && (
+            <>
+              {/* Left arrow */}
+              <NavigationButton
+                onClick={handleArrowClick(carousel.onPrev)}
+                sx={{
+                  left: { xs: '10px', sm: '15px', md: '20px' },
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: { xs: 32, sm: 36, md: 40 },
+                  height: { xs: 32, sm: 36, md: 40 },
+                  fontSize: { xs: 16, sm: 18, md: 20 },
+                }}
+              >
+                <span style={{ marginTop: '-2px' }}>&lt;</span>
+              </NavigationButton>
+
+              {/* Right arrow */}
+              <NavigationButton
+                onClick={handleArrowClick(carousel.onNext)}
+                sx={{
+                  right: { xs: '10px', sm: '15px', md: '20px' },
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: { xs: 32, sm: 36, md: 40 },
+                  height: { xs: 32, sm: 36, md: 40 },
+                  fontSize: { xs: 16, sm: 18, md: 20 },
+                }}
+              >
+                <span style={{ marginTop: '-2px' }}>&gt;</span>
+              </NavigationButton>
+            </>
+          )}
+        </Box>
       </Box>
     </Container>
   );

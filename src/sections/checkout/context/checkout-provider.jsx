@@ -282,7 +282,7 @@ export function CheckoutProvider({ children }) {
         // Cek minimal belanja
         if (min_order_amount && subTotal < parseFloat(min_order_amount)) {
           enqueueSnackbar(`Minimal belanja Rp${parseFloat(min_order_amount).toLocaleString()}`, {
-            variant: 'error',
+            variant: 'warning',
           });
           return;
         }
