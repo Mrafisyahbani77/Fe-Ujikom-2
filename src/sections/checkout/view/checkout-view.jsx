@@ -1,4 +1,5 @@
 // @mui
+import { useState, useCallback } from 'react';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
@@ -18,8 +19,15 @@ import CheckoutBillingAddress from '../checkout-billing-address';
 
 export default function CheckoutView() {
   const settings = useSettingsContext();
-
   const checkout = useCheckoutContext();
+
+  // Add a refresh function for billing data
+  const handleRefreshBillingData = useCallback(() => {
+    // Fetch updated billing data
+    // Assuming checkout context has a method to refresh billing data
+    checkout.onGetBilling();
+    // If your context doesn't have this function, you need to implement it
+  }, [checkout]);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'} sx={{ mb: 10 }}>
@@ -44,7 +52,9 @@ export default function CheckoutView() {
         <>
           {checkout.activeStep === 0 && <CheckoutCart />}
 
-          {checkout.activeStep === 1 && <CheckoutBillingAddress />}
+          {checkout.activeStep === 1 && (
+            <CheckoutBillingAddress onRefreshData={handleRefreshBillingData} />
+          )}
 
           {checkout.activeStep === 2 && checkout.billing && <CheckoutPayment />}
         </>

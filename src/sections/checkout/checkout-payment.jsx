@@ -19,19 +19,19 @@ import CheckoutBillingInfo from './checkout-billing-info';
 const DELIVERY_OPTIONS = [
   {
     value: 0,
-    label: 'Free',
-    description: '5-7 Days delivery',
+    label: 'Gratis',
+    // description: '5-7 Days delivery',
   },
-  {
-    value: 10,
-    label: 'Standard',
-    description: '3-5 Days delivery',
-  },
-  {
-    value: 20,
-    label: 'Express',
-    description: '2-3 Days delivery',
-  },
+  // {
+  //   value: 10,
+  //   label: 'Standard',
+  //   description: '3-5 Days delivery',
+  // },
+  // {
+  //   value: 20,
+  //   label: 'Express',
+  //   description: '2-3 Days delivery',
+  // },
 ];
 
 export default function CheckoutPayment() {
