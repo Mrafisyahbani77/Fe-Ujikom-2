@@ -33,6 +33,24 @@ export default function NotificationItem({ notification, onRead, onClose }) {
     }
   };
 
+  const STATUS_OPTIONS = [
+    { value: 'all', label: 'All' },
+    { value: 'pending', label: 'Belum Bayar' },
+    { value: 'paid', label: 'Dikemas' },
+    // { value: 'processing', label: 'Proses' },
+    { value: 'shipped', label: 'Dikirim' },
+    { value: 'delivered', label: 'Selesai' },
+    { value: 'cancellation_requested', label: 'Dibatalkan' },
+  ];
+
+  // Function to get status label from STATUS_OPTIONS based on value
+  const getStatusLabel = (statusValue) => {
+    const statusOption = STATUS_OPTIONS.find((option) => option.value === statusValue);
+    return statusOption
+      ? statusOption.label
+      : statusValue.charAt(0).toUpperCase() + statusValue.slice(1);
+  };
+
   const handleClick = () => {
     if (!notification.is_read && onRead) {
       onRead(notification.id);
@@ -105,7 +123,7 @@ export default function NotificationItem({ notification, onRead, onClose }) {
               }
               variant="soft"
             >
-              {notification.data.status.charAt(0).toUpperCase() + notification.data.status.slice(1)}
+              {getStatusLabel(notification.data.status)}
             </Label>
           )}
         </Stack>
