@@ -19,7 +19,7 @@ export default function HomeHero() {
     autoplay: true,
     autoplaySpeed: 5000,
     speed: 500,
-    infinite: true, // Changed from loop to infinite for better compatibility
+    infinite: true,
     pauseOnHover: true,
     draggable: true,
     slidesToShow: 1,
@@ -63,11 +63,12 @@ export default function HomeHero() {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
+        px: { xs: 1, sm: 2, md: 3 }, // Responsive padding
       }}
     >
       <Box
         sx={{
-          width: { xs: '100%', md: '100%', lg: '100%' },
+          width: '100%',
           height: { xs: '30vh', md: '50vh' },
           maxWidth: '1800px',
           position: 'relative',
@@ -123,31 +124,43 @@ export default function HomeHero() {
 
         {/* Only show arrows if we have multiple items */}
         {isBannerAvailable && data.length > 1 && (
-          <CarouselArrows
-            onNext={carousel.onNext}
-            onPrev={carousel.onPrev}
+          <Box
             sx={{
               position: 'absolute',
-              top: '50%',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-between',
-              px: 2,
-              transform: 'translateY(-50%)',
-              zIndex: 9, // Added zIndex to ensure arrows appear above images
-              '& .arrow': {
-                backgroundColor: 'rgba(161, 126, 126, 0.7)',
-                width: 70,
-                height: 48,
-                borderRadius: '50%',
-                color: 'white',
-                fontSize: 28,
-                '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.9)',
-                },
-              },
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              pointerEvents: 'none', // This allows clicks to pass through to the carousel
             }}
-          />
+          >
+            <CarouselArrows
+              onNext={carousel.onNext}
+              onPrev={carousel.onPrev}
+              sx={{
+                position: 'relative',
+                height: '100%',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                zIndex: 9,
+                '& .arrow': {
+                  pointerEvents: 'auto', // Re-enable pointer events for the arrows
+                  backgroundColor: 'rgba(161, 126, 126, 0.7)',
+                  width: { xs: 40, sm: 50, md: 70 }, // Responsive width
+                  height: { xs: 30, sm: 40, md: 48 }, // Responsive height
+                  borderRadius: '50%',
+                  color: 'white',
+                  fontSize: { xs: 20, sm: 24, md: 28 }, // Responsive font size
+                  mx: { xs: 1, sm: 2, md: 3 }, // Responsive margin
+                  '&:hover': {
+                    backgroundColor: 'rgba(0,0,0,0.9)',
+                  },
+                },
+              }}
+            />
+          </Box>
         )}
       </Box>
     </Container>
