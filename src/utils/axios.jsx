@@ -41,6 +41,18 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (!error.response) {
+      // Network error atau server tidak merespon
+      window.location.href = '/500';
+      return Promise.reject(error);
+    }
+
+    // Handle bad gateway (502) dan service unavailable (503, 504)
+    if ([502, 503, 504].includes(error.response.status)) {
+      window.location.href = '/500';
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 403) {
       window.location.href = '/403';
       return Promise.reject(error);
@@ -183,7 +195,7 @@ export const endpoints = {
     create: '/api/products/store',
     search: '/api/product/search',
     chartNew: '/api/products/newest',
-    shareProduct:'/api/products/share'
+    shareProduct: '/api/products/share',
   },
   whishlist: {
     list: '/api/wishlist',
