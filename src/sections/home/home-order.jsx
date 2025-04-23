@@ -579,6 +579,7 @@ export default function HomeOrder() {
         <DialogContent>
           <TextField
             fullWidth
+            sx={{ mt: 2 }}
             label="Masukkan alasan pembatalan"
             value={cancelReason}
             onChange={(e) => setCancelReason(e.target.value)}
