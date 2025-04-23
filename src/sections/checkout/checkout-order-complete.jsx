@@ -60,20 +60,21 @@ export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF, da
         px: { xs: 2, sm: 0 },
       }}
     >
-      <Typography variant="h4">Thank you for your purchase!</Typography>
+      <Typography variant="h4">Terima kasih telah order!</Typography>
 
       <OrderCompleteIllustration sx={{ height: 260 }} />
 
       <Typography>
-        Thanks for placing order
+        {/* Thanks for placing order */}
         <br />
         <br />
-        <Link>01dc1370-3df6-11eb-b378-0242ac130002</Link>
+        {/* <Link>01dc1370-3df6-11eb-b378-0242ac130002</Link> */}
         <br />
         <br />
-        We will send you a notification within 5 days when it ships.
-        <br /> If you have any question or queries then fell to get in contact us. <br /> <br />
-        All the best,
+        Silakan lanjutkan pembayaran anda!
+        <br /> Jika ingin belanja lagi klik lanjutkan belanja
+        {/* <br /> <br />
+        All the best, */}
       </Typography>
 
       <Divider sx={{ borderStyle: 'dashed' }} />
@@ -91,7 +92,7 @@ export default function CheckoutOrderComplete({ open, onReset, onDownloadPDF, da
           onClick={onReset}
           startIcon={<Iconify icon="eva:arrow-ios-back-fill" />}
         >
-          Continue Shopping
+          Lanjutkan belanja
         </Button>
 
         <Button
