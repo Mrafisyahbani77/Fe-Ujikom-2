@@ -145,6 +145,17 @@ export function useNavData() {
           ],
         },
 
+        {
+          title: 'activity log',
+          path: paths.dashboard.log.root,
+          icon: ICONS.order,
+          children: [
+            { title: 'list', path: paths.dashboard.log.root },
+            // { title: 'details', path: paths.dashboard.order.demo.details },
+          ],
+        },
+
+
         // INVOICE
       // {
       //   title: 'invoice',

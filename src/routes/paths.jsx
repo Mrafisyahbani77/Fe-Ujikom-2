@@ -150,6 +150,13 @@ export const paths = {
         details: `${ROOTS.DASHBOARD}/order/${MOCK_ID}`,
       },
     },
+    log: {
+      root: `${ROOTS.DASHBOARD}/log`,
+      details: (id) => `${ROOTS.DASHBOARD}/log/${id}`,
+      demo: {
+        details: `${ROOTS.DASHBOARD}/log/${MOCK_ID}`,
+      },
+    },
     discount: {
       root: `${ROOTS.DASHBOARD}/discount`,
       new: `${ROOTS.DASHBOARD}/discount/new`,

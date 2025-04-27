@@ -20,6 +20,7 @@ import CreateDiscountPage from 'src/pages/dashboard/discount/create';
 import EditDiscountPage from 'src/pages/dashboard/discount/edit';
 import DiscountDetailsPage from 'src/pages/dashboard/discount/detail';
 import RoleBaseGuard from 'src/auth/guard/role-based-guard';
+import LogListPage from 'src/pages/dashboard/activity/list-log';
 
 // ----------------------------------------------------------------------
 
@@ -53,11 +54,11 @@ export const dashboardRoutes = [
     element: (
       <AuthGuard>
         {/* <RoleBaseGuard allowedRoles={['admin']}> */}
-          <DashboardLayout>
-            <Suspense fallback={<LoadingScreen />}>
-              <Outlet />
-            </Suspense>
-          </DashboardLayout>
+        <DashboardLayout>
+          <Suspense fallback={<LoadingScreen />}>
+            <Outlet />
+          </Suspense>
+        </DashboardLayout>
         {/* </RoleBaseGuard> */}
       </AuthGuard>
     ),
@@ -115,6 +116,14 @@ export const dashboardRoutes = [
           { element: <OrderListPage />, index: true },
           { path: 'list', element: <OrderListPage /> },
           { path: ':id', element: <OrderDetailsPage /> },
+        ],
+      },
+      {
+        path: 'log',
+        children: [
+          { element: <LogListPage />, index: true },
+          { path: 'list', element: <LogListPage /> },
+          // { path: ':id', element: <OrderDetailsPage /> },
         ],
       },
       {

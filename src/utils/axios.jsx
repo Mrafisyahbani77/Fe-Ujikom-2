@@ -262,4 +262,8 @@ export const endpoints = {
     updateNontificationReadAll: '/api/notifications/read/all',
     updateNontificationById: '/api/notifications/read', //need id
   },
+  activityLog: {
+    log: '/api/logs',
+    actionType: '/api/logs/action-types',
+  },
 };
