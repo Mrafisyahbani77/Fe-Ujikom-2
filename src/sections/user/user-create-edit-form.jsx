@@ -31,11 +31,14 @@ import FormProvider, {
   RHFSelect,
 } from 'src/components/hook-form';
 import { useMutationCreateAdmin } from 'src/utils/users';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
 export default function UserCreateEditForm({ User }) {
   const currentUser = User?.user;
+
+  const queryClient = useQueryClient();
 
   const router = useRouter();
 
@@ -47,6 +50,7 @@ export default function UserCreateEditForm({ User }) {
         variant: 'success',
       });
       router.push(paths.dashboard.user.list);
+      queryClient.invalidateQueries({ queryKey: ['fetch.alluser'] });
     },
     onError: (error) => {
       enqueueSnackbar(error.message, { variant: 'error' });
@@ -74,7 +78,7 @@ export default function UserCreateEditForm({ User }) {
       password: '',
       phone_number: currentUser?.phone_number || '',
       gender: currentUser?.gender || '',
-      role: currentUser?.role || 'pembeli',
+      role: currentUser?.role || 'admin',
       avatarUrl: currentUser?.profile_photo || null,
     }),
     [currentUser]
@@ -98,25 +102,54 @@ export default function UserCreateEditForm({ User }) {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // Create the data object to send to backend
-      const userData = {
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        phone_number: data.phone_number || null,
-        gender: data.gender || null,
-        role: data.role,
-        // Handle profile photo if needed
-      };
+      const formData = new FormData();
 
-      await CreateAdmin(userData);
+      formData.append('username', data.username);
+      formData.append('email', data.email);
+      formData.append('password', data.password);
+      formData.append('role', data.role);
 
-      // If we get here, the creation was successful (handled in the mutation's onSuccess)
+      if (data.phone_number) formData.append('phone_number', data.phone_number);
+      if (data.gender) formData.append('gender', data.gender);
+
+      if (data.avatarUrl && data.avatarUrl instanceof File) {
+        formData.append('profile_photo', data.avatarUrl);
+      }
+
+      if (currentUser?.id) {
+        formData.append('userId', currentUser.id);
+      }
+
+      // The key change: pass { data: formData } instead of just formData
+      await CreateAdmin(formData);
     } catch (error) {
       console.error(error);
       enqueueSnackbar(error.message || 'Something went wrong', { variant: 'error' });
     }
   });
+
+  // const onSubmit = handleSubmit(async (data) => {
+  //   try {
+  //     // Create the data object to send to backend
+  //     const userData = {
+  //       username: data.username,
+  //       email: data.email,
+  //       password: data.password,
+  //       phone_number: data.phone_number || null,
+  //       gender: data.gender || null,
+  //       role: data.role,
+  //       profile_photo: data.avatarUrl,
+  //       // Handle profile photo if needed
+  //     };
+
+  //     await CreateAdmin(userData);
+
+  //     // If we get here, the creation was successful (handled in the mutation's onSuccess)
+  //   } catch (error) {
+  //     console.error(error);
+  //     enqueueSnackbar(error.message || 'Something went wrong', { variant: 'error' });
+  //   }
+  // });
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -219,16 +252,16 @@ export default function UserCreateEditForm({ User }) {
               <RHFTextField name="phone_number" label="Phone Number" />
 
               <RHFSelect name="gender" label="Jenis Kelamin">
-                <MenuItem value="">
+                {/* <MenuItem value="">
                   <em>None</em>
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem value="pria">Pria</MenuItem>
                 <MenuItem value="wanita">Wanita</MenuItem>
               </RHFSelect>
 
               <RHFSelect name="role" label="Role">
                 <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="pembeli">Pembeli</MenuItem>
+                {/* <MenuItem value="pembeli">Pembeli</MenuItem> */}
               </RHFSelect>
             </Box>
 
