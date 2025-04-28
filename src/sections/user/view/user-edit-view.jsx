@@ -9,8 +9,8 @@ import { _userList } from 'src/_mock';
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
-import UserNewEditForm from '../user-new-edit-form';
 import { useFetchUserById } from 'src/utils/users';
+import UserCreateEditForm from '../user-create-edit-form';
 
 // ----------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ export default function UserEditView({ id }) {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Informasi User"
+        heading="Edit User"
         links={[
           {
             name: 'Dashboard',
@@ -40,7 +40,7 @@ export default function UserEditView({ id }) {
         }}
       />
 
-      <UserNewEditForm User={data} />
+      <UserCreateEditForm User={data} />
     </Container>
   );
 }

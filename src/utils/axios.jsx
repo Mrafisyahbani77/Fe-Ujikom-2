@@ -255,6 +255,7 @@ export const endpoints = {
     getById: '/api/users', //need id
     banUser: '/api/users', //need id
     unbanUser: '/api/users', //need id
+    createAdmin: '/api/users/create',
   },
   nontification: {
     getNontification: '/api/notifications',

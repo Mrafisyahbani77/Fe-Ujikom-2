@@ -169,16 +169,16 @@ export default function UserListView() {
             // { name: 'User', href: paths.dashboard.user.root },
             { name: 'List' },
           ]}
-          // action={
-          //   <Button
-          //     component={RouterLink}
-          //     href={paths.dashboard.user.new}
-          //     variant="contained"
-          //     startIcon={<Iconify icon="mingcute:add-line" />}
-          //   >
-          //     New User
-          //   </Button>
-          // }
+          action={
+            <Button
+              component={RouterLink}
+              href={paths.dashboard.user.new}
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+            >
+              Buat User Baru
+            </Button>
+          }
           sx={{
             mb: { xs: 3, md: 5 },
           }}
